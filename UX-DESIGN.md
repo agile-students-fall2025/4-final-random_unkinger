@@ -17,7 +17,7 @@ This screen is the first step in adding an item, giving the user two methods: "S
 ### Scanned Image
 This screen displays the successful result of the scan and a button to "Add Meal".
 
-### add meal
+### Add Meal
 This screen is used to manually search for a food product to log as a meal. It includes a search bar, and options to filter the search results by Products, Food, and Record. The main area shows a "Search results" prompt.
 
 ### Add Activity	
