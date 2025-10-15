@@ -29,7 +29,7 @@ This screen is the first step in adding an item, giving the user two methods: "S
 ### Scanned Image
 ![Scanned Image](ux-design/Scanned%20Image.png)
 
-This screen displays the successful result of the scan and a button to log the item immediately.
+This screen displays the successful result of the scan.
 
 ### Add Meal
 ![Add Meal](ux-design/add%20meal.png)
@@ -59,4 +59,4 @@ This is the review and confirmation screen after a successful product scan. It d
 ### User Profile
 ![User Profile](ux-design/user%20profile.png)
 
-The User Profile screen allows the user to view and update personal data such as name, age, height, weight, and fitness settings like activity level and calorie goal. It also includes options to connect a fitness account and log out of the app.
+This screen allows the user to view and update personal data such as name, age, height, weight, and fitness settings like activity level and calorie goal. It also includes options to connect a fitness account and log out of the app.
