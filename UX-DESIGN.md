@@ -32,12 +32,12 @@ This screen displays the successful result of the scan and a button to log the i
 ### Add Meal
 ![Add Meal](ux-design/add%20meal.png)
 
-This screen is used to manually search for a food product to add to their log. 
+This screen is used to manually search for a food product to add to the log. 
 
 ### Add Activity	
 ![Add Activity](ux-design/Add%20Activity.png)
 
-This screen allows the user to log a physical activity. It has input fields for the Name of the activity and the Activity Duration. It then calculates and displays the total calories burned before the user can log the activity.
+This screen allows the user to log a physical activity. It then calculates and displays the total calories burned before the user can log the activity.
 
 ### Diary 
 ![Diary](ux-design/Diary.png)
