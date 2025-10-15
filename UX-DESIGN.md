@@ -30,3 +30,6 @@ This screen shows the detailed daily log entries. For a specific date, it lists 
 
 ### Scanned Product Screen 
 This is the review and confirmation screen after a successful product scan. It displays the food item name, brand, and a nutritional summary. It features an nutrition information section where the user can input the quantity and unit of the portion consumed. 
+
+### User Profile
+The User Profile screen allows the user to view and update personal data such as name, age, height, weight and fitness settings like activity level and calorie goal. It also includes options to connect a fitness account and log out of the app.
