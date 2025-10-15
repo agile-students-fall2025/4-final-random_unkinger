@@ -17,4 +17,14 @@ This screen is the first step in adding an item, giving the user two methods: "S
 ### Scanned Image
 This screen displays the successful result of the scan and a button to "Add Meal".
 
+### add meal
+This screen is used to manually search for a food product to log as a meal. It includes a search bar, and options to filter the search results by Products, Food, and Record. The main area shows a "Search results" prompt.
 
+### Add Activity	
+This screen allows the user to log a physical activity. It has input fields for the Name of the activity and the Activity Duration. It then calculates and displays the Total Calories Burned before the user can click "Add".
+
+### Diary 
+This screen displays the monthly calendar view for the user's log. The selected day is highlighted (the 19th of September 2021). Below the calendar, it lists the log entries for the selected day (e.g., "Nothing added"), and provides a button to "+Quick Add Activity".
+
+### Daily Log View	
+This screen shows the detailed daily log entries. For a specific date, it lists each meal or food item, along with its name/notes, and a breakdown of its calories, protein, fat, and carbs.
