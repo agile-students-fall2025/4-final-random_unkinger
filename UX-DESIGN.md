@@ -1,6 +1,9 @@
 # User Experience Design
 
-# Wideframes
+# App Map
+![App map](ux-design/AppMap.png)
+
+# Wireframes
 ### Sign up	
 ![Sign up](ux-design/Sign%20up.png)  
 
