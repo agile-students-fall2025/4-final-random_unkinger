@@ -28,3 +28,6 @@ This screen displays the monthly calendar view for the user's log. Below the cal
 
 ### Daily Log View	
 This screen shows the detailed daily log entries. For a specific date, it lists each meal or food item, along with its name/notes, and a breakdown of its calories, protein, fat, and carbs.
+
+### Scanned Product Screen 
+This is the review and confirmation screen after a successful product scan. It displays the Food Item Name, Brand, a placeholder for the item's image, and a nutritional summary. It features an "Nutrition Information" section where the user can input the quantity and unit of the portion eaten before logging the meal. There is also an edit icon in the top right where the user can modify the product's details.
