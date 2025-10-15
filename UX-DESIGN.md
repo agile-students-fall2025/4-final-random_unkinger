@@ -3,6 +3,8 @@
 # App Map
 ![App map](ux-design/AppMap.png)
 
+On the home screen, the user can see their "daily progress of their calorie summary and have the option to add a meal or activity to the current day. The bottom navigation menu also allows them to navigate to Learn/History/User Profile. Users will also be able to access the button to go to their settings for the app. The Learn tab brings users to a list of articles that provides users with educational content and tips on building healthy eating habits and nutrition knowledge and allows them to save/favorite articles they find useful. The Learn screen also displays an interactive pie chart with various food groups. Clicking on each food group pulls up the nutritional balance of the category. History contains a detailed record of their past recordings (each day) while also allowing users to make any edits to meals/activities. Add Meal section supports both manual input and also scanning to log the meal.
+
 # Wireframes
 ### Sign up	
 ![Sign up](ux-design/Sign%20up.png)  
