@@ -11,7 +11,7 @@ This screen is for existing users to access their account. There's also a link t
 The Home screen serves as the main dashboard, displaying the user's current calorie balance and a summary of their activity and macros. It provides quick access to log both physical activities and meals.
 
 ### Add Option	
-![Add Option]((ux-design/Add%20Option.png)
+![Add Option](ux-design/Add%20Option.png)
 This screen is the first step in adding an item, giving the user two methods: "Search Product" for manual entry and "Scan Product" to use the camera.
 
 ### Scanned Image
