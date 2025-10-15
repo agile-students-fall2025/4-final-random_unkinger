@@ -24,7 +24,7 @@ This screen is used to manually search for a food product to log as a meal. It i
 This screen allows the user to log a physical activity. It has input fields for the Name of the activity and the Activity Duration. It then calculates and displays the Total Calories Burned before the user can click "Add".
 
 ### Diary 
-This screen displays the monthly calendar view for the user's log. The selected day is highlighted (the 19th of September 2021). Below the calendar, it lists the log entries for the selected day (e.g., "Nothing added"), and provides a button to "+Quick Add Activity".
+This screen displays the monthly calendar view for the user's log. Below the calendar, it lists the log entries for the selected day (e.g., "Nothing added"), and provides a button to "+Quick Add Activity".
 
 ### Daily Log View	
 This screen shows the detailed daily log entries. For a specific date, it lists each meal or food item, along with its name/notes, and a breakdown of its calories, protein, fat, and carbs.
