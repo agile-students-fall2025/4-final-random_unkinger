@@ -2,7 +2,7 @@
 
 # Wideframes
 ### Sign up	
-![Sign up](ux-design/Sign%20up.png)
+![Sign up](ux-design/Sign%20up.png)  
 
 This screen is for new users to create an account. It also has a link for existing users to sign in.
 
