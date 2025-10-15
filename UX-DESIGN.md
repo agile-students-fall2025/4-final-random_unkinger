@@ -29,7 +29,7 @@ This screen is the first step in adding an item, giving the user two methods: "S
 ### Scanned Image
 ![Scanned Image](ux-design/Scanned%20Image.png)
 
-This screen displays the successful result of the scan.
+This screen indicates whether the item was successfully scanned.
 
 ### Add Meal
 ![Add Meal](ux-design/add%20meal.png)
