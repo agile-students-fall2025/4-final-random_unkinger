@@ -2,10 +2,10 @@
 
 # Wideframes
 ### Sign up	
-This screen is for new users to create an account. It features fields for Username and Password, and a button to "Create account." It also has a link for existing users to sign in.
+This screen is for new users to create an account. It features fields for username and password, and a button to "Create account." It also has a link for existing users to sign in.
 
 ### Login Page
-This screen is for existing users to access their account. It includes input fields for Username and Password, and a "Login" button. There's also a link to sign up for new users.
+This screen is for existing users to access their account. It includes input fields for username and password, and a "Login" button. There's also a link to sign up for new users.
 
 ### Home
 The main dashboard displaying a user's calorie balance, options to track meals and activity such as "Quick Add Activity" and "Quick Add Meal", a list of recent Activity, and a typical navigation bar at the bottom.
@@ -18,7 +18,7 @@ This screen is the first step in adding an item, giving the user two methods: "S
 This screen displays the successful result of the scan and a button to "Add Meal".
 
 ### Add Meal
-This screen is used to manually search for a food product to log as a meal. It includes a search bar, and options to filter the search results by Products, Food, and Record. The main area shows a "Search results" prompt.
+This screen is used to manually search for a food product to log as a meal. It includes a search bar, and options to filter the search results by products, food, and recent.
 
 ### Add Activity	
 This screen allows the user to log a physical activity. It has input fields for the Name of the activity and the Activity Duration. It then calculates and displays the Total Calories Burned before the user can click "Add".
