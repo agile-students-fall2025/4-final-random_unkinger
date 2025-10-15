@@ -27,7 +27,7 @@ This screen is the first step in adding an item, giving the user two methods: "S
 This screen displays the successful result of the scan and a button to log the item immediately.
 
 ### Add Meal
-![Add Meal](ux-design/Add%20Meal.png)
+![Add Meal](ux-design/add%20meal.png)
 
 This screen is used to manually search for a food product to add to their log. 
 
@@ -52,6 +52,6 @@ This screen shows the detailed daily log entries. For a specific date, it lists 
 This is the review and confirmation screen after a successful product scan. It displays the food item name, brand, and a nutritional summary. Users can input the quantity and unit of the portion consumed. 
 
 ### User Profile
-![User Profile](ux-design/User%20Profile.png)
+![User Profile](ux-design/user%20profile.png)
 
 The User Profile screen allows the user to view and update personal data such as name, age, height, weight, and fitness settings like activity level and calorie goal. It also includes options to connect a fitness account and log out of the app.
