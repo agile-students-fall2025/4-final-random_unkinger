@@ -15,6 +15,6 @@ This screen is the first step in adding an item, giving the user two methods: "S
 
 
 ### Scanned Image
-This screen displays the successful result of the scan, showing a large placeholder for the "Scanned Item Image" and a button to "+Add Meal".
+This screen displays the successful result of the scan and a button to "Add Meal".
 
 
