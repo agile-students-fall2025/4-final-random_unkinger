@@ -19,7 +19,7 @@ This screen is for existing users to access their account. There's also a link t
 ### Home
 ![Home](ux-design/Home.png)
 
-The Home screen serves as the main dashboard, displaying the user's current calorie balance and a summary of their activity and macros. It provides quick access to log both physical activities and meals.
+The home screen serves as the main dashboard, displaying the user's current calorie balance and a summary of their activity and macros. It provides quick access to log both physical activities and meals.
 
 ### Add Option	
 ![Add Option](ux-design/ao.png)
