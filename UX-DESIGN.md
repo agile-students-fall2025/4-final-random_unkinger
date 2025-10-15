@@ -1,7 +1,7 @@
 # User Experience Design
 
 # Prototype Link
-[Prototype](https://www.figma.com/proto/RGe8bwSlxjOgkz6uzFARct/Food-Tracker-Wireframes?node-id=0-1&t=xTtJM4DEe1uLThM6-1)
+[Prototype](https://www.figma.com/proto/RGe8bwSlxjOgkz6uzFARct/Food-Tracker-Wireframes?node-id=103-641&p=f&t=7yLC9YwLQSylTKpI-0)
 
 # App Map
 ![App map](ux-design/AppMap.png)
