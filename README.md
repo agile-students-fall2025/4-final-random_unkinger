@@ -13,8 +13,8 @@ Sprint 0 Roles:
 - [Jiaying Chen](https://github.com/jiaying0412)
 - [Kazi Hossain](https://github.com/kazisean)
 - [Lanxi Lin](https://github.com/player1notfound)
-- [Maya Felix](https://github.com/mxf4596) (*Scrum Master*)
-- [Pranathi Chinthalapani](https://github.com/PranathiChin) (*Product Owner*)
+- [Maya Felix](https://github.com/mxf4596)
+- [Pranathi Chinthalapani](https://github.com/PranathiChin)
 
 ## Project History
 NutriLens came to be through the Agile Software Development & DevOps class for Fall 2025. Our team completed a project proposal to work on for the entire semester, the outcome of that being NutriLens. We were inspired by how complicated nutrition apps can be — endless numbers, confusing data, and cluttered interfaces that make eating healthy feel like work. We wanted to design something that felt different: a playful, intelligent companion that makes food tracking simple, educational, and even fun.
