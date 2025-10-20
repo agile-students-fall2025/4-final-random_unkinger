@@ -37,9 +37,29 @@
 - Provide small descriptive commit messages.
 - Don't leave dead/commented out code behind. If you see such code, delete it.
 
-## Code Review and Requests
-- every pull request (PR) must be reviewed by at least one teammate before merging
-- use clear titles and concise descriptions in every PR
+## Git Workflow
+Default branch: `master`
+
+- Work on your own branch named **<yourname>**; do not commit directly to `master`.
+- Commit messages: **one line**, meaningful and concise (what changed + why).
+- Open a Pull Request to `master`; **at least 1 peer review is required** before merge.
+
+**Steps**
+```bash
+# update local master
+git checkout master
+git pull origin master
+
+# create your branch
+git checkout -b <new-branch-name>
+
+# stage and commit (one-line message)
+git add .
+git commit -m "meaningful one-line message"
+
+# push your branch and open a PR to master
+git push origin <new-branch-name>
+
 
 
 ## Concluding thoughts
