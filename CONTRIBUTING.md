@@ -40,7 +40,7 @@
 ## Git Workflow
 Default branch: `master`
 
-- Work on your own branch named **<new-branch-name>**; do not commit directly to `master`.
+- Work on your new branch named **<new-branch-name>**; do not commit directly to `master`.
 - Commit messages: **one line**, meaningful and concise (what changed + why).
 - Open a Pull Request to `master`; **at least 1 peer review is required** before merge.
 
