@@ -4,15 +4,20 @@
 # Team norms
 
 - be active in the chat room
+- communicate blockers early/dont do work last minute
+- respect each other’s time zones, workloads, and schedules.
 
 
 ## Team values
 
-- Be open minded to explore different ideas and provide feedback on every decisions 
+- Be open minded to explore different ideas and provide feedback on every decisions
+- encourage constructive criticism
 
 ## Sprint cadence
 
 - each sprint should last 2 weeks
+- use GitHub Projects (or your task board) to track deliverables and ownership
+- each member must have at least one assigned and actionable item per sprint to make sure everyone is contributing
 
 ## Daily standups
 
@@ -28,6 +33,11 @@
 - Make granular and small commits, per feature or per bug fix.
 - Provide small descriptive commit messages.
 - Don't leave dead/commented out code behind. If you see such code, delete it.
+
+## Code Review and Requests
+- every pull request (PR) must be reviewed by at least one teammate before merging
+- use clear titles and concise descriptions in every PR
+
 
 ## Concluding thoughts
 
