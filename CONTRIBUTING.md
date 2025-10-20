@@ -4,14 +4,17 @@
 # Team norms
 
 - be active in the chat room
+- regularly update others on your progress (through standups, chat, or Git commits)
 - communicate blockers early/dont do work last minute
 - respect each other’s time zones, workloads, and schedules.
 
 
 ## Team values
 
-- Be open minded to explore different ideas and provide feedback on every decisions
+- be open minded to explore different ideas and provide feedback on every decisions
+- make sure all voices are heard, especially quieter member
 - encourage constructive criticism
+- recognize that teammates have different strengths, learning styles, and life circumstances
 
 ## Sprint cadence
 
