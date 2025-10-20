@@ -59,8 +59,7 @@ git commit -m "meaningful one-line message"
 
 # push your branch and open a PR to master
 git push origin <new-branch-name>
-
-
+```
 
 ## Concluding thoughts
 
