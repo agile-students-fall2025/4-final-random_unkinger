@@ -1,23 +1,12 @@
 import './App.css';
 import LoginSignup from './Components/LoginSignup/LoginSignup';
-import Profile from "./Components/Profile/Profile";
-import Search from "./Components/Search/Search";
-import ActivityTracking from "./Components/ActivityTracking/ActivityTracking";
-import AddMeal from './Components/ScanFood/AddMeal';
-import ScanMeal from './Components/ScanFood/ScanMeal'
+import Home from './Components/Home/Home'
 
 function App() {
   return (
     <div>
-
-      {/* Uncomment the page you want to see: */}
       <LoginSignup/>
-      {/* <Profile /> */}
-      {/* <Search /> */}
-      {/* <ActivityTracking /> */}
-      {/* <AddMeal/> */}
-      {/* <ScanMeal/> */}
-
+      <Home/>
     </div>
   );
 }
