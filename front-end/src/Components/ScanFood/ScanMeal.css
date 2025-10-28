@@ -1,0 +1,31 @@
+.scan-meal-page {
+    min-height: 100vh;
+    background-color: lightskyblue;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.camera-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+.camera-feed {
+    width: 400px;
+    height: 300px;
+    object-fit: cover;
+}
+
+.error-message {
+    width: 400px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
