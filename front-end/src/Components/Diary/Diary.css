@@ -1,16 +1,19 @@
 .diary-container {
+  margin: 0 auto; 
+  max-width: 600px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #f9fafb;
-  color: #333;
+  color: #000000;
 }
 
 .header {
   background: #d1d5db;
+  color: #000000;
   text-align: center;
   padding: 10px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.2rem;
 }
 
@@ -47,7 +50,7 @@
 }
 
 .weekday {
-  font-weight: 600;
+  font-weight: 500;
   color: #6b7280;
 }
 
