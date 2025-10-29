@@ -10,7 +10,7 @@ export default function Diary({ currentDate, onDateSelect }) {
     "July", "August", "September", "October", "November", "December",
   ];
 
-  // --- navigate months ---
+ 
   const handlePrevMonth = () => {
     if (month === 0) {
       setMonth(11);
@@ -29,13 +29,13 @@ export default function Diary({ currentDate, onDateSelect }) {
     }
   };
 
-  // --- calendar calculations ---
+
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const handleDayClick = (day) => {
     const newDate = new Date(year, month, day);
-    onDateSelect(newDate); // go back to daily log
+    onDateSelect(newDate); 
   };
 
   const days = [];

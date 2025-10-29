@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./DailyLog.css";
-import Diary from "../Diary/Diary"; // Import diary
+import Diary from "../Diary/Diary"; 
 
-// Simple pencil emoji instead of lucide-react icon
+
 const Pencil = () => <span style={{ fontSize: "14px" }}>✏️</span>;
 
 const mockMeals = [
@@ -13,25 +13,25 @@ const mockMeals = [
 ];
 
 export default function DailyLog() {
-  // --- state for toggling diary and current date ---
+
   const [showDiary, setShowDiary] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // formatted date for header
+ 
   const formattedDate = selectedDate.toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
     day: "numeric",
   });
 
-  // --- if diary is open, render it instead ---
+
   if (showDiary) {
     return (
       <Diary
         currentDate={selectedDate}
         onDateSelect={(newDate) => {
           setSelectedDate(newDate);
-          setShowDiary(false); // return to daily log
+          setShowDiary(false);
         }}
       />
     );
