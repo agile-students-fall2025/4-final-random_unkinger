@@ -1,0 +1,104 @@
+.dailylog-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+  color: #333;
+}
+
+.header {
+  background: #d1d5db;
+  text-align: center;
+  padding: 10px;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.date-btn {
+  display: block;
+  margin: 0 auto 20px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1f2937;
+}
+
+.meal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meal-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.meal-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.meal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+.macros p {
+  margin: 2px 0;
+}
+
+.added {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.edit-btn {
+  background: #e5e7eb;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: #d1d5db;
+}
+
+.footer {
+  background: #e5e7eb;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 1px solid #d1d5db;
+}
+
+.footer button {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+.footer button:hover {
+  color: #000;
+}
