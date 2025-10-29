@@ -1,0 +1,128 @@
+.dailylog-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+  color: #000000;
+  font-weight:700;
+  font-size: 1.2rem;
+}
+
+.header {
+  background: #d1d5db;
+  color: #000000;
+  text-align: center;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.date-btn {
+  display: block;
+  margin: 0 auto 20px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1f2937;
+}
+
+.meal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meal-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.meal-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.meal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+.macros p {
+  margin: 2px 0;
+}
+
+.added {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.edit-btn {
+  background: #e5e7eb;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: #d1d5db;
+}
+
+
+
+@media (max-width: 520px) {
+  .content {
+    padding: 10px;
+  }
+
+  .meal-card {
+    flex-direction: column; /* stack image above info */
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .meal-image {
+    width: 100%;
+    height: auto; /* scale with width */
+    margin-right: 0;
+    margin-bottom: 8px;
+    border-radius: 12px;
+  }
+
+  .meal-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .macros p {
+    font-size: 0.9rem; /* smaller text for mobile */
+  }
+
+  .date-btn {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  
+}
