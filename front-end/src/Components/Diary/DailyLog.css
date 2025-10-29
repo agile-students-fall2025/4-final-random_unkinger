@@ -1,11 +1,15 @@
 .dailylog-container {
+  margin: 0 auto; 
+  max-width: 600px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #f9fafb;
   color: #000000;
-  font-weight:700;
-  font-size: 1.2rem;
+  font-weight:100;
+  font-size: 1rem;
+  margin-top: 30px;
+
 }
 
 .header {
@@ -39,6 +43,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+ 
 }
 
 .meal-card {
@@ -61,18 +66,24 @@
 .meal-info {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex: 1;
 }
 
+
 .macros p {
   margin: 2px 0;
+  text-align: right;
 }
 
 .added {
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   color: #6b7280;
+  text-align:center;
+  margin: 8px 0 2px 0;
 }
+
+
 
 .edit-btn {
   background: #e5e7eb;

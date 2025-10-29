@@ -6,8 +6,8 @@ import AddMeal from './Components/ScanFood/AddMeal';
 import ScanMeal from './Components/ScanFood/ScanMeal';
 import ActivityTracking from "./Components/ActivityTracking/ActivityTracking"
 
-//import Diary from './Components/Diary/Diary';
-//import DailyLog from './Components/Diary/DailyLog';
+import Diary from './Components/Diary/Diary';
+import DailyLog from './Components/Diary/DailyLog';
 
 //import Search from "./Components/Search/Search"
 
@@ -21,11 +21,10 @@ function App() {
       <ScanMeal/>
 
       {/* <Search/> */}
-
       <ActivityTracking/>
 
-      {/* <Diary/> */}
-      {/* <DailyLog/> */}
+      <Diary/> 
+      <DailyLog/> 
 
       <Profile/>
       

@@ -1,43 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
 import "./DailyLog.css";
-import Diary from "../Diary/Diary"; 
 
-
+// Simple pencil emoji instead of lucide-react icon
 const Pencil = () => <span style={{ fontSize: "14px" }}>✏️</span>;
 
 const mockMeals = [
-  { id: 1, image: "https://picsum.photos/200", time: "08:30 AM" },
-  { id: 2, image: "https://picsum.photos/200", time: "12:45 PM" },
-  { id: 3, image: "https://picsum.photos/200", time: "06:10 PM" },
-  { id: 4, image: "https://picsum.photos/200", time: "09:00 PM" },
+  { id: 1, image: "https://picsum.photos/id/63/5000/2813", time: "08:30 AM" },
+  { id: 2, image: "https://picsum.photos/id/63/5000/2813", time: "12:45 PM" },
+  { id: 3, image: "https://picsum.photos/id/63/5000/2813", time: "06:10 PM" },
+  { id: 4, image: "https://picsum.photos/id/63/5000/2813", time: "09:00 PM" },
 ];
 
 export default function DailyLog() {
-
-  const [showDiary, setShowDiary] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
- 
-  const formattedDate = selectedDate.toLocaleDateString("en-US", {
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
     day: "numeric",
   });
 
-
-  if (showDiary) {
-    return (
-      <Diary
-        currentDate={selectedDate}
-        onDateSelect={(newDate) => {
-          setSelectedDate(newDate);
-          setShowDiary(false);
-        }}
-      />
-    );
-  }
-
-  // --- otherwise render daily log view ---
   return (
     <div className="dailylog-container">
       <header className="header">
@@ -46,8 +27,7 @@ export default function DailyLog() {
       </header>
 
       <main className="content">
-        {/* Clicking this opens Diary */}
-        <button className="date-btn" onClick={() => setShowDiary(true)}>
+        <button className="date-btn">
           Date: {formattedDate}
         </button>
 
@@ -57,10 +37,10 @@ export default function DailyLog() {
               <img src={meal.image} alt="Meal" className="meal-image" />
               <div className="meal-info">
                 <div className="macros">
-                  <p>Protein = 00%</p>
-                  <p>Fat = 00%</p>
-                  <p>Carbs = 00%</p>
-                  <p>Calories = 000</p>
+                  <p>Protein = 1%</p>
+                  <p>Fat = 2%</p>
+                  <p>Carbs = 10%</p>
+                  <p>Calories = 100</p>
                   <p className="added">Added: {meal.time}</p>
                 </div>
                 <button className="edit-btn">

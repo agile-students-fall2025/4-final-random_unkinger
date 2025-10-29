@@ -1,42 +1,21 @@
 import React, { useState } from "react";
+import "../LoginSignup/LoginSignup.css";
 import "./Diary.css";
 
-export default function Diary({ currentDate, onDateSelect }) {
-  const [year, setYear] = useState(currentDate.getFullYear());
-  const [month, setMonth] = useState(currentDate.getMonth());
+export default function Diary() {
+  const today = new Date();
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+  const [selectedDay, setSelectedDay] = useState(null); // Track clicked day
 
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December",
   ];
-
- 
-  const handlePrevMonth = () => {
-    if (month === 0) {
-      setMonth(11);
-      setYear((prev) => prev - 1);
-    } else {
-      setMonth((prev) => prev - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (month === 11) {
-      setMonth(0);
-      setYear((prev) => prev + 1);
-    } else {
-      setMonth((prev) => prev + 1);
-    }
-  };
-
+  const years = Array.from({ length: 16 }, (_, i) => 2010 + i);
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const handleDayClick = (day) => {
-    const newDate = new Date(year, month, day);
-    onDateSelect(newDate); 
-  };
 
   const days = [];
   for (let i = 0; i < firstDay; i++) days.push("");
@@ -44,43 +23,44 @@ export default function Diary({ currentDate, onDateSelect }) {
 
   return (
     <div className="diary-container">
-      <header className="header">Select a Date</header>
+      <header className="header">
+        <div className="text">Diary</div>
+        <div className="underline"></div>
+      </header>
+      
       <main className="content">
-        {/* Month/Year Header with Arrows */}
         <div className="month-bar">
-          <button onClick={handlePrevMonth} className="arrow-btn">&lt;</button>
-          <span className="month-year">
-            {months[month]} {year}
-          </span>
-          <button onClick={handleNextMonth} className="arrow-btn">&gt;</button>
+          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>‹</button>
+          <div>
+            <h2>
+              {months[month]} {year}
+            </h2>
+          </div>
+          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>›</button>
         </div>
 
-        {/* Calendar grid */}
         <div className="calendar">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-            <div key={d} className="weekday">
-              {d}
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div key={day} className="weekday">
+              {day}
             </div>
           ))}
-
-          {days.map((day, i) => (
+          {days.map((day, index) => (
             <div
-              key={i}
-              className={`day-cell ${day ? "clickable" : ""}`}
-              onClick={() => day && handleDayClick(day)}
+              key={index}
+              className={`day-cell ${day ? "clickable" : ""} ${selectedDay === day ? "selected" : ""}`}
+              onClick={() => day && setSelectedDay(day)}
             >
               {day}
             </div>
           ))}
         </div>
 
-        {/* Add Activity Button */}
-        <button className="add-btn">+ Add Activity</button>
-
-        {/* Back Button */}
-        <button className="back-btn" onClick={() => onDateSelect(currentDate)}>
-          ← Back
-        </button>
+        {selectedDay && (
+          <div className="selected-info">
+            <p>Selected: {months[month]} {selectedDay}, {year}</p>
+          </div>
+        )}
       </main>
     </div>
   );
