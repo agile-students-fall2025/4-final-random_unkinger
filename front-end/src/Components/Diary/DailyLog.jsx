@@ -15,7 +15,11 @@ export default function DailyLog() {
 
   return (
     <div className="dailylog-container">
-      <header className="header">Diary</header>
+
+      <header className="header">
+        <div className="text">Diary</div>
+        <div className="underline"></div>
+      </header>
 
       <main className="content">
         <button className="date-btn" onClick={()=> navigate("/diary")}>

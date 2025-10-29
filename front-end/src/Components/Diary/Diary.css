@@ -73,22 +73,41 @@
   border-color: #f97316;
 }
 
-.footer {
-  background: #e5e7eb;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-  border-top: 1px solid #d1d5db;
+
+/* Mobile responsiveness */
+@media (max-width: 520px) {
+  .content {
+    padding: 10px;
+  }
+
+  .month-bar {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .month-bar h2 {
+    font-size: 1rem;
+  }
+
+  .month-bar button {
+    font-size: 1.25rem;
+  }
+
+  .calendar {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .day-cell {
+    height: 40px;
+    font-size: 0.8rem;
+  }
+
+  .day-cell.clickable {
+    font-size: 0.85rem;
+  }
+
+ 
 }
 
-.footer button {
-  background: none;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  color: #374151;
-}
-
-.footer button:hover {
-  color: #000;
-}
