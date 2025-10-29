@@ -1,0 +1,93 @@
+.edit-item-page {
+  padding: 40px 20px;
+  background-color: #f0f2f5;
+}
+
+.food-brand {
+  font-size: 20px;
+  color: #666;
+}
+
+.edit-item-container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.food-grams {
+  font-size: 19px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.food-image {
+  width: 200px;
+  height: 200px;
+  background-color: #eaeaea;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: grey;
+  font-size: 19px;
+  border-radius: 8px;
+}
+
+.food-calories {
+  font-size: 24px;
+  font-weight: 600;
+  color: grey;
+  margin-bottom: 30px;
+}
+
+.nutrient-tables {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.nutrient-table {
+  padding: 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  width: 100px;
+}
+
+.nutrient-table h4 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: #333;
+}
+
+.nutrient-table p {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: #f48b14;
+}
+
+.nutrition-info-container {
+  background-color: #f8f9fa;
+  padding: 25px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.nutrition-info-header {
+  text-align: left;
+  font-size: 23px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.quantity-unit-inputs {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
