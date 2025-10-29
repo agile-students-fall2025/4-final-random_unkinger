@@ -1,58 +1,87 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./Diary.css";
 
-export default function Diary() {
-  const navigate=useNavigate();
-  const today=new Date();
-  const [month,setMonth]=useState(today.getMonth());
-  const [year,setYear]=useState(today.getFullYear());
+export default function Diary({ currentDate, onDateSelect }) {
+  const [year, setYear] = useState(currentDate.getFullYear());
+  const [month, setMonth] = useState(currentDate.getMonth());
 
-  const months=[
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December",
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
 
-  const years=Array.from({ length:16 }, (_, i) => 2010 + i);
-  const firstDay=new Date(year,month, 1).getDay();
-  const daysInMonth=new Date(year,month+1,0).getDate();
+  // --- navigate months ---
+  const handlePrevMonth = () => {
+    if (month === 0) {
+      setMonth(11);
+      setYear((prev) => prev - 1);
+    } else {
+      setMonth((prev) => prev - 1);
+    }
+  };
 
-  const days=[];
-  for (let i=0;i< firstDay;i++) days.push("");
-  for (let d=1;d<= daysInMonth; d++) days.push(d);
+  const handleNextMonth = () => {
+    if (month === 11) {
+      setMonth(0);
+      setYear((prev) => prev + 1);
+    } else {
+      setMonth((prev) => prev + 1);
+    }
+  };
+
+  // --- calendar calculations ---
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const handleDayClick = (day) => {
+    const newDate = new Date(year, month, day);
+    onDateSelect(newDate); // go back to daily log
+  };
+
+  const days = [];
+  for (let i = 0; i < firstDay; i++) days.push("");
+  for (let d = 1; d <= daysInMonth; d++) days.push(d);
 
   return (
     <div className="diary-container">
-      <header className="header">Diary</header>
-
+      <header className="header">Select a Date</header>
       <main className="content">
+        {/* Month/Year Header with Arrows */}
         <div className="month-bar">
-          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>‹</button>
-          <div>
-            <h2>{months[month]} {year}</h2>
-
-          </div>
-          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>›</button>
+          <button onClick={handlePrevMonth} className="arrow-btn">&lt;</button>
+          <span className="month-year">
+            {months[month]} {year}
+          </span>
+          <button onClick={handleNextMonth} className="arrow-btn">&gt;</button>
         </div>
 
+        {/* Calendar grid */}
         <div className="calendar">
-          {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((day) => (
-            <div key={day} className="weekday">{day}</div>
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+            <div key={d} className="weekday">
+              {d}
+            </div>
           ))}
 
-          {days.map((day, index) => (
+          {days.map((day, i) => (
             <div
-              key={index}
+              key={i}
               className={`day-cell ${day ? "clickable" : ""}`}
-              onClick={() => day && navigate("/")}
+              onClick={() => day && handleDayClick(day)}
             >
               {day}
             </div>
           ))}
         </div>
+
+        {/* Add Activity Button */}
+        <button className="add-btn">+ Add Activity</button>
+
+        {/* Back Button */}
+        <button className="back-btn" onClick={() => onDateSelect(currentDate)}>
+          ← Back
+        </button>
       </main>
-
-
     </div>
   );
 }
