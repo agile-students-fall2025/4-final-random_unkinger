@@ -60,11 +60,22 @@
     font-weight: bold;
   }
   
-  .macros {
+.home-container .macros {
     display: flex;
-    justify-content: space-around;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
     margin: 2rem 0;
-  }
+}
+
+.home-container .macro { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 0;
+}
   
   .macro-ring {
     width: 40px;

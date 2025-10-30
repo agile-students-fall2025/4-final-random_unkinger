@@ -14,21 +14,21 @@ import DailyLog from './Components/Diary/DailyLog';
 
 function App() {
   return (
-    <div>
-      <LoginSignup />
-      <Home />
-      <AddMeal />
-      <ScanMeal />
-      <EditMeal />
+    <div className="mobile-app-shell">
+      <div className="mobile-section"><div className="page-frame"><LoginSignup /></div></div>
+      <div className="mobile-section"><div className="page-frame"><Home /></div></div>
+      <div className="mobile-section"><div className="page-frame"><AddMeal /></div></div>
+      <div className="mobile-section"><div className="page-frame"><ScanMeal /></div></div>
+      <div className="mobile-section"><div className="page-frame"><EditMeal /></div></div>
 
       {/* <Search/> */}
 
-      <ActivityTracking />
+      <div className="mobile-section"><div className="page-frame"><ActivityTracking /></div></div>
 
-      <Diary/> 
-      <DailyLog/> 
+      <div className="mobile-section"><div className="page-frame"><Diary/></div></div>
+      <div className="mobile-section"><div className="page-frame"><DailyLog/></div></div>
 
-      <Profile />
+      <div className="mobile-section"><div className="page-frame"><Profile /></div></div>
     </div>
   );
 }
