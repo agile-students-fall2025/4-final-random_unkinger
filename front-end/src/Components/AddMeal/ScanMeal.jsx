@@ -20,7 +20,7 @@ const ScanMeal = () => {
           }
         } catch (err) {
           console.log("BRO GIVE ME CAMERA PERMISSION!!", err);
-          setError("Could not access camera! Please geant permission!");
+          setError("Could not access camera! Please grant permission!");
         }
       } else {
         setError("Browser does not support camera access");
