@@ -1,25 +1,37 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./EditMeal.css";
 
 const EditMeal = () => {
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("gram");
+  const navigate = useNavigate();
 
   const handleAdd = () => {
-    console.log("add clicked");
+    navigate("/home");
   };
 
   return (
     <div className="edit-item-page">
       <div className="edit-item-container">
         <div className="header">
+          <button
+            onClick={() => navigate(-1)}
+            className="back-button"
+            aria-label="Back"
+          >
+            <i className="ri-arrow-left-line"></i>
+          </button>
           <div className="text">Food Item Name</div>
           <div className="underline"></div>
         </div>
         <p className="food-brand">FOOD BRAND</p>
         <p className="food-grams">100 gram</p>
         <div className="food-image">
-          <span>Food Image</span>
+          <img
+            src="https://fastly.picsum.photos/id/63/5000/2813.jpg?hmac=HvaeSK6WT-G9bYF_CyB2m1ARQirL8UMnygdU9W6PDvM"
+            alt="food"
+          />
         </div>
 
         <p className="food-calories">000 kcal / 000 g</p>

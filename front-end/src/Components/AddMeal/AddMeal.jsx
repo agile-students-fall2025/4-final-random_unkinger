@@ -1,21 +1,31 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../LoginSignup/LoginSignup.css";
 import "./AddMeal.css";
 
 const AddMeal = () => {
-    // TODO : 
-    const handleSearchClick = () => {
-        console.log("update later to go to search page")
-    }
+  const navigate = useNavigate();
 
-    const handleScanClick = () =>{
-        console.log("update later to go to scan page")
-    }
+  // TODO :
+  const handleSearchClick = () => {
+    navigate("/search");
+  };
+
+  const handleScanClick = () => {
+    navigate("/scan-meal");
+  };
 
   return (
     <div className="add-meal-page">
       <div className="container">
         <div className="header">
+          <button
+            onClick={() => navigate(-1)}
+            className="back-button"
+            aria-label="Back"
+          >
+            <i className="ri-arrow-left-line"></i>
+          </button>
           <div className="text">Quick Add Meal</div>
           <div className="underline"></div>
         </div>
@@ -25,7 +35,7 @@ const AddMeal = () => {
           </button>
 
           <button onClick={handleScanClick} className="action-button">
-                <span>Scan Product</span>
+            <span>Scan Product</span>
           </button>
         </div>
       </div>

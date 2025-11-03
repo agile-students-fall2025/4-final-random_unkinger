@@ -27,9 +27,7 @@ export default function DailyLog() {
       </header>
 
       <main className="content">
-        <button className="date-btn">
-          Date: {formattedDate}
-        </button>
+        <button className="date-btn">Date: {formattedDate}</button>
 
         <div className="meal-list">
           {mockMeals.map((meal) => (
