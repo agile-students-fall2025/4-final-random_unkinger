@@ -5,6 +5,11 @@
     color: #333;     
     padding: 20px;      
 }
+
+.dark-mode .welcome-text {
+    color: #ffffff;
+}
+
 .container{
     display: flex;
     flex-direction: column;
@@ -13,6 +18,10 @@
     width: 600px; 
     background: white;
     padding-bottom: 30px;
+}
+
+.dark-mode .container {
+    background: var(--color-secondary);
 }
 
 .header{
@@ -53,9 +62,17 @@
     border-radius: 6px;
 }
 
+.dark-mode .input {
+    background: #3a3a3a;
+}
+
 .input i{
     margin: 0px 30px;
     color: gray;
+}
+
+.dark-mode .input i {
+    color: #aaa;
 }
 
 .input input{
@@ -68,11 +85,23 @@
     font-size: 18px;
 }
 
+.dark-mode .input input {
+    color: #ffffff;
+}
+
+.dark-mode .input input::placeholder {
+    color: #aaa;
+}
+
 .forgot-password{
     padding-left: 62px;
     margin-top: 27px;
     color: #797979;
     font-size: 16px;
+}
+
+.dark-mode .forgot-password {
+    color: #aaa;
 }
 
 .forgot-password span{

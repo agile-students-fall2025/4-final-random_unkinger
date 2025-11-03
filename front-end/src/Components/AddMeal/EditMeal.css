@@ -1,11 +1,21 @@
 .edit-item-page {
   padding: 40px 20px;
   background-color: #f0f2f5;
+  min-height: 100vh;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .edit-item-page {
+  background-color: var(--color-bg);
 }
 
 .food-brand {
   font-size: 20px;
   color: #666;
+}
+
+.dark-mode .food-brand {
+  color: #ccc;
 }
 
 .edit-item-container {
@@ -15,12 +25,22 @@
   padding: 30px;
   border-radius: 8px;
   text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode .edit-item-container {
+  background: var(--color-secondary);
+  color: var(--color-text);
 }
 
 .food-grams {
   font-size: 19px;
   color: #888;
   margin-bottom: 20px;
+}
+
+.dark-mode .food-grams {
+  color: #bbb;
 }
 
 .food-image {
@@ -49,6 +69,10 @@
   margin-bottom: 30px;
 }
 
+.dark-mode .food-calories {
+  color: #ccc;
+}
+
 .nutrient-tables {
   display: flex;
   justify-content: space-around;
@@ -61,12 +85,21 @@
   border-radius: 8px;
   background: #f8f9fa;
   width: 100px;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .nutrient-table {
+  background: var(--color-bg);
 }
 
 .nutrient-table h4 {
   margin: 0 0 10px;
   font-size: 20px;
   color: #333;
+}
+
+.dark-mode .nutrient-table h4 {
+  color: var(--color-text);
 }
 
 .nutrient-table p {
@@ -81,6 +114,11 @@
   padding: 25px;
   border-radius: 8px;
   margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .nutrition-info-container {
+  background-color: var(--color-bg);
 }
 
 .nutrition-info-header {
@@ -89,6 +127,10 @@
   font-weight: 600;
   color: #333;
   margin-bottom: 20px;
+}
+
+.dark-mode .nutrition-info-header {
+  color: var(--color-text);
 }
 
 .quantity-unit-inputs {
@@ -106,6 +148,11 @@
   padding: 6px 10px;
   height: 48px;
   width: auto;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .quantity-unit-inputs .input {
+  background: #3a3a3a;
 }
 
 .quantity-unit-inputs .input:first-child {
@@ -125,4 +172,14 @@
   background: transparent;
   font-size: 16px;
   box-sizing: border-box;
+  color: #333;
+}
+
+.dark-mode .quantity-unit-inputs input,
+.dark-mode .quantity-unit-inputs select {
+  color: var(--color-text);
+}
+
+.dark-mode .quantity-unit-inputs input::placeholder {
+  color: #aaa;
 }

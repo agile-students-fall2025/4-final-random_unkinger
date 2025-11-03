@@ -6,12 +6,21 @@
     color: #333;
     font-family: 'Arial', sans-serif;
   }
+
+  .dark-mode .home-container {
+    color: #ffffff;
+  }
   
   .header {
     background: #ddd;
     padding: 1rem;
     align-items: left;
     font-weight: bold;
+  }
+
+  .dark-mode .header {
+    background: var(--color-secondary);
+    color: var(--color-text);
   }
   
   .logo-img {
@@ -21,6 +30,11 @@
   .app-name {
     font-weight: 600;
     font-size: 1.8rem;
+    color: var(--color-dark);
+  }
+
+  .dark-mode .app-name {
+    color: var(--color-text);
   }
   
   
@@ -33,6 +47,11 @@
   .date {
     font-weight: normal;
     margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .dark-mode .date {
+    color: #ffffff;
   }
   
   .calorie-circle {
@@ -53,11 +72,21 @@
   
   .circle-text {
     text-align: center;
+    color: #333;
+  }
+
+  .dark-mode .circle-text {
+    color: #ffffff;
   }
   
   .kcal {
     font-size: 1.8rem;
     font-weight: bold;
+    color: #333;
+  }
+
+  .dark-mode .kcal {
+    color: #ffffff;
   }
   
 .home-container .macros {
@@ -75,7 +104,16 @@
     align-items: center;
     flex: 1 1 0;
     min-width: 0;
-}
+    color: #333;
+  }
+
+  .dark-mode .home-container .macro {
+    color: #ffffff;
+  }
+
+  .dark-mode .home-container .macro p {
+    color: #ffffff;
+  }
   
   .macro-ring {
     width: 40px;
@@ -84,12 +122,29 @@
     border-radius: 50%;
     margin: 0 auto 0.5rem;
   }
+
+  .dark-mode .macro-ring {
+    border-color: #666;
+  }
   
   .section-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     justify-content: center;
+    color: #333;
+  }
+
+  .dark-mode .section-header {
+    color: #ffffff;
+  }
+
+  .dark-mode .section-header h3 {
+    color: #ffffff;
+  }
+
+  .dark-mode .section-header .icon {
+    color: #ffffff;
   }
   
   .add-btn {

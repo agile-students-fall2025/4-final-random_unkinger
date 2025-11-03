@@ -5,6 +5,11 @@
     align-items: flex-start;
     justify-content: center;
     box-sizing: border-box;
+    transition: background-color 0.3s ease;
+}
+
+.dark-mode .scan-meal-page {
+    background-color: var(--color-bg);
 }
 
 .camera-container {
@@ -28,4 +33,9 @@
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
+    color: #333;
+}
+
+.dark-mode .error-message {
+    color: var(--color-text);
 }

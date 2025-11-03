@@ -5,6 +5,12 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'remixicon/fonts/remixicon.css';
 
+// Initialize dark mode before first render to prevent flash
+const savedTheme = localStorage.getItem('darkMode');
+if (savedTheme === 'true') {
+  document.documentElement.classList.add('dark-mode');
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
