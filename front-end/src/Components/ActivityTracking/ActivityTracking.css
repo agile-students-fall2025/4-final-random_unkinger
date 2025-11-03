@@ -2,6 +2,11 @@
   min-height: 100vh;
   padding: 40px 20px;
   background-color: lightskyblue;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .activity-page {
+  background-color: var(--color-bg);
 }
 
 .activity-form {
@@ -24,6 +29,13 @@
   border-radius: 12px;
   padding: 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode .activities-list {
+  background: var(--color-secondary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: var(--color-text);
 }
 
 .list-header {
@@ -34,14 +46,26 @@
   text-align: center;
 }
 
+.dark-mode .list-header {
+  color: var(--color-text);
+}
+
 .empty-state {
   text-align: center;
   padding: 40px;
   color: #999;
 }
 
+.dark-mode .empty-state {
+  color: #aaa;
+}
+
 .empty-state p {
   font-size: 1.1rem;
+}
+
+.dark-mode .empty-state p {
+  color: #aaa;
 }
 
 .activities {
@@ -59,6 +83,10 @@
   border-radius: 12px;
   border-left: 4px solid #F48B14;
   transition: all 0.3s ease;
+}
+
+.dark-mode .activity-card {
+  background: var(--color-bg);
 }
 
 .activity-card:hover {
@@ -80,6 +108,10 @@
   gap: 10px;
 }
 
+.dark-mode .activity-name {
+  color: var(--color-text);
+}
+
 .activity-name i {
   color: #F48B14;
   font-size: 1.5rem;
@@ -91,6 +123,14 @@
   font-size: 1rem;
   color: #666;
   flex-wrap: wrap;
+}
+
+.dark-mode .activity-details {
+  color: #ccc;
+}
+
+.dark-mode .activity-details span {
+  color: #ccc;
 }
 
 .activity-time,
@@ -135,6 +175,12 @@
   padding: 35px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode .stats-summary {
+  background: var(--color-secondary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .stat-item {
@@ -146,6 +192,10 @@
   font-size: 0.9rem;
   color: #666;
   margin-bottom: 8px;
+}
+
+.dark-mode .stat-label {
+  color: #ccc;
 }
 
 .stat-value {

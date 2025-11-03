@@ -3,6 +3,8 @@
     flex-direction: column;
     justify-content: space-between;
     min-height: 100vh;
+    background-color: var(--color-bg);
+    transition: background-color 0.3s ease;
 }
 
 .add-meal-page .container {
