@@ -48,8 +48,6 @@ export default function Profile() {
 
   return (
     <div className="profile-page">
-
-
       <div className="container">
         <div className="header">
           <div className="text">{form.name || "Name"}</div>

@@ -9,8 +9,18 @@ export default function Diary() {
   const [selectedDay, setSelectedDay] = useState(null); // Track clicked day
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   const years = Array.from({ length: 16 }, (_, i) => 2010 + i);
 
@@ -27,16 +37,20 @@ export default function Diary() {
         <div className="text">Diary</div>
         <div className="underline"></div>
       </header>
-      
+
       <main className="content">
         <div className="month-bar">
-          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>‹</button>
+          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>
+            ‹
+          </button>
           <div>
             <h2>
               {months[month]} {year}
             </h2>
           </div>
-          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>›</button>
+          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>
+            ›
+          </button>
         </div>
 
         <div className="calendar">
@@ -48,7 +62,9 @@ export default function Diary() {
           {days.map((day, index) => (
             <div
               key={index}
-              className={`day-cell ${day ? "clickable" : ""} ${selectedDay === day ? "selected" : ""}`}
+              className={`day-cell ${day ? "clickable" : ""} ${
+                selectedDay === day ? "selected" : ""
+              }`}
               onClick={() => day && setSelectedDay(day)}
             >
               {day}
@@ -58,7 +74,9 @@ export default function Diary() {
 
         {selectedDay && (
           <div className="selected-info">
-            <p>Selected: {months[month]} {selectedDay}, {year}</p>
+            <p>
+              Selected: {months[month]} {selectedDay}, {year}
+            </p>
           </div>
         )}
       </main>

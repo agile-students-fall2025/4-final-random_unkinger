@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
-import '../LoginSignup/LoginSignup.css';
-import './ActivityTracking.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../LoginSignup/LoginSignup.css";
+import "./ActivityTracking.css";
 
 const ActivityTracking = () => {
   const [form, setForm] = useState({
-    name: '',
-    time: '',
-    notes: ''
+    name: "",
+    time: "",
+    notes: "",
   });
 
   const [activities, setActivities] = useState([]);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({
       ...form,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -25,21 +28,28 @@ const ActivityTracking = () => {
       const newActivity = {
         id: Date.now(),
         ...form,
-        date: new Date().toLocaleDateString()
+        date: new Date().toLocaleDateString(),
       };
       setActivities([...activities, newActivity]);
-      setForm({ name: '', time: '', notes: '' });
+      setForm({ name: "", time: "", notes: "" });
     }
   };
 
   const handleDelete = (id) => {
-    setActivities(activities.filter(activity => activity.id !== id));
+    setActivities(activities.filter((activity) => activity.id !== id));
   };
 
   return (
     <div className="activity-page">
       <div className="container">
         <div className="header">
+          <button
+            onClick={() => navigate(-1)}
+            className="back-button"
+            aria-label="Back"
+          >
+            <i className="ri-arrow-left-line"></i>
+          </button>
           <div className="text">Activity Tracking</div>
           <div className="underline"></div>
         </div>
@@ -136,7 +146,11 @@ const ActivityTracking = () => {
             <div className="stat-item">
               <span className="stat-label">Total Time:</span>
               <span className="stat-value">
-                {activities.reduce((sum, activity) => sum + parseInt(activity.time || 0), 0)} min
+                {activities.reduce(
+                  (sum, activity) => sum + parseInt(activity.time || 0),
+                  0
+                )}{" "}
+                min
               </span>
             </div>
           </div>
@@ -147,4 +161,3 @@ const ActivityTracking = () => {
 };
 
 export default ActivityTracking;
-
