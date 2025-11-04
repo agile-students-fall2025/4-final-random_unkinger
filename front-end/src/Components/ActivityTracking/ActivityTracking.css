@@ -3,6 +3,7 @@
   padding: 40px 20px;
   background-color: lightskyblue;
   transition: background-color 0.3s ease;
+  padding-bottom: 72px;
 }
 
 .dark-mode .activity-page {
@@ -233,5 +234,12 @@
   .activity-details {
     flex-direction: column;
     gap: 10px;
+  }
+
+  .navbar {
+    background: #ddd;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.6rem 0;
   }
 }

@@ -5,12 +5,13 @@
     min-height: 100vh;
     background-color: var(--color-bg);
     transition: background-color 0.3s ease;
+    padding-bottom: 72px;
 }
 
 .add-meal-page .container {
     flex-grow: 1;
     display: flex;
-    padding-top: 0px; /* bring banner higher */
+    padding-top: 0px;
     flex-direction: column;
     align-items: center;
 }
@@ -19,11 +20,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 55px; /* reduce vertical gap below banner */
+    margin-top: 55px; 
     gap: 20px;
 }
 
-/* tighten the header spacing for this page only */
+
 .add-meal-page .header {
     margin-top: 10px;
 }
@@ -42,3 +43,10 @@
     border: none;
     border-radius: 0;
 }
+
+.navbar {
+    background: #ddd;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.6rem 0;
+  }

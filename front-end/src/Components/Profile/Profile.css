@@ -1,4 +1,5 @@
 .profile-page .container {
+  padding-bottom: 72px;
 }
 
 .profile-page .avatar-row {
@@ -112,5 +113,12 @@
   .profile-page .profile-input {
     max-width: none;
     width: 100%;
+  }
+
+  .navbar {
+    background: #ddd;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.6rem 0;
   }
 }

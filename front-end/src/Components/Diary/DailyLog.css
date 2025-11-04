@@ -9,6 +9,7 @@
   font-weight:100;
   font-size: 1rem;
   margin-top: 30px;
+  padding-bottom: 72px;
 }
 
 .header {
@@ -115,7 +116,6 @@
   border-radius: 50%;
   cursor: pointer;
   transition: background 0.2s ease;
-  /* Added margin to ensure spacing from meal-info */
   margin-left: 15px; 
   flex-shrink: 0;
 }
@@ -132,21 +132,20 @@
   }
 
   .meal-card {
-    flex-direction: column; /* stack image above info */
+    flex-direction: column; 
     align-items: flex-start;
     padding: 12px;
   }
 
   .meal-image {
     width: 100%;
-    height: auto; /* scale with width */
+    height: auto;
     margin-right: 0;
     margin-bottom: 8px;
     border-radius: 12px;
   }
 
   .meal-info {
-    /* When stacking, use column direction and align items to the center */
     flex-direction: column;
     align-items: center; 
     gap: 12px;
@@ -154,7 +153,6 @@
   }
 
   .macros {
-    /* For mobile, stack the macros and time into a single column */
     grid-template-columns: 1fr;
     gap: 5px;
     width: 100%;
@@ -162,7 +160,7 @@
   }
   
   .macros p:last-child {
-    grid-column: auto; /* Reset column span */
+    grid-column: auto; 
     text-align: center;
     margin-top: 10px;
   }
@@ -177,5 +175,10 @@
     margin-bottom: 12px;
   }
 
-  
+  .navbar {
+    background: #ddd;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.6rem 0;
+  }
 }

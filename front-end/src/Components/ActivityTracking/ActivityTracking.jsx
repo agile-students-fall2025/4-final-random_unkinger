@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../LoginSignup/LoginSignup.css";
 import "./ActivityTracking.css";
+import NavBar from "../NavBar/NavBar";
 
 const ActivityTracking = () => {
   const [form, setForm] = useState({
@@ -156,6 +157,7 @@ const ActivityTracking = () => {
           </div>
         )}
       </div>
+      <NavBar />
     </div>
   );
 };

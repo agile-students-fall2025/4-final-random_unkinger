@@ -6,6 +6,7 @@
     justify-content: center;
     box-sizing: border-box;
     transition: background-color 0.3s ease;
+    padding-bottom: 72px;
 }
 
 .dark-mode .scan-meal-page {
@@ -39,3 +40,10 @@
 .dark-mode .error-message {
     color: var(--color-text);
 }
+
+.navbar {
+    background: #ddd;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.6rem 0;
+  }

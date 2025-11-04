@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../LoginSignup/LoginSignup.css";
 import "./ScanMeal.css";
+import NavBar from "../NavBar/NavBar";
 
 const ScanMeal = () => {
   const videoRef = useRef(null);
@@ -74,6 +75,7 @@ const ScanMeal = () => {
           </button>
         </div>
       </div>
+      <NavBar />
     </div>
   );
 };

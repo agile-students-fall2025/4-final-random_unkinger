@@ -1,0 +1,38 @@
+.navbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: #ddd;
+    border-top: 1px solid #c9c9c9;
+    z-index: 100;
+  }
+  
+  .nav-item {
+    background: transparent;
+    border: 0;
+    padding: 6px 10px;
+    font: inherit;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  .nav-item.active .nav-label {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  
+  /* Dark mode support (your app uses .dark-mode on <html>) */
+  .dark-mode .navbar {
+    background: var(--color-secondary);
+    border-top-color: rgba(255,255,255,0.12);
+  }
+  
+  .dark-mode .nav-item {
+    color: var(--color-text);
+  }
+  
