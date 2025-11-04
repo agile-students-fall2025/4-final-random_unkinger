@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../LoginSignup/LoginSignup.css";
 import "./AddMeal.css";
+import NavBar from "../NavBar/NavBar";
 
 const AddMeal = () => {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ const AddMeal = () => {
           </button>
         </div>
       </div>
+      <NavBar />
     </div>
   );
 };

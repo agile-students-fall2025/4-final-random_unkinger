@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../LoginSignup/LoginSignup.css";
 import "./Diary.css";
+import NavBar from "../NavBar/NavBar";
 
 export default function Diary() {
   const today = new Date();
@@ -80,6 +81,7 @@ export default function Diary() {
           </div>
         )}
       </main>
+      <NavBar />
     </div>
   );
 }

@@ -6,6 +6,7 @@
   flex-direction: column;
   background: #f9fafb;
   color: #000000;
+  padding-bottom: 72px;
 }
 
 .header {
@@ -109,6 +110,13 @@
 
   .day-cell.clickable {
     font-size: 0.85rem;
+  }
+
+  .navbar {
+    background: #ddd;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.6rem 0;
   }
 
  

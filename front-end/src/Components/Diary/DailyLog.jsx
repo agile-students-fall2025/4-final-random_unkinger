@@ -1,7 +1,7 @@
 import React from "react";
 import "./DailyLog.css";
+import NavBar from "../NavBar/NavBar";
 
-// Simple pencil emoji instead of lucide-react icon
 const Pencil = () => <span style={{ fontSize: "14px" }}>✏️</span>;
 
 const mockMeals = [
@@ -49,6 +49,7 @@ export default function DailyLog() {
           ))}
         </div>
       </main>
+      <NavBar />
     </div>
   );
 }

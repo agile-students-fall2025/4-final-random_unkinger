@@ -1,21 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
 import "./Home.css";
+import NavBar from "../NavBar/NavBar";
 
-const Home = ({ user }) => {
+export default function Home() {
   const today = new Date();
   const options = { weekday: "long", month: "short", day: "numeric" };
   const formattedDate = today.toLocaleDateString("en-US", options);
-  const navigator = useNavigate();
+  const navigate = useNavigate();
 
-  const handleAddActivity = () => {
-    navigator("/tracking");
-  };
-
-  const handleAddMeal = () => {
-    navigator("/add-meal");
-  };
+  const handleAddActivity = () => navigate("/tracking");
+  const handleAddMeal = () => navigate("/add-meal");
 
   return (
     <div className="home-container">
@@ -53,7 +48,7 @@ const Home = ({ user }) => {
 
         <section className="activity">
           <div className="section-header">
-            <i className="ri-run-line icon"></i>
+            <i className="ri-run-line icon" aria-hidden="true"></i>
             <h3>Activity</h3>
           </div>
           <button className="add-btn" onClick={handleAddActivity}>
@@ -63,7 +58,7 @@ const Home = ({ user }) => {
 
         <section className="meal">
           <div className="section-header">
-            <i className="ri-restaurant-fill icon"></i>
+            <i className="ri-restaurant-fill icon" aria-hidden="true"></i>
             <h3>Meals</h3>
           </div>
           <button className="add-btn" onClick={handleAddMeal}>
@@ -71,8 +66,7 @@ const Home = ({ user }) => {
           </button>
         </section>
       </main>
+      <NavBar />
     </div>
   );
-};
-
-export default Home;
+}

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import "../LoginSignup/LoginSignup.css";
 import "./Profile.css";
+import NavBar from "../NavBar/NavBar";
 
 const initial = {
   name: "",
@@ -179,6 +180,7 @@ export default function Profile() {
           </div>
         </div>
       </div>
+      <NavBar />
     </div>
   );
 }
