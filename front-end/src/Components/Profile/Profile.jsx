@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "../LoginSignup/LoginSignup.css";
 import "./Profile.css";
 import NavBar from "../NavBar/NavBar";
+
+const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
 
 const initial = {
   name: "",
@@ -18,6 +20,34 @@ const initial = {
 
 export default function Profile() {
   const [form, setForm] = useState(initial);
+
+  useEffect(() => {
+    fetch(`${API}/api/profile`)
+      .then((res) => res.json())
+      .then((data) => setForm((f) => ({ ...f, ...data })))
+      .catch((err) => console.error("Failed to load profile:", err));
+    async function loadProfile() {
+      try {
+        const res = await fetch("/api/profile");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setForm((f) => ({
+          ...f,
+          name: data.name ?? f.name,
+          age: String(data.age ?? f.age),
+          heightCm: String(data.heightCm ?? f.heightCm),
+          weightKg: String(data.weightKg ?? f.weightKg),
+          activity: data.activity ?? f.activity,
+          calorieGoal: String(data.calorieGoal ?? f.calorieGoal),
+          proteinGoal: String(data.proteinGoal ?? f.proteinGoal),
+          avatarUrl: data.avatarUrl ?? f.avatarUrl,
+        }));
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      }
+    }
+    loadProfile();
+  }, []);
 
   const bmi = useMemo(() => {
     const h = parseFloat(form.heightCm);
@@ -44,8 +74,15 @@ export default function Profile() {
     alert("Logged out (demo).");
   };
 
-  const onSave = () => {
-    alert("Profile saved (demo).");
+  const onSave = async () => {
+    const res = await fetch(`${API}/api/profile`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    const json = await res.json();
+    console.log("Saved:", json);
+    alert("Profile saved (mock).");
   };
 
   return (
