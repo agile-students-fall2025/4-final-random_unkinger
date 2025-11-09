@@ -1,0 +1,257 @@
+.manual-meal-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease;
+}
+
+.manual-meal-page .container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 24px 96px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.manual-meal-form {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 6px 18px rgba(17, 45, 78, 0.08);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.manual-error {
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  color: #ff4757;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  margin: 0;
+}
+
+.manual-loading {
+  text-align: center;
+  font-size: 15px;
+  color: rgba(17, 45, 78, 0.7);
+}
+
+.manual-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.manual-field label {
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.manual-field input,
+.manual-field textarea {
+  border: none;
+  border-radius: 10px;
+  background: #f2f4f8;
+  padding: 12px 14px;
+  font-size: 16px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.manual-field textarea {
+  resize: vertical;
+}
+
+.manual-field input:focus,
+.manual-field textarea:focus {
+  outline: 2px solid var(--color-primary);
+  background: #ffffff;
+}
+
+.manual-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.manual-submit {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.manual-summary {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 6px 18px rgba(17, 45, 78, 0.08);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.manual-summary-title {
+  margin: 0 0 16px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.manual-summary-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(63, 114, 175, 0.15);
+}
+
+.manual-summary-totals div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  background: rgba(63, 114, 175, 0.08);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.manual-summary-totals span {
+  font-size: 14px;
+  color: var(--color-dark);
+}
+
+.manual-summary-totals strong {
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.manual-meal-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.manual-meal-card {
+  background: rgba(63, 114, 175, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.manual-meal-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.manual-meal-card-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.manual-meal-card-header time {
+  font-size: 13px;
+  color: rgba(17, 45, 78, 0.6);
+}
+
+.manual-meal-macros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.manual-meal-macros span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: rgba(17, 45, 78, 0.9);
+}
+
+.manual-meal-macros strong {
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.manual-meal-notes {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(17, 45, 78, 0.85);
+}
+
+@media (max-width: 520px) {
+  .manual-meal-page .container {
+    padding: 0 16px 88px;
+  }
+
+  .manual-summary-totals {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Dark mode adjustments */
+.dark-mode .manual-meal-form,
+.dark-mode .manual-summary {
+  background: var(--color-secondary);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .manual-field label,
+.dark-mode .manual-summary-title {
+  color: var(--color-text);
+}
+
+.dark-mode .manual-field input,
+.dark-mode .manual-field textarea {
+  background: #2c2c2c;
+  color: var(--color-text);
+}
+
+.dark-mode .manual-field input:focus,
+.dark-mode .manual-field textarea:focus {
+  background: #1f1f1f;
+}
+
+.dark-mode .manual-summary-totals span,
+.dark-mode .manual-meal-card-header h4,
+.dark-mode .manual-meal-macros span,
+.dark-mode .manual-meal-notes {
+  color: var(--color-text);
+}
+
+.dark-mode .manual-error {
+  background: rgba(255, 82, 82, 0.15);
+  border-color: rgba(255, 82, 82, 0.5);
+  color: #ff9b9b;
+}
+
+.dark-mode .manual-loading {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark-mode .manual-meal-card {
+  background: rgba(90, 155, 212, 0.1);
+}
+
+.dark-mode .manual-meal-card-header time {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dark-mode .manual-summary-totals div {
+  background: rgba(90, 155, 212, 0.12);
+}
+
+

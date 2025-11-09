@@ -16,6 +16,10 @@ const AddMeal = () => {
     navigate("/scan-meal");
   };
 
+  const handleManualClick = () => {
+    navigate("/manual-meal");
+  };
+
   return (
     <div className="add-meal-page">
       <div className="container">
@@ -37,6 +41,10 @@ const AddMeal = () => {
 
           <button onClick={handleScanClick} className="action-button">
             <span>Scan Product</span>
+          </button>
+
+          <button onClick={handleManualClick} className="action-button">
+            <span>Enter Manually</span>
           </button>
         </div>
       </div>

@@ -5,6 +5,7 @@ import Home from "./Components/Home/Home";
 import Profile from "./Components/Profile/Profile";
 import AddMeal from "./Components/AddMeal/AddMeal";
 import ScanMeal from "./Components/AddMeal/ScanMeal";
+import ManualMeal from "./Components/AddMeal/ManualMeal";
 import ActivityTracking from "./Components/ActivityTracking/ActivityTracking";
 import EditMeal from "./Components/AddMeal/EditMeal";
 import Search from './Components/Search/Search'
@@ -64,6 +65,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/add-meal" element={<AddMeal />} />
         <Route path="/scan-meal" element={<ScanMeal />} />
+        <Route path="/manual-meal" element={<ManualMeal />} />
         <Route path="/edit-meal" element={<EditMeal />} />
         <Route path="/tracking" element={<ActivityTracking />} />
         <Route path="/diary" element={<Diary />} />
