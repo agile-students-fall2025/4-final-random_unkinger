@@ -10,6 +10,7 @@ const initial = {
   weightKg: "",
   activity: "sedentary",
   calorieGoal: "",
+  proteinGoal: "",
   avatarUrl: `https://picsum.photos/seed/profile-${Math.floor(
     Math.random() * 1e9
   )}/120/120`,
@@ -148,9 +149,9 @@ export default function Profile() {
                 aria-label="Activity level"
               >
                 <option value="sedentary">Sedentary</option>
-                <option value="light">Light (1–3 days/wk)</option>
-                <option value="moderate">Moderate (3–5 days/wk)</option>
-                <option value="active">Active (6–7 days/wk)</option>
+                <option value="light">Light (1-3 days/wk)</option>
+                <option value="moderate">Moderate (3-5 days/wk)</option>
+                <option value="active">Active (6-7 days/wk)</option>
                 <option value="very_active">Very Active (athlete)</option>
               </select>
             </div>
@@ -164,6 +165,19 @@ export default function Profile() {
                 type="number"
                 placeholder=" kcal/day"
                 value={form.calorieGoal}
+                onChange={handle}
+                min="0"
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <label className="form-label">Protein Goal</label>
+            <div className="input profile-input">
+              <input
+                name="proteinGoal"
+                type="number"
+                placeholder=" g/day"
+                value={form.proteinGoal}
                 onChange={handle}
                 min="0"
               />

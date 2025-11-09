@@ -57,13 +57,15 @@
 }
 
 .profile-page .form-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 140px 1fr;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
+  column-gap: 12px;
+  margin: 10px 0;
 }
 
 .profile-page .form-label {
+  justify-self: end;
   width: 120px;
   text-align: right;
   font-size: 18px;
@@ -76,8 +78,10 @@
 }
 
 .profile-page .profile-input input,
-.profile-page .profile-input select {
+.profile-page .profile-input select,
+.profile-page .profile-input textarea {
   width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-page .input--select select {
