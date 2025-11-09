@@ -21,6 +21,8 @@ const ManualMeal = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -80,8 +82,13 @@ const ManualMeal = () => {
         notes: form.notes.trim(),
       };
 
-      const response = await fetch(`${API_BASE}/api/meals`, {
-        method: "POST",
+      const endpoint = editingId
+        ? `${API_BASE}/api/meals/${editingId}`
+        : `${API_BASE}/api/meals`;
+      const method = editingId ? "PUT" : "POST";
+
+      const response = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -92,8 +99,15 @@ const ManualMeal = () => {
       }
 
       const { meal } = await response.json();
-      setEntries((prev) => [meal, ...prev]);
+
+      setEntries((prev) => {
+        if (!editingId) {
+          return [meal, ...prev];
+        }
+        return prev.map((item) => (item.id === meal.id ? meal : item));
+      });
       setForm(initialForm);
+      setEditingId(null);
     } catch (err) {
       console.error(err);
       setError(
@@ -124,6 +138,70 @@ const ManualMeal = () => {
       return isoString;
     }
     return date.toLocaleString();
+  };
+
+  const startEditing = (meal) => {
+    setEditingId(meal.id);
+    setForm({
+      name: meal.name || "",
+      calories: meal.calories?.toString() || "",
+      carbs: meal.carbs?.toString() || "",
+      protein: meal.protein?.toString() || "",
+      fat: meal.fat?.toString() || "",
+      notes: meal.notes || "",
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setForm(initialForm);
+  };
+
+  const handleDelete = async (mealId) => {
+    const meal = entries.find((item) => item.id === mealId);
+    if (!meal) {
+      return;
+    }
+
+    const confirmed =
+      typeof window === "undefined"
+        ? true
+        : window.confirm(`Remove "${meal.name}" from your manual meals?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingId(mealId);
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/meals/${mealId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const message = await response.json().catch(() => ({}));
+        throw new Error(message.error || "Failed to delete meal.");
+      }
+
+      const { meal: deletedMeal } = await response.json();
+      setEntries((prev) =>
+        prev.filter((item) => item.id !== (deletedMeal?.id ?? mealId))
+      );
+
+      if (editingId === mealId) {
+        cancelEditing();
+      }
+    } catch (err) {
+      console.error(err);
+      setError(
+        err.message ||
+          "Something went wrong deleting your meal. Please try again."
+      );
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -225,8 +303,22 @@ const ManualMeal = () => {
           </div>
 
           <button type="submit" className="submit manual-submit">
-            {saving ? "Saving..." : "Log Meal"}
+            {saving
+              ? "Saving..."
+              : editingId
+              ? "Update Meal"
+              : "Log Meal"}
           </button>
+          {editingId && (
+            <button
+              type="button"
+              className="manual-cancel"
+              onClick={cancelEditing}
+              disabled={saving}
+            >
+              Cancel Edit
+            </button>
+          )}
         </form>
 
         {loading ? (
@@ -259,7 +351,12 @@ const ManualMeal = () => {
                 <li key={item.id} className="manual-meal-card">
                   <div className="manual-meal-card-header">
                     <h4>{item.name}</h4>
+                    <div className="manual-meal-meta">
+                      {editingId === item.id && (
+                        <span className="manual-editing-pill">Editing</span>
+                      )}
                       <time>{formatTimestamp(item.loggedAt)}</time>
+                    </div>
                   </div>
                   <div className="manual-meal-macros">
                     <span>
@@ -278,6 +375,26 @@ const ManualMeal = () => {
                   {item.notes && (
                     <p className="manual-meal-notes">{item.notes}</p>
                   )}
+                  <div className="manual-meal-actions">
+                    <button
+                      type="button"
+                      className="manual-edit-btn"
+                      onClick={() => startEditing(item)}
+                      disabled={saving && editingId === item.id}
+                    >
+                      <i className="ri-edit-line" aria-hidden="true"></i>
+                      Edit meal
+                    </button>
+                    <button
+                      type="button"
+                      className="manual-delete-btn"
+                      onClick={() => handleDelete(item.id)}
+                      disabled={deletingId === item.id}
+                    >
+                      <i className="ri-delete-bin-6-line" aria-hidden="true"></i>
+                      {deletingId === item.id ? "Deleting…" : "Delete"}
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

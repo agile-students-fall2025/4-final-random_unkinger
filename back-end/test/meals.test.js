@@ -34,6 +34,67 @@ describe("Manual Meals API", () => {
     expect(res.status).to.equal(400);
     expect(res.body.error).to.match(/calories/i);
   });
+
+  it("PUT /api/meals/:id updates an existing meal", async () => {
+    const createRes = await request(app).post("/api/meals").send({
+      name: "Edit Me",
+      calories: 300,
+      carbs: 40,
+      protein: 20,
+      fat: 10,
+    });
+
+    expect(createRes.status).to.equal(201);
+    const mealId = createRes.body.meal.id;
+
+    const updateRes = await request(app)
+      .put(`/api/meals/${mealId}`)
+      .send({
+        name: "Updated Meal",
+        calories: 450,
+        protein: 35,
+      });
+
+    expect(updateRes.status).to.equal(200);
+    expect(updateRes.body).to.have.property("meal");
+    expect(updateRes.body.meal.name).to.equal("Updated Meal");
+    expect(updateRes.body.meal.calories).to.equal(450);
+    expect(updateRes.body.meal.protein).to.equal(35);
+  });
+
+  it("PUT /api/meals/:id returns 404 for missing meal", async () => {
+    const res = await request(app).put("/api/meals/999999").send({
+      name: "Does not exist",
+    });
+
+    expect(res.status).to.equal(404);
+    expect(res.body.error).to.match(/not found/i);
+  });
+
+  it("DELETE /api/meals/:id removes a meal", async () => {
+    const createRes = await request(app).post("/api/meals").send({
+      name: "Delete Me",
+      calories: 250,
+    });
+
+    expect(createRes.status).to.equal(201);
+    const mealId = createRes.body.meal.id;
+
+    const deleteRes = await request(app).delete(`/api/meals/${mealId}`);
+    expect(deleteRes.status).to.equal(200);
+    expect(deleteRes.body.meal.id).to.equal(mealId);
+
+    const listRes = await request(app).get("/api/meals");
+    expect(listRes.status).to.equal(200);
+    const ids = listRes.body.meals.map((meal) => meal.id);
+    expect(ids).to.not.include(mealId);
+  });
+
+  it("DELETE /api/meals/:id returns 404 for missing meal", async () => {
+    const res = await request(app).delete("/api/meals/123456789");
+    expect(res.status).to.equal(404);
+    expect(res.body.error).to.match(/not found/i);
+  });
 });
 
 

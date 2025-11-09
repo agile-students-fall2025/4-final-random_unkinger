@@ -86,6 +86,24 @@
   margin: 0 auto;
 }
 
+.manual-cancel {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  margin-top: -8px;
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid rgba(63, 114, 175, 0.4);
+  padding: 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.manual-cancel:hover {
+  background: rgba(63, 114, 175, 0.1);
+}
+
 .manual-summary {
   background: #ffffff;
   border-radius: 16px;
@@ -155,6 +173,21 @@
   gap: 12px;
 }
 
+.manual-meal-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manual-editing-pill {
+  background: rgba(63, 114, 175, 0.15);
+  color: var(--color-primary);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
 .manual-meal-card-header h4 {
   margin: 0;
   font-size: 18px;
@@ -192,6 +225,60 @@
   color: rgba(17, 45, 78, 0.85);
 }
 
+.manual-meal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.manual-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(63, 114, 175, 0.35);
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.manual-edit-btn:hover {
+  background: rgba(63, 114, 175, 0.12);
+}
+
+.manual-edit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.manual-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 75, 95, 0.5);
+  background: transparent;
+  color: #f44b5f;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.manual-delete-btn:hover {
+  background: rgba(244, 75, 95, 0.12);
+}
+
+.manual-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 520px) {
   .manual-meal-page .container {
     padding: 0 16px 88px;
@@ -218,6 +305,15 @@
 .dark-mode .manual-field textarea {
   background: #2c2c2c;
   color: var(--color-text);
+}
+
+.dark-mode .manual-cancel {
+  color: var(--color-text);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.dark-mode .manual-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .dark-mode .manual-field input:focus,
@@ -250,8 +346,31 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+.dark-mode .manual-editing-pill {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text);
+}
+
 .dark-mode .manual-summary-totals div {
   background: rgba(90, 155, 212, 0.12);
+}
+
+.dark-mode .manual-edit-btn {
+  color: var(--color-text);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.dark-mode .manual-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dark-mode .manual-delete-btn {
+  border-color: rgba(255, 99, 132, 0.65);
+  color: #ff6b81;
+}
+
+.dark-mode .manual-delete-btn:hover {
+  background: rgba(255, 107, 129, 0.15);
 }
 
 
