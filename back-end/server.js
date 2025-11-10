@@ -86,6 +86,77 @@ app.post("/api/meals", (req, res) => {
   res.status(201).json({ meal: newMeal });
 });
 
+app.put("/api/meals/:id", (req, res) => {
+  const mealId = Number(req.params.id);
+
+  if (!Number.isInteger(mealId)) {
+    return res.status(400).json({ error: "Meal id must be a valid integer." });
+  }
+
+  const index = manualMeals.findIndex((meal) => meal.id === mealId);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Meal not found." });
+  }
+
+  const current = manualMeals[index];
+  const {
+    name = current.name,
+    calories = current.calories,
+    carbs = current.carbs,
+    protein = current.protein,
+    fat = current.fat,
+    notes = current.notes,
+  } = req.body || {};
+
+  if (!name || typeof name !== "string" || !name.trim()) {
+    return res.status(400).json({ error: "Meal name is required." });
+  }
+
+  const numericFields = { calories, carbs, protein, fat };
+  for (const [field, value] of Object.entries(numericFields)) {
+    if (value !== undefined) {
+      const numberValue = Number(value);
+      if (Number.isNaN(numberValue) || numberValue < 0) {
+        return res
+          .status(400)
+          .json({ error: `${field} must be a non-negative number.` });
+      }
+    }
+  }
+
+  const updatedMeal = {
+    ...current,
+    name: name.trim(),
+    calories: Number(calories) || 0,
+    carbs: Number(carbs) || 0,
+    protein: Number(protein) || 0,
+    fat: Number(fat) || 0,
+    notes: typeof notes === "string" ? notes.trim() : current.notes,
+    updatedAt: new Date().toISOString(),
+  };
+
+  manualMeals[index] = updatedMeal;
+  res.json({ meal: updatedMeal });
+});
+
+app.delete("/api/meals/:id", (req, res) => {
+  const mealId = Number(req.params.id);
+
+  if (!Number.isInteger(mealId)) {
+    return res.status(400).json({ error: "Meal id must be a valid integer." });
+  }
+
+  const index = manualMeals.findIndex((meal) => meal.id === mealId);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Meal not found." });
+  }
+
+  const [deletedMeal] = manualMeals.splice(index, 1);
+  res.json({ meal: deletedMeal });
+});
+
 const PORT = process.env.PORT || 5050;
 
 if (require.main === module) {
