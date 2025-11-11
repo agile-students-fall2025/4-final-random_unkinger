@@ -20,14 +20,45 @@ const manualMeals = [
   {
     id: 1,
     name: "Overnight Oats",
-    calories: 350,
-    carbs: 45,
     protein: 18,
+    carbs: 45,
     fat: 12,
-    notes: "Made with almond milk, chia seeds, blueberries.",
-    loggedAt: new Date().toISOString(),
+    calories: 350,
+    loggedAt: "2025-11-10T21:29:00",
+    image: "https://picsum.photos/id/1060/400/300",
+  },
+  {
+    id: 2,
+    name: "Chicken Salad",
+    protein: 32,
+    carbs: 10,
+    fat: 15,
+    calories: 360,
+    loggedAt: "2025-11-10T13:45:00",
+    image: "https://picsum.photos/id/292/400/300",
+  },
+  {
+    id: 3,
+    name: "Pasta Primavera",
+    protein: 15,
+    carbs: 70,
+    fat: 9,
+    calories: 450,
+    loggedAt: "2025-11-10T18:00:00",
+    image: "https://picsum.photos/id/1080/400/300",
+  },
+  {
+    id: 4,
+    name: "Avocado Toast",
+    protein: 10,
+    carbs: 30,
+    fat: 20,
+    calories: 280,
+    loggedAt: "2025-11-10T09:00:00",
+    image: "https://picsum.photos/id/1052/400/300",
   },
 ];
+
 
 app.get("/api/profile", (req, res) => {
   res.json(MOCK_PROFILE);
@@ -49,8 +80,70 @@ app.post("/api/profile", (req, res) => {
 });
 
 app.get("/api/meals", (req, res) => {
-  res.json({ meals: manualMeals });
+  const { date } = req.query;
+  let filtered = manualMeals;
+
+  if (date) {
+    const start = new Date(date + "T00:00:00");
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+    filtered = manualMeals.filter((m) => {
+      const logged = new Date(m.loggedAt);
+      return logged >= start && logged < end;
+    });
+  }
+
+  res.json({ meals: filtered });
 });
+
+
+
+app.get("/api/macros/summary", (req, res) => {
+    const { date } = req.query; 
+    let filteredMeals = manualMeals;
+
+    if (date) {
+        const start = new Date(date + "T00:00:00");
+        const end = new Date(start);
+        end.setDate(end.getDate() + 1);
+
+        filteredMeals = manualMeals.filter((m) => {
+            const logged = new Date(m.loggedAt);
+            return logged >= start && logged < end;
+        });
+    }
+
+    if (filteredMeals.length === 0) {
+
+        return res.status(200).json({ 
+            mostProtein: { name: "", value: 0 },
+            mostCarbs: { name: "", value: 0 },
+            mostFat: { name: "", value: 0 },
+            message: "No meals available for this date." 
+        });
+    }
+
+
+    const mostProtein = filteredMeals.reduce((a, b) => 
+        a.protein > b.protein ? a : b
+    );
+    const mostCarbs = filteredMeals.reduce((a, b) => 
+        a.carbs > b.carbs ? a : b
+    );
+    const mostFat = filteredMeals.reduce((a, b) => 
+        a.fat > b.fat ? a : b
+    );
+
+    res.json({
+        mostProtein: { name: mostProtein.name, value: mostProtein.protein },
+        mostCarbs: { name: mostCarbs.name, value: mostCarbs.carbs },
+        mostFat: { name: mostFat.name, value: mostFat.fat },
+    });
+});
+
+
+
+
 
 app.post("/api/meals", (req, res) => {
   const { name, calories, carbs, protein, fat, notes } = req.body || {};
@@ -158,6 +251,7 @@ app.delete("/api/meals/:id", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5050;
+
 
 if (require.main === module) {
   app.listen(PORT, () =>

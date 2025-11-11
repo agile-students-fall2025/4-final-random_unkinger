@@ -69,7 +69,8 @@ function App() {
         <Route path="/edit-meal" element={<EditMeal />} />
         <Route path="/tracking" element={<ActivityTracking />} />
         <Route path="/diary" element={<Diary />} />
-        <Route path="/daily-log" element={<DailyLog />} />
+        <Route path="/dailylog/:date" element={<DailyLog />} />
+        <Route path="/editmeal/:id" element={<EditMeal />} />
         <Route path="/search" element={<Search />} />
       </Routes>
     </Router>

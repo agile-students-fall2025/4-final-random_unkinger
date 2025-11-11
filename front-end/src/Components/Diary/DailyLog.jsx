@@ -1,23 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "./DailyLog.css";
 import NavBar from "../NavBar/NavBar";
 
 const Pencil = () => <span style={{ fontSize: "14px" }}>✏️</span>;
 
-const mockMeals = [
-  { id: 1, image: "https://picsum.photos/id/63/5000/2813", time: "08:30 AM" },
-  { id: 2, image: "https://picsum.photos/id/63/5000/2813", time: "12:45 PM" },
-  { id: 3, image: "https://picsum.photos/id/63/5000/2813", time: "06:10 PM" },
-  { id: 4, image: "https://picsum.photos/id/63/5000/2813", time: "09:00 PM" },
-];
-
 export default function DailyLog() {
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString("en-US", {
+  const { date } = useParams();
+  const navigate = useNavigate();
+  const [meals, setMeals] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!date) return;
+
+
+    fetch(`http://localhost:5050/api/macros/summary?date=${date}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Summary:", data);
+        setSummary(data);
+      })
+      .catch((err) => console.error("Error fetching summary:", err));
+
+
+    fetch(`http://localhost:5050/api/meals?date=${date}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMeals(data.meals || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching meals:", err);
+        setLoading(false);
+      });
+  }, [date]);
+
+  const formattedDate = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
     day: "numeric",
   });
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="dailylog-container">
@@ -29,26 +55,57 @@ export default function DailyLog() {
       <main className="content">
         <button className="date-btn">Date: {formattedDate}</button>
 
+   
+        <div className="macro-summary">
+          <p>
+            Most Protein: {summary?.mostProtein?.name} ({summary?.mostProtein?.value}g)
+          </p>
+          <p>
+            Most Carbs: {summary?.mostCarbs?.name} ({summary?.mostCarbs?.value}g)
+          </p>
+          <p>
+            Most Fat: {summary?.mostFat?.name} ({summary?.mostFat?.value}g)
+          </p>
+        </div>
+
+   
         <div className="meal-list">
-          {mockMeals.map((meal) => (
+          {meals.map((meal) => (
             <div className="meal-card" key={meal.id}>
-              <img src={meal.image} alt="Meal" className="meal-image" />
+              <div className="meal-name">{meal.name}</div>
+<div className="meal-content-row"> 
+    <img
+      src={meal.image || "https://picsum.photos/id/63/400/300"}
+      alt={meal.name}
+      className="meal-image"
+    />
               <div className="meal-info">
                 <div className="macros">
-                  <p>Protein = 1%</p>
-                  <p>Fat = 2%</p>
-                  <p>Carbs = 10%</p>
-                  <p>Calories = 100</p>
-                  <p className="added">Added: {meal.time}</p>
+                  <p>Protein = {meal.protein}g</p>
+                  <p>Fat = {meal.fat}g</p>
+                  <p>Carbs = {meal.carbs}g</p>
+                  <p>Calories = {meal.calories}</p>
+                  <p className="added">
+                    Added:{" "}
+                    {new Date(meal.loggedAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
                 </div>
-                <button className="edit-btn">
+                <button
+                  className="edit-btn"
+                  onClick={() => navigate(`/editmeal/${meal.id}`)}
+                >
                   <Pencil />
                 </button>
+              </div>
               </div>
             </div>
           ))}
         </div>
       </main>
+
       <NavBar />
     </div>
   );
