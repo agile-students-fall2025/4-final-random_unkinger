@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../LoginSignup/LoginSignup.css";
 import "./Diary.css";
 import NavBar from "../NavBar/NavBar";
 
 export default function Diary() {
+  const navigate = useNavigate();
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
@@ -23,7 +25,9 @@ export default function Diary() {
     "November",
     "December",
   ];
-  const years = Array.from({ length: 16 }, (_, i) => 2010 + i);
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 30 }, (_, i) => currentYear - 10 + i);
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -31,6 +35,18 @@ export default function Diary() {
   const days = [];
   for (let i = 0; i < firstDay; i++) days.push("");
   for (let d = 1; d <= daysInMonth; d++) days.push(d);
+
+  const handleDayClick = (day) => {
+    if (!day) return;
+    setSelectedDay(day);
+
+    const localDate = new Date(year, month, day);
+    const selectedDate = `${localDate.getFullYear()}-${String(
+      localDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
+
+    navigate(`/dailylog/${selectedDate}`);
+  };
 
   return (
     <div className="diary-container">
@@ -41,17 +57,13 @@ export default function Diary() {
 
       <main className="content">
         <div className="month-bar">
-          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>
-            ‹
-          </button>
+          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>‹</button>
           <div>
             <h2>
               {months[month]} {year}
             </h2>
           </div>
-          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>
-            ›
-          </button>
+          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>›</button>
         </div>
 
         <div className="calendar">
@@ -66,21 +78,14 @@ export default function Diary() {
               className={`day-cell ${day ? "clickable" : ""} ${
                 selectedDay === day ? "selected" : ""
               }`}
-              onClick={() => day && setSelectedDay(day)}
+              onClick={() => handleDayClick(day)}
             >
               {day}
             </div>
           ))}
         </div>
-
-        {selectedDay && (
-          <div className="selected-info">
-            <p>
-              Selected: {months[month]} {selectedDay}, {year}
-            </p>
-          </div>
-        )}
       </main>
+
       <NavBar />
     </div>
   );

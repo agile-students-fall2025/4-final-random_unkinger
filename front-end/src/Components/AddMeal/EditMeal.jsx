@@ -8,7 +8,7 @@ const EditMeal = () => {
   const navigate = useNavigate();
 
   const handleAdd = () => {
-    navigate("/home");
+    navigate(-1);
   };
 
   return (

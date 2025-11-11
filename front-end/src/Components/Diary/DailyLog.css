@@ -22,6 +22,34 @@
 }
 
 
+.meal-card {
+   
+    display: flex;
+    flex-direction: column; 
+
+}
+
+
+.meal-content-row {
+    display: flex; 
+    gap: 10px; 
+    align-items: center;
+}
+
+.meal-name {
+
+    font-weight: bold;
+    margin-bottom: 5px; 
+}
+
+
+.meal-image {
+    width: 80px; 
+    height: 80px; 
+    object-fit: cover;
+    border-radius: 8px;
+}
+
 .content {
   flex: 1;
   padding: 20px;
@@ -47,49 +75,78 @@
 }
 
 .meal-card {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column; 
+    
+
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 20px;
+    width: 100%; 
+}
+
+
+.meal-name {
+    font-size: 1.3em; 
+    font-weight: bold;
+    margin-bottom: 15px; 
+    text-align: center; 
+    padding-left:60px;
+}
+
+
+.meal-content-row {
+    display: flex;
+    align-items: flex-start; 
+    width: 100%;
+    
+    gap: 15px; 
 }
 
 .meal-image {
-  width: 110px;
-  height: 110px;
-  border-radius: 12px;
-  object-fit: cover;
-  margin-right: 20px;
+    width: 100px; 
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0; 
 }
 
 .meal-info {
-  display: flex;
-  align-items: center; 
-
-
-  flex: 1;
+    display: flex;
+    flex-grow: 1; 
+    align-items: flex-start;
+    justify-content: space-between; 
 }
 
-.macros {
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
 
+.macros {
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
 }
 
 
 .macros p {
-  margin: 4px 0; 
-  text-align: center; 
-  width: 100%;
+    margin: 0; 
+    font-size: 1em; 
+    line-height: 1.4;
+    width: 100%;
+    text-align:center; 
 }
 
-.macros {
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-  flex-grow: 1; 
+
+.edit-btn {
+    align-self: flex-start; 
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    flex-shrink: 0; 
+    font-size: 1.2em; 
 }
 
 .added {
