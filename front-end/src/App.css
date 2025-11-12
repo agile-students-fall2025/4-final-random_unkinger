@@ -37,3 +37,162 @@
     transform: rotate(360deg);
   }
 }
+
+/* Mobile-friendly base styles */
+html, body, #root {
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Ensure text elements inherit the theme color in dark mode */
+.dark-mode p,
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode span:not(.text):not(.app-name) {
+  color: var(--color-text);
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+input, select, textarea, button {
+  font-size: 16px; 
+}
+
+.mobile-app-shell {
+  max-width: 630px; 
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
+.mobile-section {
+  width: 100%;
+}
+
+
+.page-frame {
+  max-width: 680px;          
+  width: 100%;
+  margin: 0 auto;
+  min-height: 88dvh;        
+  background: var(--color-bg);       
+  border-radius: 12px;
+  padding: 16px;            
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.dark-mode .page-frame {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  background: var(--color-bg);
+}
+
+/* Improve dark mode text visibility in page frames */
+.dark-mode .page-frame {
+  color: var(--color-text);
+}
+
+.dark-mode .page-frame input,
+.dark-mode .page-frame textarea,
+.dark-mode .page-frame select {
+  color: var(--color-text);
+  background: var(--color-secondary);
+}
+
+@media (max-width: 520px) {
+  .page-frame {
+    border-radius: 10px;
+    padding: 12px;
+  }
+}
+
+
+.page-frame .home-container,
+.page-frame .add-meal-page,
+.page-frame .scan-meal-page,
+.page-frame .activity-page,
+.page-frame .diary-container,
+.page-frame .edit-item-page,
+.page-frame .profile-page {
+  min-height: unset;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+}
+
+.page-frame .container {
+  width: 100%;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.page-frame .camera-feed,
+.page-frame .error-message {
+  width: 100%;
+  max-width: 400px;
+}
+
+.page-frame .action-button {
+  width: 100%;
+  max-width: 300px;
+}
+
+.page-frame .header {
+  background: var(--color-secondary);
+  color: var(--color-dark);
+}
+
+.underline {
+  background: var(--color-primary);
+}
+
+.submit,
+.add-btn {
+  background: var(--color-primary);
+}
+
+.circle {
+  border-color: var(--color-primary);
+}
+
+.activity-card {
+  border-left-color: var(--color-primary);
+}
+
+.stat-value {
+  color: var(--color-primary);
+}
+
+.forgot-password span {
+  color: var(--color-primary);
+}
+@media (min-width: 480px) {
+  .mobile-app-shell {
+    padding: 16px;
+    gap: 20px;
+  }
+}
