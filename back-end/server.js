@@ -30,7 +30,7 @@ function addRecentSearch(queryRaw) {
   return recentSearches;
 }
 
-const MOCK_PROFILE = {
+let MOCK_PROFILE = {
   name: "John",
   age: 21,
   heightCm: 165,
@@ -70,7 +70,15 @@ app.post("/api/profile", (req, res) => {
     });
   }
 
-  res.status(200).json({ ok: true, saved: req.body });
+  // Update the profile with the new data
+  MOCK_PROFILE = {
+    ...MOCK_PROFILE,
+    ...req.body,
+    calorieGoal: calorieGoal !== undefined ? Number(calorieGoal) : MOCK_PROFILE.calorieGoal,
+    proteinGoal: proteinGoal !== undefined ? Number(proteinGoal) : MOCK_PROFILE.proteinGoal,
+  };
+
+  res.status(200).json({ ok: true, saved: MOCK_PROFILE });
 });
 
 app.get("/api/meals", (req, res) => {
