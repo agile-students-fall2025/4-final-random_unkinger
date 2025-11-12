@@ -30,7 +30,7 @@ function addRecentSearch(queryRaw) {
   return recentSearches;
 }
 
-const MOCK_PROFILE = {
+let MOCK_PROFILE = {
   name: "John",
   age: 21,
   heightCm: 165,
@@ -51,6 +51,7 @@ const manualMeals = [
     fat: 12,
     notes: "Made with almond milk, chia seeds, blueberries.",
     loggedAt: new Date().toISOString(),
+    source: "manual", // "manual" or "scanned"
   },
 ];
 
@@ -70,7 +71,15 @@ app.post("/api/profile", (req, res) => {
     });
   }
 
-  res.status(200).json({ ok: true, saved: req.body });
+  // Update the profile with the new data
+  MOCK_PROFILE = {
+    ...MOCK_PROFILE,
+    ...req.body,
+    calorieGoal: calorieGoal !== undefined ? Number(calorieGoal) : MOCK_PROFILE.calorieGoal,
+    proteinGoal: proteinGoal !== undefined ? Number(proteinGoal) : MOCK_PROFILE.proteinGoal,
+  };
+
+  res.status(200).json({ ok: true, saved: MOCK_PROFILE });
 });
 
 app.get("/api/meals", (req, res) => {
@@ -96,7 +105,7 @@ app.get("/api/meals", (req, res) => {
 });
 
 app.post("/api/meals", (req, res) => {
-  const { name, calories, carbs, protein, fat, notes } = req.body || {};
+  const { name, calories, carbs, protein, fat, notes, source } = req.body || {};
 
   if (!name || typeof name !== "string" || !name.trim()) {
     return res.status(400).json({ error: "Meal name is required." });
@@ -114,6 +123,9 @@ app.post("/api/meals", (req, res) => {
     }
   }
 
+  // Validate source if provided, default to "manual"
+  const mealSource = source === "scanned" ? "scanned" : "manual";
+
   const newMeal = {
     id: Date.now(),
     name: name.trim(),
@@ -123,6 +135,7 @@ app.post("/api/meals", (req, res) => {
     fat: Number(fat) || 0,
     notes: typeof notes === "string" ? notes.trim() : "",
     loggedAt: new Date().toISOString(),
+    source: mealSource,
   };
 
   manualMeals.unshift(newMeal);

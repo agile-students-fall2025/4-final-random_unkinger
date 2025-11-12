@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../LoginSignup/LoginSignup.css";
 import "./ManualMeal.css";
 import NavBar from "../NavBar/NavBar";
@@ -15,6 +15,7 @@ const initialForm = {
 
 const ManualMeal = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5050";
   const [form, setForm] = useState(initialForm);
   const [entries, setEntries] = useState([]);
@@ -49,6 +50,30 @@ const ManualMeal = () => {
             loggedAt: meal.loggedAt,
           }))
         );
+
+        // Check if there's an edit parameter in the URL
+        const editId = searchParams.get("edit");
+        if (editId) {
+          const mealToEdit = meals.find((meal) => meal.id === Number(editId));
+          if (mealToEdit) {
+            setForm({
+              name: mealToEdit.name || "",
+              calories: mealToEdit.calories || "",
+              carbs: mealToEdit.carbs || "",
+              protein: mealToEdit.protein || "",
+              fat: mealToEdit.fat || "",
+              notes: mealToEdit.notes || "",
+            });
+            setEditingId(mealToEdit.id);
+            setSearchParams({});
+            setTimeout(() => {
+              const formElement = document.querySelector(".manual-meal-form");
+              if (formElement) {
+                formElement.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+            }, 100);
+          }
+        }
       } catch (err) {
         console.error(err);
         setError(
@@ -60,7 +85,7 @@ const ManualMeal = () => {
     };
 
     fetchMeals();
-  }, [API_BASE]);
+  }, [API_BASE, searchParams, setSearchParams]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -80,6 +105,7 @@ const ManualMeal = () => {
         protein: form.protein ? Number(form.protein) : undefined,
         fat: form.fat ? Number(form.fat) : undefined,
         notes: form.notes.trim(),
+        source: "manual",
       };
 
       const endpoint = editingId
@@ -206,20 +232,19 @@ const ManualMeal = () => {
 
   return (
     <div className="manual-meal-page">
-      <div className="container">
-        <div className="header">
-          <button
-            onClick={() => navigate(-1)}
-            className="back-button"
-            aria-label="Back"
-          >
-            <i className="ri-arrow-left-line"></i>
-          </button>
-          <div className="text">Enter Meal Manually</div>
-          <div className="underline"></div>
-        </div>
+      <div className="header">
+        <button
+          onClick={() => navigate(-1)}
+          className="back-button"
+          aria-label="Back"
+        >
+          <i className="ri-arrow-left-line"></i>
+        </button>
+        <div className="text">Enter Meal Manually</div>
+        <div className="underline"></div>
+      </div>
 
-        {error && <div className="manual-error">{error}</div>}
+      {error && <div className="manual-error">{error}</div>}
 
         <form className="manual-meal-form" onSubmit={handleSubmit}>
           <div className="manual-field">
@@ -400,7 +425,7 @@ const ManualMeal = () => {
             </section>
           )
         )}
-      </div>
+
       <NavBar />
     </div>
   );

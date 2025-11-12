@@ -4,6 +4,10 @@
   background-color: lightskyblue;
   transition: background-color 0.3s ease;
   padding-bottom: 72px;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .dark-mode .activity-page {

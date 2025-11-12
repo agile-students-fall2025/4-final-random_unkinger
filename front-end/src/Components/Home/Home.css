@@ -57,20 +57,41 @@
 .calorie-circle {
   position: relative;
   margin: 2rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.circle {
+.circle-wrapper {
+  position: relative;
   width: 160px;
   height: 160px;
-  border: 8px solid orange;
-  border-radius: 50%;
-  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.progress-ring-background {
+  transition: stroke 0.3s ease;
+}
+
+.progress-ring-progress {
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.dark-mode .progress-ring-background {
+  stroke: #444;
+}
+
 .circle-text {
+  position: relative;
+  z-index: 1;
   text-align: center;
   color: #333;
 }
@@ -115,16 +136,66 @@
   color: #ffffff;
 }
 
-.macro-ring {
+.macro-ring-wrapper {
+  position: relative;
   width: 40px;
   height: 40px;
-  border: 3px solid #aaa;
-  border-radius: 50%;
   margin: 0 auto 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dark-mode .macro-ring {
-  border-color: #666;
+.macro-progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.macro-ring-background {
+  transition: stroke 0.3s ease;
+}
+
+.macro-ring-progress {
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.macro-circle-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #333;
+  z-index: 1;
+  text-align: center;
+  line-height: 1;
+}
+
+.dark-mode .macro-circle-text {
+  color: #ffffff;
+}
+
+.dark-mode .macro-ring-background {
+  stroke: #444;
+}
+
+.macro-info {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.5rem;
+}
+
+.macro-info-text {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+  font-style: italic;
+}
+
+.dark-mode .macro-info-text {
+  color: #aaa;
 }
 
 .section-header {
