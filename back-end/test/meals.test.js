@@ -13,8 +13,10 @@ describe("Manual Meals API", () => {
 
   it("GET /api/meals?date filters meals by date", async () => {
     const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-    
+    const todayStr = `${today.getFullYear()}-${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
     const createRes = await request(app).post("/api/meals").send({
       name: "Today's Meal",
       calories: 400,
@@ -66,13 +68,11 @@ describe("Manual Meals API", () => {
     expect(createRes.status).to.equal(201);
     const mealId = createRes.body.meal.id;
 
-    const updateRes = await request(app)
-      .put(`/api/meals/${mealId}`)
-      .send({
-        name: "Updated Meal",
-        calories: 450,
-        protein: 35,
-      });
+    const updateRes = await request(app).put(`/api/meals/${mealId}`).send({
+      name: "Updated Meal",
+      calories: 450,
+      protein: 35,
+    });
 
     expect(updateRes.status).to.equal(200);
     expect(updateRes.body).to.have.property("meal");
@@ -115,5 +115,3 @@ describe("Manual Meals API", () => {
     expect(res.body.error).to.match(/not found/i);
   });
 });
-
-
