@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../LoginSignup/LoginSignup.css";
 import "./Profile.css";
 import NavBar from "../NavBar/NavBar";
@@ -20,6 +21,7 @@ const initial = {
 
 export default function Profile() {
   const [form, setForm] = useState(initial);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${API}/api/profile`)
@@ -70,9 +72,7 @@ export default function Profile() {
     setForm((f) => ({ ...f, avatarUrl: url }));
   };
 
-  const onLogout = () => {
-    alert("Logged out (demo).");
-  };
+  const onLogout = () => navigate("/");
 
   const onSave = async () => {
     const res = await fetch(`${API}/api/profile`, {
