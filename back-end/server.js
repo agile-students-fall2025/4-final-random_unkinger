@@ -83,7 +83,25 @@ res.status(200).json({ ok: true, saved: req.body });
 
 
 app.get("/api/meals", (req, res) => {
-res.json({ meals: manualMeals });
+  const { date } = req.query;
+
+  if (date) {
+    // Filter meals by date (YYYY-MM-DD format)
+    const filteredMeals = manualMeals.filter((meal) => {
+      if (!meal.loggedAt) return false;
+      const mealDate = new Date(meal.loggedAt);
+      const targetDate = new Date(date + "T00:00:00");
+      
+      return (
+        mealDate.getFullYear() === targetDate.getFullYear() &&
+        mealDate.getMonth() === targetDate.getMonth() &&
+        mealDate.getDate() === targetDate.getDate()
+      );
+    });
+    return res.json({ meals: filteredMeals });
+  }
+
+  res.json({ meals: manualMeals });
 });
 
 

@@ -11,6 +11,25 @@ describe("Manual Meals API", () => {
     expect(res.body.meals[0]).to.have.property("name");
   });
 
+  it("GET /api/meals?date filters meals by date", async () => {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    
+    const createRes = await request(app).post("/api/meals").send({
+      name: "Today's Meal",
+      calories: 400,
+    });
+    expect(createRes.status).to.equal(201);
+
+    const filteredRes = await request(app).get(`/api/meals?date=${todayStr}`);
+    expect(filteredRes.status).to.equal(200);
+    expect(filteredRes.body.meals).to.be.an("array");
+    const hasTodaysMeal = filteredRes.body.meals.some(
+      (meal) => meal.name === "Today's Meal"
+    );
+    expect(hasTodaysMeal).to.be.true;
+  });
+
   it("POST /api/meals creates a new meal entry", async () => {
     const payload = {
       name: "Homemade Stir Fry",
