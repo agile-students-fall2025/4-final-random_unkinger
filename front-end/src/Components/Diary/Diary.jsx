@@ -57,13 +57,17 @@ export default function Diary() {
 
       <main className="content">
         <div className="month-bar">
-          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>‹</button>
+          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>
+            ‹
+          </button>
           <div>
             <h2>
               {months[month]} {year}
             </h2>
           </div>
-          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>›</button>
+          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)}>
+            ›
+          </button>
         </div>
 
         <div className="calendar">

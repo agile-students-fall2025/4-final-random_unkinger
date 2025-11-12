@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Quagga from "@ericblade/quagga2"
+import Quagga from "@ericblade/quagga2";
 import "../LoginSignup/LoginSignup.css";
 import "./ScanMeal.css";
 import NavBar from "../NavBar/NavBar";
@@ -12,24 +12,23 @@ const ScanMeal = () => {
   const [barcode, setBarcode] = useState(null);
   const navigate = useNavigate();
 
-
   const startScanning = React.useCallback(() => {
     if (!videoRef.current) {
       console.log("Video reference not available");
       return;
     }
-    
+
     if (videoRef.current.videoWidth === 0) {
       console.log("Video not ready yet, waiting...");
       setTimeout(startScanning, 500);
       return;
     }
-    
+
     // clean up any existing scan instances first
     try {
       Quagga.stop();
     } catch (e) {}
-        
+
     const constraints = {
       inputStream: {
         name: "Live",
@@ -39,12 +38,12 @@ const ScanMeal = () => {
           width: { min: 640 },
           height: { min: 480 },
           facingMode: "environment",
-          aspectRatio: { min: 1, max: 2 }
-        }
+          aspectRatio: { min: 1, max: 2 },
+        },
       },
       locator: {
         patchSize: "medium",
-        halfSample: true
+        halfSample: true,
       },
       numOfWorkers: 2, // can reduce for btr compatibility
       frequency: 10,
@@ -58,12 +57,12 @@ const ScanMeal = () => {
           "codabar_reader",
           "upc_reader",
           "upc_e_reader",
-          "i2of5_reader"
-        ]
+          "i2of5_reader",
+        ],
       },
-      locate: true
+      locate: true,
     };
-    
+
     try {
       Quagga.init(constraints, (err) => {
         if (err) {
@@ -72,23 +71,23 @@ const ScanMeal = () => {
           setScanStatus(false);
           return;
         }
-                
+
         Quagga.onDetected((result) => {
           if (!result || !result.codeResult) {
             console.log("Invalid detection result");
             return;
           }
-          
+
           const code = result.codeResult.code;
           console.log("Barcode detected:", code);
           setBarcode(code);
-          
+
           // stop and auto move on after detecting barcode
           Quagga.stop();
           setScanStatus(false);
-          navigate("/edit-meal", {state: {barcode: code}});
+          navigate("/edit-meal", { state: { barcode: code } });
         });
-        
+
         // log every time frame is processed to the console
         Quagga.onProcessed((result) => {
           if (result) {
@@ -97,7 +96,7 @@ const ScanMeal = () => {
             }
           }
         });
-        
+
         // start scanning
         Quagga.start();
         setScanStatus(true);
@@ -141,12 +140,12 @@ const ScanMeal = () => {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
       }
-      if (scanStatus){
+      if (scanStatus) {
         Quagga.stop();
       }
     };
   }, [startScanning]);
-  
+
   // TODO might need to remove this manual add option
   const handleAddClick = () => {
     navigate("/edit-meal");

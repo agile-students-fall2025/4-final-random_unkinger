@@ -8,7 +8,7 @@ import ScanMeal from "./Components/AddMeal/ScanMeal";
 import ManualMeal from "./Components/AddMeal/ManualMeal";
 import ActivityTracking from "./Components/ActivityTracking/ActivityTracking";
 import EditMeal from "./Components/AddMeal/EditMeal";
-import Search from './Components/Search/Search'
+import Search from "./Components/Search/Search";
 import ThemeToggle from "./Components/ThemeToggle/ThemeToggle";
 
 import Diary from "./Components/Diary/Diary";
@@ -19,25 +19,24 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved === 'true';
+    const saved = localStorage.getItem("darkMode");
+    return saved === "true";
   });
 
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add('dark-mode');
+      document.documentElement.classList.add("dark-mode");
     } else {
-      document.documentElement.classList.remove('dark-mode');
+      document.documentElement.classList.remove("dark-mode");
     }
-    localStorage.setItem('darkMode', isDarkMode.toString());
+    localStorage.setItem("darkMode", isDarkMode.toString());
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
+    setIsDarkMode((prev) => !prev);
   };
 
   return (
-    
     /*
     <div className="mobile-app-shell">
       <div className="mobile-section"><div className="page-frame"><LoginSignup /></div></div>

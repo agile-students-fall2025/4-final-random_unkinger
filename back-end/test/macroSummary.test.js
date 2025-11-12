@@ -1,6 +1,6 @@
 const request = require("supertest");
 const { expect } = require("chai");
-const app = require("../server"); 
+const app = require("../server");
 describe("GET /api/macros/summary", () => {
   it("should return the most protein, carbs, and fat meals", async () => {
     const res = await request(app).get("/api/macros/summary");

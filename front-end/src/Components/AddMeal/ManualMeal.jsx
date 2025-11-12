@@ -303,11 +303,7 @@ const ManualMeal = () => {
           </div>
 
           <button type="submit" className="submit manual-submit">
-            {saving
-              ? "Saving..."
-              : editingId
-              ? "Update Meal"
-              : "Log Meal"}
+            {saving ? "Saving..." : editingId ? "Update Meal" : "Log Meal"}
           </button>
           {editingId && (
             <button
@@ -325,80 +321,83 @@ const ManualMeal = () => {
           <div className="manual-loading">Loading your manual meals…</div>
         ) : (
           entries.length > 0 && (
-          <section className="manual-summary">
-            <h3 className="manual-summary-title">Meals Logged Today</h3>
-            <div className="manual-summary-totals">
-              <div>
-                <span>Total Calories</span>
-                <strong>{totals.calories} kcal</strong>
+            <section className="manual-summary">
+              <h3 className="manual-summary-title">Meals Logged Today</h3>
+              <div className="manual-summary-totals">
+                <div>
+                  <span>Total Calories</span>
+                  <strong>{totals.calories} kcal</strong>
+                </div>
+                <div>
+                  <span>Carbs</span>
+                  <strong>{totals.carbs} g</strong>
+                </div>
+                <div>
+                  <span>Protein</span>
+                  <strong>{totals.protein} g</strong>
+                </div>
+                <div>
+                  <span>Fat</span>
+                  <strong>{totals.fat} g</strong>
+                </div>
               </div>
-              <div>
-                <span>Carbs</span>
-                <strong>{totals.carbs} g</strong>
-              </div>
-              <div>
-                <span>Protein</span>
-                <strong>{totals.protein} g</strong>
-              </div>
-              <div>
-                <span>Fat</span>
-                <strong>{totals.fat} g</strong>
-              </div>
-            </div>
 
-            <ul className="manual-meal-list">
-              {entries.map((item) => (
-                <li key={item.id} className="manual-meal-card">
-                  <div className="manual-meal-card-header">
-                    <h4>{item.name}</h4>
-                    <div className="manual-meal-meta">
-                      {editingId === item.id && (
-                        <span className="manual-editing-pill">Editing</span>
-                      )}
-                      <time>{formatTimestamp(item.loggedAt)}</time>
+              <ul className="manual-meal-list">
+                {entries.map((item) => (
+                  <li key={item.id} className="manual-meal-card">
+                    <div className="manual-meal-card-header">
+                      <h4>{item.name}</h4>
+                      <div className="manual-meal-meta">
+                        {editingId === item.id && (
+                          <span className="manual-editing-pill">Editing</span>
+                        )}
+                        <time>{formatTimestamp(item.loggedAt)}</time>
+                      </div>
                     </div>
-                  </div>
-                  <div className="manual-meal-macros">
-                    <span>
-                      <strong>{item.calories}</strong> kcal
-                    </span>
-                    <span>
-                      <strong>{item.carbs}</strong> g carbs
-                    </span>
-                    <span>
-                      <strong>{item.protein}</strong> g protein
-                    </span>
-                    <span>
-                      <strong>{item.fat}</strong> g fat
-                    </span>
-                  </div>
-                  {item.notes && (
-                    <p className="manual-meal-notes">{item.notes}</p>
-                  )}
-                  <div className="manual-meal-actions">
-                    <button
-                      type="button"
-                      className="manual-edit-btn"
-                      onClick={() => startEditing(item)}
-                      disabled={saving && editingId === item.id}
-                    >
-                      <i className="ri-edit-line" aria-hidden="true"></i>
-                      Edit meal
-                    </button>
-                    <button
-                      type="button"
-                      className="manual-delete-btn"
-                      onClick={() => handleDelete(item.id)}
-                      disabled={deletingId === item.id}
-                    >
-                      <i className="ri-delete-bin-6-line" aria-hidden="true"></i>
-                      {deletingId === item.id ? "Deleting…" : "Delete"}
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
+                    <div className="manual-meal-macros">
+                      <span>
+                        <strong>{item.calories}</strong> kcal
+                      </span>
+                      <span>
+                        <strong>{item.carbs}</strong> g carbs
+                      </span>
+                      <span>
+                        <strong>{item.protein}</strong> g protein
+                      </span>
+                      <span>
+                        <strong>{item.fat}</strong> g fat
+                      </span>
+                    </div>
+                    {item.notes && (
+                      <p className="manual-meal-notes">{item.notes}</p>
+                    )}
+                    <div className="manual-meal-actions">
+                      <button
+                        type="button"
+                        className="manual-edit-btn"
+                        onClick={() => startEditing(item)}
+                        disabled={saving && editingId === item.id}
+                      >
+                        <i className="ri-edit-line" aria-hidden="true"></i>
+                        Edit meal
+                      </button>
+                      <button
+                        type="button"
+                        className="manual-delete-btn"
+                        onClick={() => handleDelete(item.id)}
+                        disabled={deletingId === item.id}
+                      >
+                        <i
+                          className="ri-delete-bin-6-line"
+                          aria-hidden="true"
+                        ></i>
+                        {deletingId === item.id ? "Deleting…" : "Delete"}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )
         )}
       </div>
@@ -408,5 +407,3 @@ const ManualMeal = () => {
 };
 
 export default ManualMeal;
-
-
