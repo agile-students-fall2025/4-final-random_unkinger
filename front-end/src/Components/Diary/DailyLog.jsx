@@ -15,7 +15,6 @@ export default function DailyLog() {
   useEffect(() => {
     if (!date) return;
 
-
     fetch(`http://localhost:5050/api/macros/summary?date=${date}`)
       .then((res) => res.json())
       .then((data) => {
@@ -23,7 +22,6 @@ export default function DailyLog() {
         setSummary(data);
       })
       .catch((err) => console.error("Error fetching summary:", err));
-
 
     fetch(`http://localhost:5050/api/meals?date=${date}`)
       .then((res) => res.json())
@@ -37,11 +35,14 @@ export default function DailyLog() {
       });
   }, [date]);
 
-  const formattedDate = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-  });
+  const formattedDate = new Date(date + "T00:00:00").toLocaleDateString(
+    "en-US",
+    {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    }
+  );
 
   if (loading) return <p>Loading...</p>;
 
@@ -55,51 +56,51 @@ export default function DailyLog() {
       <main className="content">
         <button className="date-btn">Date: {formattedDate}</button>
 
-   
         <div className="macro-summary">
           <p>
-            Most Protein: {summary?.mostProtein?.name} ({summary?.mostProtein?.value}g)
+            Most Protein: {summary?.mostProtein?.name} (
+            {summary?.mostProtein?.value}g)
           </p>
           <p>
-            Most Carbs: {summary?.mostCarbs?.name} ({summary?.mostCarbs?.value}g)
+            Most Carbs: {summary?.mostCarbs?.name} ({summary?.mostCarbs?.value}
+            g)
           </p>
           <p>
             Most Fat: {summary?.mostFat?.name} ({summary?.mostFat?.value}g)
           </p>
         </div>
 
-   
         <div className="meal-list">
           {meals.map((meal) => (
             <div className="meal-card" key={meal.id}>
               <div className="meal-name">{meal.name}</div>
-<div className="meal-content-row"> 
-    <img
-      src={meal.image || "https://picsum.photos/id/63/400/300"}
-      alt={meal.name}
-      className="meal-image"
-    />
-              <div className="meal-info">
-                <div className="macros">
-                  <p>Protein = {meal.protein}g</p>
-                  <p>Fat = {meal.fat}g</p>
-                  <p>Carbs = {meal.carbs}g</p>
-                  <p>Calories = {meal.calories}</p>
-                  <p className="added">
-                    Added:{" "}
-                    {new Date(meal.loggedAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+              <div className="meal-content-row">
+                <img
+                  src={meal.image || "https://picsum.photos/id/63/400/300"}
+                  alt={meal.name}
+                  className="meal-image"
+                />
+                <div className="meal-info">
+                  <div className="macros">
+                    <p>Protein = {meal.protein}g</p>
+                    <p>Fat = {meal.fat}g</p>
+                    <p>Carbs = {meal.carbs}g</p>
+                    <p>Calories = {meal.calories}</p>
+                    <p className="added">
+                      Added:{" "}
+                      {new Date(meal.loggedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <button
+                    className="edit-btn"
+                    onClick={() => navigate(`/editmeal/${meal.id}`)}
+                  >
+                    <Pencil />
+                  </button>
                 </div>
-                <button
-                  className="edit-btn"
-                  onClick={() => navigate(`/editmeal/${meal.id}`)}
-                >
-                  <Pencil />
-                </button>
-              </div>
               </div>
             </div>
           ))}
