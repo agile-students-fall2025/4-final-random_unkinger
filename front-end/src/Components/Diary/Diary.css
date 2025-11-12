@@ -77,6 +77,52 @@
   border-color: #f97316;
 }
 
+.day-cell.selected {
+  background: #f97316;
+  color: white;
+  border-color: #f97316;
+}
+
+/* Dark mode styles */
+.dark-mode .diary-container {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.dark-mode .header {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.dark-mode .month-bar h2 {
+  color: var(--color-text);
+}
+
+.dark-mode .month-bar button {
+  color: var(--color-text);
+}
+
+.dark-mode .weekday {
+  color: #aaa;
+}
+
+.dark-mode .day-cell.clickable {
+  background: var(--color-secondary);
+  border-color: #555;
+  color: var(--color-text);
+}
+
+.dark-mode .day-cell.clickable:hover {
+  background: #f97316;
+  color: white;
+  border-color: #f97316;
+}
+
+.dark-mode .day-cell.selected {
+  background: #f97316;
+  color: white;
+  border-color: #f97316;
+}
 
 /* Mobile responsiveness */
 @media (max-width: 520px) {

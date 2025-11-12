@@ -181,7 +181,68 @@
   background: #d1d5db;
 }
 
+.macro-summary {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
+.macro-summary p {
+  margin: 8px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+/* Dark mode styles */
+.dark-mode .dailylog-container {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.dark-mode .header {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.dark-mode .date-btn {
+  color: var(--color-text);
+}
+
+.dark-mode .meal-card {
+  background-color: var(--color-secondary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .meal-name {
+  color: var(--color-text);
+}
+
+.dark-mode .macros p {
+  color: var(--color-text);
+}
+
+.dark-mode .added {
+  color: #aaa;
+}
+
+.dark-mode .edit-btn {
+  background: #3a3a3a;
+}
+
+.dark-mode .edit-btn:hover {
+  background: #4a4a4a;
+}
+
+.dark-mode .macro-summary {
+  background: var(--color-secondary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .macro-summary p {
+  color: var(--color-text);
+}
 
 @media (max-width: 520px) {
   .content {
