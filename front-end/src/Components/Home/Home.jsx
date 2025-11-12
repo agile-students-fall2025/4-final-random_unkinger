@@ -65,22 +65,18 @@ export default function Home() {
     ? Math.min(100, (caloriesConsumed / calorieGoal) * 100) 
     : 0;
 
-  // Calculate macro goals (defaults based on calorie goal if not set)
-  const carbsGoal = Math.round(calorieGoal * 0.5 / 4); // 50% of calories from carbs (4 cal/g)
-  const fatGoal = Math.round(calorieGoal * 0.3 / 9); // 30% of calories from fat (9 cal/g)
+  const carbsGoal = Math.round(calorieGoal * 0.5 / 4); 
+  const fatGoal = Math.round(calorieGoal * 0.3 / 9); 
 
-  // Calculate macro percentages
   const carbsPercentage = carbsGoal > 0 ? Math.min(100, (carbsConsumed / carbsGoal) * 100) : 0;
   const proteinPercentage = proteinGoal > 0 ? Math.min(100, (proteinConsumed / proteinGoal) * 100) : 0;
   const fatPercentage = fatGoal > 0 ? Math.min(100, (fatConsumed / fatGoal) * 100) : 0;
 
-  // Calculate SVG circle progress (circumference = 2 * π * radius)
-  const radius = 72; // radius of the main calorie circle (160px / 2 - 8px border)
+  const radius = 72; 
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (caloriePercentage / 100) * circumference;
 
-  // Macro circle dimensions (smaller circles)
-  const macroRadius = 18; // radius for macro circles (40px / 2 - 2px border)
+  const macroRadius = 18;
   const macroCircumference = 2 * Math.PI * macroRadius;
   
   const carbsOffset = macroCircumference - (carbsPercentage / 100) * macroCircumference;
@@ -162,6 +158,9 @@ export default function Home() {
                   transform="rotate(-90 20 20)"
                 />
               </svg>
+              <div className="macro-circle-text">
+                {loading ? "..." : Math.round(carbsConsumed)}
+              </div>
             </div>
             <p>{loading ? "..." : `${Math.round(carbsConsumed)}/${carbsGoal} g`} carbs</p>
           </div>
@@ -191,6 +190,9 @@ export default function Home() {
                   transform="rotate(-90 20 20)"
                 />
               </svg>
+              <div className="macro-circle-text">
+                {loading ? "..." : Math.round(fatConsumed)}
+              </div>
             </div>
             <p>{loading ? "..." : `${Math.round(fatConsumed)}/${fatGoal} g`} fat</p>
           </div>
@@ -220,9 +222,18 @@ export default function Home() {
                   transform="rotate(-90 20 20)"
                 />
               </svg>
+              <div className="macro-circle-text">
+                {loading ? "..." : Math.round(proteinConsumed)}
+              </div>
             </div>
             <p>{loading ? "..." : `${Math.round(proteinConsumed)}/${proteinGoal} g`} protein</p>
           </div>
+        </div>
+
+        <div className="macro-info">
+          <p className="macro-info-text">
+            Carbs and fat goals are calculated based on your calorie goal: 50% from carbs (4 cal/g), 30% from fat (9 cal/g)
+          </p>
         </div>
 
         <section className="activity">

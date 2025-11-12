@@ -88,12 +88,40 @@
 }
 
 
+.meal-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
 .meal-name {
     font-size: 1.3em; 
     font-weight: bold;
-    margin-bottom: 15px; 
-    text-align: center; 
-    padding-left:60px;
+    text-align: center;
+    margin: 0;
+}
+
+.meal-source-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.meal-source-tag--manual {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.meal-source-tag--scanned {
+    background-color: #fff3e0;
+    color: #f57c00;
 }
 
 
@@ -242,6 +270,16 @@
 
 .dark-mode .macro-summary p {
   color: var(--color-text);
+}
+
+.dark-mode .meal-source-tag--manual {
+  background-color: rgba(25, 118, 210, 0.2);
+  color: #90caf9;
+}
+
+.dark-mode .meal-source-tag--scanned {
+  background-color: rgba(245, 124, 0, 0.2);
+  color: #ffb74d;
 }
 
 @media (max-width: 520px) {

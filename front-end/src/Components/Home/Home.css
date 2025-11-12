@@ -160,8 +160,42 @@
   transition: stroke-dashoffset 0.5s ease;
 }
 
+.macro-circle-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #333;
+  z-index: 1;
+  text-align: center;
+  line-height: 1;
+}
+
+.dark-mode .macro-circle-text {
+  color: #ffffff;
+}
+
 .dark-mode .macro-ring-background {
   stroke: #444;
+}
+
+.macro-info {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.5rem;
+}
+
+.macro-info-text {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+  font-style: italic;
+}
+
+.dark-mode .macro-info-text {
+  color: #aaa;
 }
 
 .section-header {

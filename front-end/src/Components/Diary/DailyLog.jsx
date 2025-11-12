@@ -1,29 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./DailyLog.css";
 import NavBar from "../NavBar/NavBar";
 
 const Pencil = () => <span style={{ fontSize: "14px" }}>✏️</span>;
 
+const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
+
 export default function DailyLog() {
   const { date } = useParams();
   const navigate = useNavigate();
   const [meals, setMeals] = useState([]);
-  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!date) return;
 
-    fetch(`http://localhost:5050/api/macros/summary?date=${date}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Summary:", data);
-        setSummary(data);
-      })
-      .catch((err) => console.error("Error fetching summary:", err));
-
-    fetch(`http://localhost:5050/api/meals?date=${date}`)
+    fetch(`${API}/api/meals?date=${date}`)
       .then((res) => res.json())
       .then((data) => {
         setMeals(data.meals || []);
@@ -34,6 +27,19 @@ export default function DailyLog() {
         setLoading(false);
       });
   }, [date]);
+
+  // Calculate totals from meals
+  const totals = useMemo(() => {
+    return meals.reduce(
+      (acc, meal) => ({
+        calories: acc.calories + (meal.calories || 0),
+        carbs: acc.carbs + (meal.carbs || 0),
+        protein: acc.protein + (meal.protein || 0),
+        fat: acc.fat + (meal.fat || 0),
+      }),
+      { calories: 0, carbs: 0, protein: 0, fat: 0 }
+    );
+  }, [meals]);
 
   const formattedDate = new Date(date + "T00:00:00").toLocaleDateString(
     "en-US",
@@ -58,22 +64,28 @@ export default function DailyLog() {
 
         <div className="macro-summary">
           <p>
-            Most Protein: {summary?.mostProtein?.name} (
-            {summary?.mostProtein?.value}g)
+            Total Calories: {totals.calories} kcal
           </p>
           <p>
-            Most Carbs: {summary?.mostCarbs?.name} ({summary?.mostCarbs?.value}
-            g)
+            Total Carbs: {totals.carbs} g
           </p>
           <p>
-            Most Fat: {summary?.mostFat?.name} ({summary?.mostFat?.value}g)
+            Total Protein: {totals.protein} g
+          </p>
+          <p>
+            Total Fat: {totals.fat} g
           </p>
         </div>
 
         <div className="meal-list">
           {meals.map((meal) => (
             <div className="meal-card" key={meal.id}>
-              <div className="meal-name">{meal.name}</div>
+              <div className="meal-name-row">
+                <div className="meal-name">{meal.name}</div>
+                <span className={`meal-source-tag meal-source-tag--${meal.source || "manual"}`}>
+                  {meal.source === "scanned" ? "Scanned" : "Manual"}
+                </span>
+              </div>
               <div className="meal-content-row">
                 <img
                   src={meal.image || "https://picsum.photos/id/63/400/300"}
@@ -96,7 +108,13 @@ export default function DailyLog() {
                   </div>
                   <button
                     className="edit-btn"
-                    onClick={() => navigate(`/editmeal/${meal.id}`)}
+                    onClick={() => {
+                      if (meal.source === "manual" || !meal.source) {
+                        navigate(`/manual-meal?edit=${meal.id}`);
+                      } else {
+                        navigate(`/editmeal/${meal.id}`);
+                      }
+                    }}
                   >
                     <Pencil />
                   </button>
