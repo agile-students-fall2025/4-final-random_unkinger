@@ -4,16 +4,13 @@
   display: flex;
   flex-direction: column;
   transition: background-color 0.3s ease;
-}
-
-.manual-meal-page .container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   gap: 24px;
   padding: 0 24px 96px;
-  max-width: 720px;
+  max-width: min(720px, 100vw);
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .manual-meal-form {
@@ -280,7 +277,7 @@
 }
 
 @media (max-width: 520px) {
-  .manual-meal-page .container {
+  .manual-meal-page {
     padding: 0 16px 88px;
   }
 

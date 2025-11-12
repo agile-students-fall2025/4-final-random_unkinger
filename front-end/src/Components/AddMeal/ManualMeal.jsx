@@ -65,9 +65,7 @@ const ManualMeal = () => {
               notes: mealToEdit.notes || "",
             });
             setEditingId(mealToEdit.id);
-            // Remove the edit parameter from URL
             setSearchParams({});
-            // Scroll to the form after a short delay to ensure it's rendered
             setTimeout(() => {
               const formElement = document.querySelector(".manual-meal-form");
               if (formElement) {
@@ -234,20 +232,19 @@ const ManualMeal = () => {
 
   return (
     <div className="manual-meal-page">
-      <div className="container">
-        <div className="header">
-          <button
-            onClick={() => navigate(-1)}
-            className="back-button"
-            aria-label="Back"
-          >
-            <i className="ri-arrow-left-line"></i>
-          </button>
-          <div className="text">Enter Meal Manually</div>
-          <div className="underline"></div>
-        </div>
+      <div className="header">
+        <button
+          onClick={() => navigate(-1)}
+          className="back-button"
+          aria-label="Back"
+        >
+          <i className="ri-arrow-left-line"></i>
+        </button>
+        <div className="text">Enter Meal Manually</div>
+        <div className="underline"></div>
+      </div>
 
-        {error && <div className="manual-error">{error}</div>}
+      {error && <div className="manual-error">{error}</div>}
 
         <form className="manual-meal-form" onSubmit={handleSubmit}>
           <div className="manual-field">
@@ -428,7 +425,7 @@ const ManualMeal = () => {
             </section>
           )
         )}
-      </div>
+
       <NavBar />
     </div>
   );

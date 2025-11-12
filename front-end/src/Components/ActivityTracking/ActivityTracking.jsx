@@ -42,20 +42,19 @@ const ActivityTracking = () => {
 
   return (
     <div className="activity-page">
-      <div className="container">
-        <div className="header">
-          <button
-            onClick={() => navigate(-1)}
-            className="back-button"
-            aria-label="Back"
-          >
-            <i className="ri-arrow-left-line"></i>
-          </button>
-          <div className="text">Activity Tracking</div>
-          <div className="underline"></div>
-        </div>
+      <div className="header">
+        <button
+          onClick={() => navigate(-1)}
+          className="back-button"
+          aria-label="Back"
+        >
+          <i className="ri-arrow-left-line"></i>
+        </button>
+        <div className="text">Activity Tracking</div>
+        <div className="underline"></div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="activity-form">
+      <form onSubmit={handleSubmit} className="activity-form">
           <div className="input">
             <i className="ri-run-line"></i>
             <input
@@ -156,7 +155,7 @@ const ActivityTracking = () => {
             </div>
           </div>
         )}
-      </div>
+
       <NavBar />
     </div>
   );
