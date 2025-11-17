@@ -15,7 +15,7 @@
   font-size: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
-  z-index: 1000;
+  z-index: 1002;
 }
 
 .theme-toggle:hover {
@@ -27,13 +27,23 @@
   transform: scale(0.95);
 }
 
+/* on mobile position toggle on the left */
+@media (max-width: 768px) {
+  .theme-toggle {
+    top: auto;
+    bottom: 20px;
+    right: auto;
+    left: 20px;
+  }
+}
+
 @media (max-width: 520px) {
   .theme-toggle {
     width: 44px;
     height: 44px;
     font-size: 22px;
-    top: 16px;
-    right: 16px;
+    bottom: 16px;
+    left: 16px;
   }
 }
 
