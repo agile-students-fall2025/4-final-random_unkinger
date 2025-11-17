@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
 
 const app = express();
 app.use(express.json());
@@ -75,8 +76,14 @@ app.post("/api/profile", (req, res) => {
   MOCK_PROFILE = {
     ...MOCK_PROFILE,
     ...req.body,
-    calorieGoal: calorieGoal !== undefined ? Number(calorieGoal) : MOCK_PROFILE.calorieGoal,
-    proteinGoal: proteinGoal !== undefined ? Number(proteinGoal) : MOCK_PROFILE.proteinGoal,
+    calorieGoal:
+      calorieGoal !== undefined
+        ? Number(calorieGoal)
+        : MOCK_PROFILE.calorieGoal,
+    proteinGoal:
+      proteinGoal !== undefined
+        ? Number(proteinGoal)
+        : MOCK_PROFILE.proteinGoal,
   };
 
   res.status(200).json({ ok: true, saved: MOCK_PROFILE });
@@ -102,6 +109,47 @@ app.get("/api/meals", (req, res) => {
   }
 
   res.json({ meals: manualMeals });
+});
+
+// TODO : back up load + test cases
+app.get("/api/barcode/:barcode", async (req, res) => {
+  const { barcode } = req.params;
+
+  try {
+    const response = await axios.get(
+      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+    );
+
+    if (response.data.status === 1) {
+      const product = response.data.product;
+
+      const nutri = product.nutriments || {};
+      const nutriData = {
+        barcode: barcode,
+        name: product.product_name || "Unknown",
+        brand: product.brands || "Unknown",
+        imageUrl: product.image_url || null,
+        // per 100g
+        calories: Math.round((nutri.energy_value || 0) / 4.184), // kJ to kcal
+        protein: Math.round((nutri.proteins_100g || 0) * 10) / 10,
+        carbs: Math.round((nutri.carbohydrates_100g || 0) * 10) / 10,
+        fat: Math.round((nutri.fat_100g || 0) * 10) / 10,
+        fiber: Math.round((nutri.fiber_100g || 0) * 10) / 10,
+        sugar: Math.round((nutri.sugars_100g || 0) * 10) / 10,
+      };
+
+      return res.json(nutriData);
+    }
+    res.status(404).json({
+      error: "product not found",
+      barcode,
+    });
+  } catch (e) {
+    res.status(505).json({
+      error: "failed to fetch product data",
+      details: e.message,
+    });
+  }
 });
 
 app.post("/api/meals", (req, res) => {
