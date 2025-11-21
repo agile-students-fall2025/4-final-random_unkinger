@@ -23,34 +23,64 @@ export default function Profile() {
   const [form, setForm] = useState(initial);
   const navigate = useNavigate();
 
+  // --- Load profile from backend with JWT ---
   useEffect(() => {
-    fetch(`${API}/api/profile`)
-      .then((res) => res.json())
-      .then((data) => setForm((f) => ({ ...f, ...data })))
-      .catch((err) => console.error("Failed to load profile:", err));
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("No token found, redirecting to login.");
+      navigate("/");
+      return;
+    }
+
     async function loadProfile() {
       try {
-        const res = await fetch("/api/profile");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const res = await fetch(`${API}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         const data = await res.json();
+
         setForm((f) => ({
           ...f,
           name: data.name ?? f.name,
-          age: String(data.age ?? f.age),
-          heightCm: String(data.heightCm ?? f.heightCm),
-          weightKg: String(data.weightKg ?? f.weightKg),
+          age:
+            data.age !== undefined && data.age !== null
+              ? String(data.age)
+              : f.age,
+          heightCm:
+            data.heightCm !== undefined && data.heightCm !== null
+              ? String(data.heightCm)
+              : f.heightCm,
+          weightKg:
+            data.weightKg !== undefined && data.weightKg !== null
+              ? String(data.weightKg)
+              : f.weightKg,
           activity: data.activity ?? f.activity,
-          calorieGoal: String(data.calorieGoal ?? f.calorieGoal),
-          proteinGoal: String(data.proteinGoal ?? f.proteinGoal),
+          calorieGoal:
+            data.calorieGoal !== undefined && data.calorieGoal !== null
+              ? String(data.calorieGoal)
+              : f.calorieGoal,
+          proteinGoal:
+            data.proteinGoal !== undefined && data.proteinGoal !== null
+              ? String(data.proteinGoal)
+              : f.proteinGoal,
           avatarUrl: data.avatarUrl ?? f.avatarUrl,
         }));
       } catch (err) {
         console.error("Failed to load profile:", err);
       }
     }
-    loadProfile();
-  }, []);
 
+    loadProfile();
+  }, [navigate]);
+
+  // --- BMI calculation ---
   const bmi = useMemo(() => {
     const h = parseFloat(form.heightCm);
     const w = parseFloat(form.weightKg);
@@ -60,31 +90,67 @@ export default function Profile() {
     return Number.isFinite(v) ? v.toFixed(1) : "";
   }, [form.heightCm, form.weightKg]);
 
+  // --- Handlers ---
   const handle = (e) => {
     const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    setForm((f) => ({
+      ...f,
+      [name]: value,
+    }));
   };
 
   const onAvatarChange = (e) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    setForm((f) => ({ ...f, avatarUrl: url }));
+    setForm((f) => ({
+      ...f,
+      avatarUrl: url,
+    }));
   };
 
-  const onLogout = () => navigate("/");
+  const onLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
 
   const onSave = async () => {
-    const res = await fetch(`${API}/api/profile`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const json = await res.json();
-    console.log("Saved:", json);
-    alert("Profile saved (mock).");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You must be logged in to save your profile.");
+      navigate("/");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
+
+      const json = await res.json();
+      console.log("Saved:", json);
+
+      if (!res.ok) {
+        const msg =
+          json.error ||
+          (json.errors && json.errors[0]?.msg) ||
+          "Unknown error saving profile.";
+        alert("Failed to save profile: " + msg);
+      } else {
+        alert("Profile saved!");
+      }
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      alert("Unexpected error saving profile.");
+    }
   };
 
+  // --- JSX ---
   return (
     <div className="profile-page">
       <div className="container">
@@ -98,16 +164,22 @@ export default function Profile() {
             {form.avatarUrl ? (
               <img className="avatar-img" src={form.avatarUrl} alt="avatar" />
             ) : (
-              <div className="avatar-placeholder">Profile{"\n"}Picture</div>
+              <div className="avatar-placeholder">
+                Profile
+                <br />
+                Picture
+              </div>
             )}
           </div>
-          <label className="avatar-upload">
-            <input type="file" accept="image/*" onChange={onAvatarChange} />
-            Upload
-          </label>
+          <div className="avatar-actions">
+            <label className="avatar-upload">
+              <span>Change photo</span>
+              <input type="file" accept="image/*" onChange={onAvatarChange} />
+            </label>
+          </div>
         </div>
 
-        <div className="profile-form">
+        <div className="form-grid">
           <div className="form-row">
             <label className="form-label">Name</label>
             <div className="input profile-input">
@@ -140,7 +212,7 @@ export default function Profile() {
               <input
                 name="age"
                 type="number"
-                placeholder=" e.g., 21"
+                placeholder=" years"
                 value={form.age}
                 onChange={handle}
                 min="0"
@@ -186,10 +258,10 @@ export default function Profile() {
                 aria-label="Activity level"
               >
                 <option value="sedentary">Sedentary</option>
-                <option value="light">Light (1-3 days/wk)</option>
-                <option value="moderate">Moderate (3-5 days/wk)</option>
-                <option value="active">Active (6-7 days/wk)</option>
-                <option value="very_active">Very Active (athlete)</option>
+                <option value="light">Lightly active</option>
+                <option value="moderate">Moderately active</option>
+                <option value="active">Active</option>
+                <option value="very_active">Very active</option>
               </select>
             </div>
           </div>
@@ -207,6 +279,7 @@ export default function Profile() {
               />
             </div>
           </div>
+
           <div className="form-row">
             <label className="form-label">Protein Goal</label>
             <div className="input profile-input">
