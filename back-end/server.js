@@ -1,10 +1,72 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
+const Profile = require("./models/Profile");
+
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connected to MongoDB Atlas"))
+  .catch((err) => {
+    console.error("MongoDB connection error:", err.message);
+    process.exit(1);
+  });
+
+
+
+function auth(req, res, next) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice(7)
+    : null;
+
+  if (!token) {
+    return res.status(401).json({ error: "Missing Authorization token" });
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = payload;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid or expired token" });
+  }
+}
+
+
+
+const validateProfile = [
+  body("name").optional().isString().trim().isLength({ max: 100 }),
+  body("age").optional().isInt({ min: 0, max: 200 }),
+  body("heightCm").optional().isFloat({ min: 0 }),
+  body("weightKg").optional().isFloat({ min: 0 }),
+  body("activity")
+    .optional()
+    .isIn(["sedentary", "light", "moderate", "active", "very_active"]),
+  body("calorieGoal").optional().isFloat({ min: 0 }),
+  body("proteinGoal").optional().isFloat({ min: 0 }),
+  body("avatarUrl").optional().isString().isLength({ max: 500 }),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
 
 const MAX_RECENTS = 10;
 let recentSearches = [];
@@ -31,16 +93,6 @@ function addRecentSearch(queryRaw) {
   return recentSearches;
 }
 
-let MOCK_PROFILE = {
-  name: "John",
-  age: 21,
-  heightCm: 165,
-  weightKg: 60,
-  activity: "moderate",
-  calorieGoal: 2000,
-  proteinGoal: 120,
-  avatarUrl: "https://picsum.photos/seed/mock/120/120",
-};
 
 const manualMeals = [
   {
@@ -56,44 +108,81 @@ const manualMeals = [
   },
 ];
 
-app.get("/api/profile", (req, res) => {
-  res.json(MOCK_PROFILE);
-});
 
-app.post("/api/profile", (req, res) => {
-  const { calorieGoal, proteinGoal } = req.body;
+app.get("/api/profile", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-  if (
-    (typeof calorieGoal === "number" && calorieGoal < 0) ||
-    (typeof proteinGoal === "number" && proteinGoal < 0)
-  ) {
-    return res.status(400).json({
-      error: "calorieGoal and proteinGoal must be positive numbers.",
-    });
+    const profile = await Profile.findOne({ userId });
+
+    if (!profile) {
+      return res.json({
+        userId,
+        name: "",
+        age: "",
+        heightCm: "",
+        weightKg: "",
+        activity: "sedentary",
+        calorieGoal: "",
+        proteinGoal: "",
+        avatarUrl: `https://picsum.photos/seed/profile-${userId}/120/120`,
+      });
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error("Error loading profile:", err);
+    res.status(500).json({ error: "Failed to load profile" });
   }
-
-  // Update the profile with the new data
-  MOCK_PROFILE = {
-    ...MOCK_PROFILE,
-    ...req.body,
-    calorieGoal:
-      calorieGoal !== undefined
-        ? Number(calorieGoal)
-        : MOCK_PROFILE.calorieGoal,
-    proteinGoal:
-      proteinGoal !== undefined
-        ? Number(proteinGoal)
-        : MOCK_PROFILE.proteinGoal,
-  };
-
-  res.status(200).json({ ok: true, saved: MOCK_PROFILE });
 });
+
+app.post("/api/profile", auth, validateProfile, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      name,
+      age,
+      heightCm,
+      weightKg,
+      activity,
+      calorieGoal,
+      proteinGoal,
+      avatarUrl,
+    } = req.body;
+
+    const update = {
+      ...(name !== undefined && { name: name.trim() }),
+      ...(age !== undefined && { age: Number(age) }),
+      ...(heightCm !== undefined && { heightCm: Number(heightCm) }),
+      ...(weightKg !== undefined && { weightKg: Number(weightKg) }),
+      ...(activity !== undefined && { activity }),
+      ...(calorieGoal !== undefined && { calorieGoal: Number(calorieGoal) }),
+      ...(proteinGoal !== undefined && { proteinGoal: Number(proteinGoal) }),
+      ...(avatarUrl !== undefined && { avatarUrl }),
+    };
+
+    const saved = await Profile.findOneAndUpdate(
+      { userId },
+      { userId, ...update },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+
+    res.status(200).json({ ok: true, saved });
+  } catch (err) {
+    console.error("Error saving profile:", err);
+    res.status(500).json({ error: "Failed to save profile" });
+  }
+});
+
 
 app.get("/api/meals", (req, res) => {
   const { date } = req.query;
 
   if (date) {
-    // Filter meals by date (YYYY-MM-DD format)
     const filteredMeals = manualMeals.filter((meal) => {
       if (!meal.loggedAt) return false;
       const mealDate = new Date(meal.loggedAt);
@@ -111,7 +200,6 @@ app.get("/api/meals", (req, res) => {
   res.json({ meals: manualMeals });
 });
 
-// TODO : back up load + test cases
 app.get("/api/barcode/:barcode", async (req, res) => {
   const { barcode } = req.params;
 
@@ -129,8 +217,7 @@ app.get("/api/barcode/:barcode", async (req, res) => {
         name: product.product_name || "Unknown",
         brand: product.brands || "Unknown",
         imageUrl: product.image_url || null,
-        // per 100g
-        calories: Math.round((nutri.energy_value || 0) / 4.184), // kJ to kcal
+        calories: Math.round((nutri.energy_value || 0) / 4.184),
         protein: Math.round((nutri.proteins_100g || 0) * 10) / 10,
         carbs: Math.round((nutri.carbohydrates_100g || 0) * 10) / 10,
         fat: Math.round((nutri.fat_100g || 0) * 10) / 10,
@@ -171,7 +258,6 @@ app.post("/api/meals", (req, res) => {
     }
   }
 
-  // Validate source if provided, default to "manual"
   const mealSource = source === "scanned" ? "scanned" : "manual";
 
   const newMeal = {
