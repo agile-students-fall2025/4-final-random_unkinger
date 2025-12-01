@@ -88,7 +88,6 @@ export default function Profile() {
     return Number.isFinite(v) ? v.toFixed(1) : "";
   }, [form.heightCm, form.weightKg]);
 
-
   const handle = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({

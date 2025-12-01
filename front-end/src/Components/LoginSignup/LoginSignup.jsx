@@ -13,7 +13,6 @@ const LoginSignup = () => {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
-
   const handleReset = () => {
     if (!resetEmail.trim()) {
       alert("Please enter a valid email address.");
@@ -46,9 +45,7 @@ const LoginSignup = () => {
           return;
         }
 
-
         localStorage.setItem("token", data.token);
-
 
         navigate("/home");
       } catch (err) {
@@ -64,7 +61,6 @@ const LoginSignup = () => {
     if (action === "Login") {
       setAction("Sign Up");
     } else {
-
       setAction("Login");
     }
   };
@@ -113,7 +109,6 @@ const LoginSignup = () => {
             </div>
           </div>
         ) : (
-
           <>
             <div className="inputs">
               {action === "Login" ? (
