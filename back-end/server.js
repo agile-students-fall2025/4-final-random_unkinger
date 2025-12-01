@@ -397,9 +397,13 @@ app.get("/api/barcode/:barcode", async (req, res) => {
 app.post("/api/meals", auth, async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(`📥 [MongoDB] Creating meal for user: ${userId}`);
+    console.log(`   → Request body:`, req.body);
+    
     const { name, calories, carbs, protein, fat, notes, source, image } = req.body || {};
 
     if (!name || typeof name !== "string" || !name.trim()) {
+      console.log(`   ❌ Validation failed: Meal name is required`);
       return res.status(400).json({ error: "Meal name is required." });
     }
 
@@ -452,7 +456,9 @@ app.post("/api/meals", auth, async (req, res) => {
     });
   } catch (err) {
     console.error("❌ Error saving meal:", err);
-    res.status(500).json({ error: "Failed to save meal" });
+    console.error("   → Error details:", err.message);
+    console.error("   → Stack:", err.stack);
+    res.status(500).json({ error: "Failed to save meal", details: err.message });
   }
 });
 
