@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Home.css";
 import NavBar from "../NavBar/NavBar";
+import GoalReminder from "./GoalReminder";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
 
@@ -22,12 +23,24 @@ export default function Home() {
 
   const loadData = async () => {
     try {
+      const token = localStorage.getItem("token");
+      
       // Fetch profile to get goals
-      const profileRes = await fetch(`${API}/api/profile`);
-      if (profileRes.ok) {
-        const profile = await profileRes.json();
-        setCalorieGoal(profile.calorieGoal || 2000);
-        setProteinGoal(profile.proteinGoal || 120);
+      if (token) {
+        const profileRes = await fetch(`${API}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          setCalorieGoal(profile.calorieGoal || 2000);
+          setProteinGoal(profile.proteinGoal || 120);
+        }
+      } else {
+        // Default goals if not logged in
+        setCalorieGoal(2000);
+        setProteinGoal(120);
       }
 
       // Fetch today's meals to calculate consumed macros
@@ -95,6 +108,14 @@ export default function Home() {
 
       <main className="content">
         <h2 className="date">TODAY, {formattedDate}</h2>
+
+        <GoalReminder
+          calorieGoal={calorieGoal}
+          caloriesConsumed={caloriesConsumed}
+          proteinGoal={proteinGoal}
+          proteinConsumed={proteinConsumed}
+          loading={loading}
+        />
 
         <div className="calorie-circle">
           <div className="circle-wrapper">
