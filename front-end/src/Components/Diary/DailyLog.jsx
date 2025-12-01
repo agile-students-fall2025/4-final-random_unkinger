@@ -55,6 +55,13 @@ export default function DailyLog() {
   return (
     <div className="dailylog-container">
       <header className="header">
+        <button
+          onClick={() => navigate("/diary")}
+          className="back-button"
+          aria-label="Back"
+        >
+          <i className="ri-arrow-left-line"></i>
+        </button>
         <div className="text">Diary</div>
         <div className="underline"></div>
       </header>

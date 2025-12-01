@@ -19,6 +19,32 @@
   padding: 10px;
   font-weight: 700;
   font-size: 1.2rem;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #000000;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.back-button:hover {
+  opacity: 0.7;
+}
+
+.back-button i {
+  font-size: 1.5rem;
 }
 
 
@@ -232,6 +258,14 @@
 .dark-mode .header {
   background: var(--color-secondary);
   color: var(--color-text);
+}
+
+.dark-mode .back-button {
+  color: var(--color-text);
+}
+
+.dark-mode .back-button:hover {
+  opacity: 0.8;
 }
 
 .dark-mode .date-btn {
