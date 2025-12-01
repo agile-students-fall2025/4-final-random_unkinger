@@ -23,7 +23,6 @@ export default function Profile() {
   const [form, setForm] = useState(initial);
   const navigate = useNavigate();
 
-  // --- Load profile from backend with JWT ---
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -80,7 +79,6 @@ export default function Profile() {
     loadProfile();
   }, [navigate]);
 
-  // --- BMI calculation ---
   const bmi = useMemo(() => {
     const h = parseFloat(form.heightCm);
     const w = parseFloat(form.weightKg);
@@ -90,7 +88,7 @@ export default function Profile() {
     return Number.isFinite(v) ? v.toFixed(1) : "";
   }, [form.heightCm, form.weightKg]);
 
-  // --- Handlers ---
+
   const handle = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({
@@ -150,7 +148,6 @@ export default function Profile() {
     }
   };
 
-  // --- JSX ---
   return (
     <div className="profile-page">
       <div className="container">

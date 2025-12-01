@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginSignup.css";
 
+const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
+
 const LoginSignup = () => {
   const [action, setAction] = useState("Login");
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
-  // Handle forgot password request (mock)
+
   const handleReset = () => {
     if (!resetEmail.trim()) {
       alert("Please enter a valid email address.");
@@ -17,6 +22,51 @@ const LoginSignup = () => {
     alert(`Reset link sent to ${resetEmail} (mock).`);
     setShowReset(false);
     setResetEmail("");
+  };
+
+  const handleLoginClick = async () => {
+    if (action === "Login") {
+      if (!email.trim()) {
+        alert("Please enter your email.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API}/api/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Login failed.");
+          return;
+        }
+
+
+        localStorage.setItem("token", data.token);
+
+
+        navigate("/home");
+      } catch (err) {
+        console.error("Login error:", err);
+        alert("Unexpected error during login.");
+      }
+    } else {
+      setAction("Login");
+    }
+  };
+
+  const handleSignUpClick = () => {
+    if (action === "Login") {
+      setAction("Sign Up");
+    } else {
+
+      setAction("Login");
+    }
   };
 
   return (
@@ -31,7 +81,7 @@ const LoginSignup = () => {
           <div className="underline"></div>
         </div>
 
-        {/* ============ Forgot Password Popup ============ */}
+        {}
         {showReset ? (
           <div className="forgot-container">
             <p className="forgot-paragraph">
@@ -63,7 +113,7 @@ const LoginSignup = () => {
             </div>
           </div>
         ) : (
-          /* ============ Regular Login / Signup ============ */
+
           <>
             <div className="inputs">
               {action === "Login" ? (
@@ -71,16 +121,31 @@ const LoginSignup = () => {
               ) : (
                 <div className="input">
                   <i className="ri-user-fill"></i>
-                  <input type="text" placeholder="username" />
+                  <input
+                    type="text"
+                    placeholder="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
                 </div>
               )}
               <div className="input">
                 <i className="ri-mail-fill"></i>
-                <input type="email" placeholder="email" />
+                <input
+                  type="email"
+                  placeholder="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="input">
                 <i className="ri-lock-fill"></i>
-                <input type="password" placeholder="password" />
+                <input
+                  type="password"
+                  placeholder="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
             </div>
 
@@ -96,19 +161,13 @@ const LoginSignup = () => {
             <div className="submit-container">
               <div
                 className={action === "Login" ? "submit gray" : "submit"}
-                onClick={() => setAction("Sign Up")}
+                onClick={handleSignUpClick}
               >
                 Sign Up
               </div>
               <div
                 className={action === "Sign Up" ? "submit gray" : "submit"}
-                onClick={() => {
-                  if (action === "Login") {
-                    navigate("/home");
-                  } else {
-                    setAction("Login");
-                  }
-                }}
+                onClick={handleLoginClick}
               >
                 Login
               </div>

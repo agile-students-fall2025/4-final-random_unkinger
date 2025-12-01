@@ -48,16 +48,22 @@ function auth(req, res, next) {
 
 
 const validateProfile = [
-  body("name").optional().isString().trim().isLength({ max: 100 }),
-  body("age").optional().isInt({ min: 0, max: 200 }),
-  body("heightCm").optional().isFloat({ min: 0 }),
-  body("weightKg").optional().isFloat({ min: 0 }),
+  body("name").optional({ checkFalsy: false }).isString().trim().isLength({ max: 100 }),
+
+  // Allow empty string to be treated as "not provided"
+  body("age").optional({ checkFalsy: true }).isInt({ min: 0, max: 200 }),
+  body("heightCm").optional({ checkFalsy: true }).isFloat({ min: 0 }),
+  body("weightKg").optional({ checkFalsy: true }).isFloat({ min: 0 }),
+
   body("activity")
-    .optional()
+    .optional({ checkFalsy: true })
     .isIn(["sedentary", "light", "moderate", "active", "very_active"]),
-  body("calorieGoal").optional().isFloat({ min: 0 }),
-  body("proteinGoal").optional().isFloat({ min: 0 }),
-  body("avatarUrl").optional().isString().isLength({ max: 500 }),
+
+  body("calorieGoal").optional({ checkFalsy: true }).isFloat({ min: 0 }),
+  body("proteinGoal").optional({ checkFalsy: true }).isFloat({ min: 0 }),
+
+  body("avatarUrl").optional({ checkFalsy: true }).isString().isLength({ max: 500 }),
+
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -66,6 +72,38 @@ const validateProfile = [
     next();
   },
 ];
+
+
+
+
+
+app.post(
+  "/api/auth/login",
+  [
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required"),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    const userId = email.trim().toLowerCase();
+
+    const token = jwt.sign(
+      { id: userId },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({ token });
+  }
+);
+
+
 
 
 const MAX_RECENTS = 10;
@@ -104,9 +142,63 @@ const manualMeals = [
     fat: 12,
     notes: "Made with almond milk, chia seeds, blueberries.",
     loggedAt: new Date().toISOString(),
-    source: "manual", // "manual" or "scanned"
+    source: "manual", 
   },
 ];
+
+
+
+app.post("/api/auth/login", (req, res) => {
+  const { email } = req.body || {};
+
+  if (!email || typeof email !== "string" || !email.trim()) {
+    return res.status(400).json({ error: "Valid email is required." });
+  }
+
+
+  const userId = email.trim().toLowerCase();
+
+  const token = jwt.sign(
+    { id: userId }, 
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.json({ token });
+});
+
+
+
+// --- Simple JWT login route ---
+app.post(
+  "/api/auth/login",
+  [
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required"),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    const userId = email.trim().toLowerCase();
+
+    const token = jwt.sign(
+      { id: userId },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({ token });
+  }
+);
+
+
+
+
 
 
 app.get("/api/profile", auth, async (req, res) => {
