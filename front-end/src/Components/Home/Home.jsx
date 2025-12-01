@@ -45,7 +45,13 @@ export default function Home() {
 
       // Fetch today's meals to calculate consumed macros
       const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-      const mealsRes = await fetch(`${API}/api/meals?date=${todayStr}`);
+      const mealsHeaders = {};
+      if (token) {
+        mealsHeaders.Authorization = `Bearer ${token}`;
+      }
+      const mealsRes = await fetch(`${API}/api/meals?date=${todayStr}`, {
+        headers: mealsHeaders,
+      });
       if (mealsRes.ok) {
         const data = await mealsRes.json();
         const totals = (data.meals || []).reduce(

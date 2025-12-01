@@ -37,7 +37,17 @@ const ManualMeal = () => {
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${API_BASE}/api/meals`);
+        const token = localStorage.getItem("token");
+        const headers = {
+          "Content-Type": "application/json",
+        };
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API_BASE}/api/meals`, {
+          headers,
+        });
         if (!response.ok) {
           throw new Error(`Failed to load meals (${response.status})`);
         }
@@ -113,18 +123,39 @@ const ManualMeal = () => {
         : `${API_BASE}/api/meals`;
       const method = editingId ? "PUT" : "POST";
 
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("You must be logged in to save meals. Please log in and try again.");
+        setSaving(false);
+        return;
+      }
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      console.log("📤 Sending meal data:", { endpoint, method, payload });
+
       const response = await fetch(endpoint, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const message = await response.json().catch(() => ({}));
-        throw new Error(message.error || "Failed to save meal.");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("❌ Meal save failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+        });
+        throw new Error(errorData.error || `Failed to save meal (${response.status})`);
       }
 
-      const { meal } = await response.json();
+      const result = await response.json();
+      console.log("✅ Meal saved successfully:", result);
+      const { meal } = result;
 
       setEntries((prev) => {
         if (!editingId) {
@@ -202,8 +233,15 @@ const ManualMeal = () => {
     setError(null);
 
     try {
+      const token = localStorage.getItem("token");
+      const headers = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_BASE}/api/meals/${mealId}`, {
         method: "DELETE",
+        headers,
       });
 
       if (!response.ok) {

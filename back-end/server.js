@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const Profile = require("./models/Profile");
 const Activity = require("./models/Activity");
+const Meal = require("./models/Meal");
 
 const app = express();
 app.use(express.json());
@@ -147,19 +148,7 @@ function addRecentSearch(queryRaw) {
   return recentSearches;
 }
 
-const manualMeals = [
-  {
-    id: 1,
-    name: "Overnight Oats",
-    calories: 350,
-    carbs: 45,
-    protein: 18,
-    fat: 12,
-    notes: "Made with almond milk, chia seeds, blueberries.",
-    loggedAt: new Date().toISOString(),
-    source: "manual",
-  },
-];
+// Meals are now stored in MongoDB - see Meal model
 
 app.post("/api/auth/login", (req, res) => {
   const { email } = req.body || {};
@@ -321,25 +310,49 @@ app.delete("/api/activities/:id", auth, async (req, res) => {
   }
 });
 
-app.get("/api/meals", (req, res) => {
-  const { date } = req.query;
+app.get("/api/meals", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { date } = req.query;
 
-  if (date) {
-    const filteredMeals = manualMeals.filter((meal) => {
-      if (!meal.loggedAt) return false;
-      const mealDate = new Date(meal.loggedAt);
+    console.log(`📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""}`);
+
+    let query = { userId };
+
+    // Filter by date if provided
+    if (date) {
       const targetDate = new Date(date + "T00:00:00");
+      const nextDay = new Date(targetDate);
+      nextDay.setDate(nextDay.getDate() + 1);
 
-      return (
-        mealDate.getFullYear() === targetDate.getFullYear() &&
-        mealDate.getMonth() === targetDate.getMonth() &&
-        mealDate.getDate() === targetDate.getDate()
-      );
-    });
-    return res.json({ meals: filteredMeals });
+      query.loggedAt = {
+        $gte: targetDate,
+        $lt: nextDay,
+      };
+    }
+
+    const meals = await Meal.find(query).sort({ loggedAt: -1 }).lean();
+    
+    // Convert to format expected by frontend (with id field)
+    const formattedMeals = meals.map((meal) => ({
+      id: meal._id.toString(),
+      name: meal.name,
+      calories: meal.calories,
+      carbs: meal.carbs,
+      protein: meal.protein,
+      fat: meal.fat,
+      notes: meal.notes || "",
+      source: meal.source || "manual",
+      image: meal.image || "",
+      loggedAt: meal.loggedAt.toISOString(),
+    }));
+
+    console.log(`   ✅ Found ${formattedMeals.length} meals`);
+    res.json({ meals: formattedMeals });
+  } catch (err) {
+    console.error("❌ Error loading meals:", err);
+    res.status(500).json({ error: "Failed to load meals" });
   }
-
-  res.json({ meals: manualMeals });
 });
 
 app.get("/api/barcode/:barcode", async (req, res) => {
@@ -381,111 +394,187 @@ app.get("/api/barcode/:barcode", async (req, res) => {
   }
 });
 
-app.post("/api/meals", (req, res) => {
-  const { name, calories, carbs, protein, fat, notes, source } = req.body || {};
+app.post("/api/meals", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log(`📥 [MongoDB] Creating meal for user: ${userId}`);
+    console.log(`   → Request body:`, req.body);
+    
+    const { name, calories, carbs, protein, fat, notes, source, image } = req.body || {};
 
-  if (!name || typeof name !== "string" || !name.trim()) {
-    return res.status(400).json({ error: "Meal name is required." });
-  }
+    if (!name || typeof name !== "string" || !name.trim()) {
+      console.log(`   ❌ Validation failed: Meal name is required`);
+      return res.status(400).json({ error: "Meal name is required." });
+    }
 
-  const numericFields = { calories, carbs, protein, fat };
-  for (const [field, value] of Object.entries(numericFields)) {
-    if (value !== undefined) {
-      const numberValue = Number(value);
-      if (Number.isNaN(numberValue) || numberValue < 0) {
-        return res
-          .status(400)
-          .json({ error: `${field} must be a non-negative number.` });
+    const numericFields = { calories, carbs, protein, fat };
+    for (const [field, value] of Object.entries(numericFields)) {
+      if (value !== undefined) {
+        const numberValue = Number(value);
+        if (Number.isNaN(numberValue) || numberValue < 0) {
+          return res
+            .status(400)
+            .json({ error: `${field} must be a non-negative number.` });
+        }
       }
     }
+
+    const mealSource = source === "scanned" ? "scanned" : "manual";
+
+    const newMeal = new Meal({
+      userId,
+      name: name.trim(),
+      calories: Number(calories) || 0,
+      carbs: Number(carbs) || 0,
+      protein: Number(protein) || 0,
+      fat: Number(fat) || 0,
+      notes: typeof notes === "string" ? notes.trim() : "",
+      source: mealSource,
+      image: image || "",
+      loggedAt: new Date(),
+    });
+
+    const saved = await newMeal.save();
+    
+    console.log(`💾 [MongoDB] Meal saved for: ${userId}`);
+    console.log(`   → Meal: ${saved.name} (${saved.calories} cal, ${saved.protein}g protein, source: ${saved.source})`);
+
+    // Return in format expected by frontend
+    res.status(201).json({
+      meal: {
+        id: saved._id.toString(),
+        name: saved.name,
+        calories: saved.calories,
+        carbs: saved.carbs,
+        protein: saved.protein,
+        fat: saved.fat,
+        notes: saved.notes,
+        source: saved.source,
+        image: saved.image,
+        loggedAt: saved.loggedAt.toISOString(),
+      },
+    });
+  } catch (err) {
+    console.error("❌ Error saving meal:", err);
+    console.error("   → Error details:", err.message);
+    console.error("   → Stack:", err.stack);
+    res.status(500).json({ error: "Failed to save meal", details: err.message });
   }
-
-  const mealSource = source === "scanned" ? "scanned" : "manual";
-
-  const newMeal = {
-    id: Date.now(),
-    name: name.trim(),
-    calories: Number(calories) || 0,
-    carbs: Number(carbs) || 0,
-    protein: Number(protein) || 0,
-    fat: Number(fat) || 0,
-    notes: typeof notes === "string" ? notes.trim() : "",
-    loggedAt: new Date().toISOString(),
-    source: mealSource,
-  };
-
-  manualMeals.unshift(newMeal);
-  res.status(201).json({ meal: newMeal });
 });
 
-app.put("/api/meals/:id", (req, res) => {
-  const mealId = Number(req.params.id);
+app.put("/api/meals/:id", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
 
-  if (!Number.isInteger(mealId)) {
-    return res.status(400).json({ error: "Meal id must be a valid integer." });
-  }
+    // Find the meal and verify it belongs to the user
+    const current = await Meal.findOne({ _id: id, userId });
 
-  const index = manualMeals.findIndex((meal) => meal.id === mealId);
+    if (!current) {
+      return res.status(404).json({ error: "Meal not found." });
+    }
 
-  if (index === -1) {
-    return res.status(404).json({ error: "Meal not found." });
-  }
+    const {
+      name = current.name,
+      calories = current.calories,
+      carbs = current.carbs,
+      protein = current.protein,
+      fat = current.fat,
+      notes = current.notes,
+      image = current.image,
+    } = req.body || {};
 
-  const current = manualMeals[index];
-  const {
-    name = current.name,
-    calories = current.calories,
-    carbs = current.carbs,
-    protein = current.protein,
-    fat = current.fat,
-    notes = current.notes,
-  } = req.body || {};
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ error: "Meal name is required." });
+    }
 
-  if (!name || typeof name !== "string" || !name.trim()) {
-    return res.status(400).json({ error: "Meal name is required." });
-  }
-
-  const numericFields = { calories, carbs, protein, fat };
-  for (const [field, value] of Object.entries(numericFields)) {
-    if (value !== undefined) {
-      const numberValue = Number(value);
-      if (Number.isNaN(numberValue) || numberValue < 0) {
-        return res
-          .status(400)
-          .json({ error: `${field} must be a non-negative number.` });
+    const numericFields = { calories, carbs, protein, fat };
+    for (const [field, value] of Object.entries(numericFields)) {
+      if (value !== undefined) {
+        const numberValue = Number(value);
+        if (Number.isNaN(numberValue) || numberValue < 0) {
+          return res
+            .status(400)
+            .json({ error: `${field} must be a non-negative number.` });
+        }
       }
     }
-  }
-  const updatedMeal = {
-    ...current,
-    name: name.trim(),
-    calories: Number(calories) || 0,
-    carbs: Number(carbs) || 0,
-    protein: Number(protein) || 0,
-    fat: Number(fat) || 0,
-    notes: typeof notes === "string" ? notes.trim() : current.notes,
-    updatedAt: new Date().toISOString(),
-  };
 
-  manualMeals[index] = updatedMeal;
-  res.json({ meal: updatedMeal });
+    const updatedMeal = await Meal.findByIdAndUpdate(
+      id,
+      {
+        name: name.trim(),
+        calories: Number(calories) || 0,
+        carbs: Number(carbs) || 0,
+        protein: Number(protein) || 0,
+        fat: Number(fat) || 0,
+        notes: typeof notes === "string" ? notes.trim() : current.notes,
+        image: image || current.image,
+      },
+      { new: true }
+    );
+
+    console.log(`💾 [MongoDB] Meal updated for: ${userId}`);
+    console.log(`   → Meal: ${updatedMeal.name} (ID: ${id})`);
+
+    res.json({
+      meal: {
+        id: updatedMeal._id.toString(),
+        name: updatedMeal.name,
+        calories: updatedMeal.calories,
+        carbs: updatedMeal.carbs,
+        protein: updatedMeal.protein,
+        fat: updatedMeal.fat,
+        notes: updatedMeal.notes,
+        source: updatedMeal.source,
+        image: updatedMeal.image,
+        loggedAt: updatedMeal.loggedAt.toISOString(),
+      },
+    });
+  } catch (err) {
+    console.error("❌ Error updating meal:", err);
+    if (err.name === "CastError") {
+      return res.status(400).json({ error: "Invalid meal ID." });
+    }
+    res.status(500).json({ error: "Failed to update meal" });
+  }
 });
 
-app.delete("/api/meals/:id", (req, res) => {
-  const mealId = Number(req.params.id);
+app.delete("/api/meals/:id", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
 
-  if (!Number.isInteger(mealId)) {
-    return res.status(400).json({ error: "Meal id must be a valid integer." });
+    const deleted = await Meal.findOneAndDelete({ _id: id, userId });
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Meal not found." });
+    }
+
+    console.log(`🗑️  [MongoDB] Meal deleted for: ${userId}`);
+    console.log(`   → Deleted meal: ${deleted.name} (ID: ${id})`);
+
+    res.json({
+      meal: {
+        id: deleted._id.toString(),
+        name: deleted.name,
+        calories: deleted.calories,
+        carbs: deleted.carbs,
+        protein: deleted.protein,
+        fat: deleted.fat,
+        notes: deleted.notes,
+        source: deleted.source,
+        image: deleted.image,
+        loggedAt: deleted.loggedAt.toISOString(),
+      },
+    });
+  } catch (err) {
+    console.error("❌ Error deleting meal:", err);
+    if (err.name === "CastError") {
+      return res.status(400).json({ error: "Invalid meal ID." });
+    }
+    res.status(500).json({ error: "Failed to delete meal" });
   }
-
-  const index = manualMeals.findIndex((meal) => meal.id === mealId);
-
-  if (index === -1) {
-    return res.status(404).json({ error: "Meal not found." });
-  }
-
-  const [deletedMeal] = manualMeals.splice(index, 1);
-  res.json({ meal: deletedMeal });
 });
 
 app.get("/api/recents/searches", (_req, res) => {
