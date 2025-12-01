@@ -7,11 +7,11 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const Profile = require("./models/Profile");
+const Activity = require("./models/Activity");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-
 
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -24,13 +24,9 @@ mongoose
     process.exit(1);
   });
 
-
-
 function auth(req, res, next) {
   const authHeader = req.headers.authorization || "";
-  const token = authHeader.startsWith("Bearer ")
-    ? authHeader.slice(7)
-    : null;
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
   if (!token) {
     return res.status(401).json({ error: "Missing Authorization token" });
@@ -45,12 +41,13 @@ function auth(req, res, next) {
   }
 }
 
-
-
 const validateProfile = [
-  body("name").optional({ checkFalsy: false }).isString().trim().isLength({ max: 100 }),
+  body("name")
+    .optional({ checkFalsy: false })
+    .isString()
+    .trim()
+    .isLength({ max: 100 }),
 
-  // Allow empty string to be treated as "not provided"
   body("age").optional({ checkFalsy: true }).isInt({ min: 0, max: 200 }),
   body("heightCm").optional({ checkFalsy: true }).isFloat({ min: 0 }),
   body("weightKg").optional({ checkFalsy: true }).isFloat({ min: 0 }),
@@ -62,7 +59,10 @@ const validateProfile = [
   body("calorieGoal").optional({ checkFalsy: true }).isFloat({ min: 0 }),
   body("proteinGoal").optional({ checkFalsy: true }).isFloat({ min: 0 }),
 
-  body("avatarUrl").optional({ checkFalsy: true }).isString().isLength({ max: 500 }),
+  body("avatarUrl")
+    .optional({ checkFalsy: true })
+    .isString()
+    .isLength({ max: 500 }),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -73,17 +73,38 @@ const validateProfile = [
   },
 ];
 
+const validateActivity = [
+  body("name")
+    .notEmpty()
+    .withMessage("Activity name is required")
+    .isString()
+    .trim()
+    .isLength({ max: 200 }),
 
+  body("time")
+    .notEmpty()
+    .withMessage("Duration is required")
+    .isInt({ min: 1, max: 24 * 60 })
+    .withMessage("Duration must be a positive number of minutes"),
 
+  body("notes")
+    .optional({ checkFalsy: true })
+    .isString()
+    .isLength({ max: 1000 })
+    .withMessage("Notes must be at most 1000 characters"),
 
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
 
 app.post(
   "/api/auth/login",
-  [
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required"),
-  ],
+  [body("email").isEmail().withMessage("Valid email is required")],
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -93,18 +114,13 @@ app.post(
     const { email } = req.body;
     const userId = email.trim().toLowerCase();
 
-    const token = jwt.sign(
-      { id: userId },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.json({ token });
   }
 );
-
-
-
 
 const MAX_RECENTS = 10;
 let recentSearches = [];
@@ -131,7 +147,6 @@ function addRecentSearch(queryRaw) {
   return recentSearches;
 }
 
-
 const manualMeals = [
   {
     id: 1,
@@ -142,11 +157,9 @@ const manualMeals = [
     fat: 12,
     notes: "Made with almond milk, chia seeds, blueberries.",
     loggedAt: new Date().toISOString(),
-    source: "manual", 
+    source: "manual",
   },
 ];
-
-
 
 app.post("/api/auth/login", (req, res) => {
   const { email } = req.body || {};
@@ -155,28 +168,18 @@ app.post("/api/auth/login", (req, res) => {
     return res.status(400).json({ error: "Valid email is required." });
   }
 
-
   const userId = email.trim().toLowerCase();
 
-  const token = jwt.sign(
-    { id: userId }, 
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 
   res.json({ token });
 });
 
-
-
-// --- Simple JWT login route ---
 app.post(
   "/api/auth/login",
-  [
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required"),
-  ],
+  [body("email").isEmail().withMessage("Valid email is required")],
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -186,20 +189,13 @@ app.post(
     const { email } = req.body;
     const userId = email.trim().toLowerCase();
 
-    const token = jwt.sign(
-      { id: userId },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.json({ token });
   }
 );
-
-
-
-
-
 
 app.get("/api/profile", auth, async (req, res) => {
   try {
@@ -270,6 +266,60 @@ app.post("/api/profile", auth, validateProfile, async (req, res) => {
   }
 });
 
+app.get("/api/activities", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const activities = await Activity.find({ userId }).sort({
+      date: -1,
+      createdAt: -1,
+    });
+    res.json(activities);
+  } catch (err) {
+    console.error("Error loading activities:", err);
+    res.status(500).json({ error: "Failed to load activities" });
+  }
+});
+
+app.post("/api/activities", auth, validateActivity, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, time, notes } = req.body;
+
+    const activity = new Activity({
+      userId,
+      name: name.trim(),
+      timeMinutes: Number(time),
+      notes: notes || "",
+    });
+
+    const saved = await activity.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    console.error("Error saving activity:", err);
+    res.status(500).json({ error: "Failed to save activity" });
+  }
+});
+
+app.delete("/api/activities/:id", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const deleted = await Activity.findOneAndDelete({
+      _id: id,
+      userId,
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Activity not found" });
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("Error deleting activity:", err);
+    res.status(500).json({ error: "Failed to delete activity" });
+  }
+});
 
 app.get("/api/meals", (req, res) => {
   const { date } = req.query;
