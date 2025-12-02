@@ -14,13 +14,7 @@ const profileSchema = new mongoose.Schema(
     weightKg: { type: Number, min: 0 },
     activity: {
       type: String,
-      enum: [
-        "sedentary",
-        "light",
-        "moderate",
-        "active",
-        "very_active",
-      ],
+      enum: ["sedentary", "light", "moderate", "active", "very_active"],
       default: "sedentary",
     },
     calorieGoal: { type: Number, min: 0 },

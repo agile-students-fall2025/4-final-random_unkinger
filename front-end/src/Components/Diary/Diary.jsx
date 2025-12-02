@@ -9,7 +9,7 @@ export default function Diary() {
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
-  const [selectedDay, setSelectedDay] = useState(null); // Track clicked day
+  const [selectedDay, setSelectedDay] = useState(null);
 
   const months = [
     "January",

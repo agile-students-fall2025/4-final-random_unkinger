@@ -42,7 +42,6 @@ function auth(req, res, next) {
   }
 }
 
-
 const validateProfile = [
   body("name")
     .optional({ checkFalsy: false })
@@ -376,16 +375,10 @@ app.get("/api/meals", auth, async (req, res) => {
     const userId = req.user.id;
     const { date } = req.query;
 
-    if (date) {
-      const parsed = Date.parse(date);
-      if (isNaN(parsed)) {
-        return res.status(400).json({
-          error: "Invalid date format. Expected YYYY-MM-DD.",
-        });
-      }
-    }
-
-    console.log(`📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""}`);
+    console.log(
+      `📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""
+      }`
+    );
 
     let query = { userId };
 
@@ -470,8 +463,8 @@ app.post("/api/meals", auth, validateMeal, async (req, res) => {
     console.log(`📥 [MongoDB] Creating meal for user: ${userId}`);
     console.log(`   → Request body:`, req.body);
 
-    const { name, calories, carbs, protein, fat, notes, source, image } = req.body || {};
-
+    const { name, calories, carbs, protein, fat, notes, source, image } =
+      req.body || {};
 
     const mealSource = source === "scanned" ? "scanned" : "manual";
 
@@ -491,7 +484,9 @@ app.post("/api/meals", auth, validateMeal, async (req, res) => {
     const saved = await newMeal.save();
 
     console.log(`💾 [MongoDB] Meal saved for: ${userId}`);
-    console.log(`   → Meal: ${saved.name} (${saved.calories} cal, ${saved.protein}g protein, source: ${saved.source})`);
+    console.log(
+      `   → Meal: ${saved.name} (${saved.calories} cal, ${saved.protein}g protein, source: ${saved.source})`
+    );
 
     // Return in format expected by frontend
     res.status(201).json({
@@ -512,11 +507,13 @@ app.post("/api/meals", auth, validateMeal, async (req, res) => {
     console.error("❌ Error saving meal:", err);
     console.error("   → Error details:", err.message);
     console.error("   → Stack:", err.stack);
-    res.status(500).json({ error: "Failed to save meal", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to save meal", details: err.message });
   }
 });
 
-app.put("/api/meals/:id", auth, validateMealId, validateMeal, async (req, res) => {
+app.put("/api/meals/:id", auth, validateMealId, async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
@@ -537,7 +534,6 @@ app.put("/api/meals/:id", auth, validateMealId, validateMeal, async (req, res) =
       notes = current.notes,
       image = current.image,
     } = req.body || {};
-
 
     const updatedMeal = await Meal.findByIdAndUpdate(
       id,

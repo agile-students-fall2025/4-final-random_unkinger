@@ -71,4 +71,3 @@ mealSchema.index({ userId: 1, loggedAt: -1 });
 mealSchema.index({ userId: 1, source: 1, loggedAt: -1 });
 
 module.exports = mongoose.model("Meal", mealSchema);
-
