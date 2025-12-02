@@ -373,7 +373,7 @@ app.delete("/api/activities/:id", auth, async (req, res) => {
 app.get("/api/meals", auth, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { date } = req.query;
+    const { date, offset } = req.query;
 
     console.log(
       `📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""
@@ -384,13 +384,21 @@ app.get("/api/meals", auth, async (req, res) => {
 
     // Filter by date if provided
     if (date) {
-      const targetDate = new Date(date + "T00:00:00");
+      // The date string (e.g., '2025-12-01') is always treated as midnight UTC.
+      const localOffsetMs = (Number(offset) || 0) * 60 * 1000;
+
+      // Target date starts at the beginning of the local day in UTC.
+      // e.g., 2025-12-01T00:00:00 + 300 min (EST offset) = 2025-12-01T05:00:00Z
+      const targetLocalMidnight = new Date(date + "T00:00:00");
+      const targetDate = new Date(targetLocalMidnight.getTime() - localOffsetMs);
+
+      // Next day is simply 24 hours (1 day) later in UTC.
       const nextDay = new Date(targetDate);
       nextDay.setDate(nextDay.getDate() + 1);
 
       query.loggedAt = {
-        $gte: targetDate,
-        $lt: nextDay,
+        $gte: targetDate, // >= Start of selected day in local time, converted to UTC
+        $lt: nextDay,     // < Start of next day in local time, converted to UTC
       };
     }
 

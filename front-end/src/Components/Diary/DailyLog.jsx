@@ -16,7 +16,14 @@ export default function DailyLog() {
   useEffect(() => {
     if (!date) return;
 
-    fetch(`${API}/api/meals?date=${date}`)
+    const token = localStorage.getItem("token");
+
+    fetch(`${API}/api/meals?date=${date}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
       .then((res) => res.json())
       .then((data) => {
         setMeals(data.meals || []);
@@ -86,7 +93,7 @@ export default function DailyLog() {
 
         <div className="meal-list">
           {meals.map((meal) => (
-            <div className="meal-card" key={meal.id}>
+            <div className="meal-card" key={meal._id}>
               <div className="meal-name-row">
                 <div className="meal-name">{meal.name}</div>
                 <span className={`meal-source-tag meal-source-tag--${meal.source || "manual"}`}>
@@ -116,10 +123,11 @@ export default function DailyLog() {
                   <button
                     className="edit-btn"
                     onClick={() => {
+                      const mealId = meal._id;
                       if (meal.source === "manual" || !meal.source) {
                         navigate(`/manual-meal?edit=${meal.id}`);
                       } else {
-                        navigate(`/editmeal/${meal.id}`);
+                        navigate(`/editmeal/${mealId}`);
                       }
                     }}
                   >
