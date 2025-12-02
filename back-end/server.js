@@ -5,7 +5,7 @@ const axios = require("axios");
 
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const { body, validationResult } = require("express-validator");
+const { body, param, validationResult } = require("express-validator");
 const Profile = require("./models/Profile");
 const Activity = require("./models/Activity");
 const Meal = require("./models/Meal");
@@ -73,6 +73,66 @@ const validateProfile = [
     next();
   },
 ];
+
+const validateMeal = [
+  body("name")
+    .exists().withMessage("Meal name is required")
+    .isString().withMessage("Meal name must be a string")
+    .trim()
+    .notEmpty().withMessage("Meal name cannot be empty"),
+
+  body("calories")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Calories must be a non-negative integer"),
+
+  body("protein")
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage("Protein must be a non-negative number"),
+
+  body("carbs")
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage("Carbs must be a non-negative number"),
+
+  body("fat")
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage("Fat must be a non-negative number"),
+
+  body("loggedAt")
+    .optional()
+    .isISO8601()
+    .withMessage("loggedAt must be a valid ISO date"),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: "Validation failed",
+        details: errors.array(),
+      });
+    }
+    next();
+  },
+];
+
+
+const validateMealId = [
+  param("id")
+    .custom((value) => mongoose.Types.ObjectId.isValid(value))
+    .withMessage("Invalid meal ID."),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: "Validation failed", details: errors.array() });
+    }
+    next();
+  },
+];
+
 
 const validateActivity = [
   body("name")
@@ -316,8 +376,7 @@ app.get("/api/meals", auth, async (req, res) => {
     const { date } = req.query;
 
     console.log(
-      `📖 [MongoDB] Loading meals for: ${userId}${
-        date ? ` (date: ${date})` : ""
+      `📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""
       }`
     );
 
@@ -398,7 +457,7 @@ app.get("/api/barcode/:barcode", async (req, res) => {
   }
 });
 
-app.post("/api/meals", auth, async (req, res) => {
+app.post("/api/meals", auth, validateMeal, async (req, res) => {
   try {
     const userId = req.user.id;
     console.log(`📥 [MongoDB] Creating meal for user: ${userId}`);
@@ -406,23 +465,6 @@ app.post("/api/meals", auth, async (req, res) => {
 
     const { name, calories, carbs, protein, fat, notes, source, image } =
       req.body || {};
-
-    if (!name || typeof name !== "string" || !name.trim()) {
-      console.log(`   ❌ Validation failed: Meal name is required`);
-      return res.status(400).json({ error: "Meal name is required." });
-    }
-
-    const numericFields = { calories, carbs, protein, fat };
-    for (const [field, value] of Object.entries(numericFields)) {
-      if (value !== undefined) {
-        const numberValue = Number(value);
-        if (Number.isNaN(numberValue) || numberValue < 0) {
-          return res
-            .status(400)
-            .json({ error: `${field} must be a non-negative number.` });
-        }
-      }
-    }
 
     const mealSource = source === "scanned" ? "scanned" : "manual";
 
@@ -471,7 +513,7 @@ app.post("/api/meals", auth, async (req, res) => {
   }
 });
 
-app.put("/api/meals/:id", auth, async (req, res) => {
+app.put("/api/meals/:id", auth, validateMealId, async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
@@ -492,22 +534,6 @@ app.put("/api/meals/:id", auth, async (req, res) => {
       notes = current.notes,
       image = current.image,
     } = req.body || {};
-
-    if (!name || typeof name !== "string" || !name.trim()) {
-      return res.status(400).json({ error: "Meal name is required." });
-    }
-
-    const numericFields = { calories, carbs, protein, fat };
-    for (const [field, value] of Object.entries(numericFields)) {
-      if (value !== undefined) {
-        const numberValue = Number(value);
-        if (Number.isNaN(numberValue) || numberValue < 0) {
-          return res
-            .status(400)
-            .json({ error: `${field} must be a non-negative number.` });
-        }
-      }
-    }
 
     const updatedMeal = await Meal.findByIdAndUpdate(
       id,
@@ -549,7 +575,7 @@ app.put("/api/meals/:id", auth, async (req, res) => {
   }
 });
 
-app.delete("/api/meals/:id", auth, async (req, res) => {
+app.delete("/api/meals/:id", auth, validateMealId, async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
