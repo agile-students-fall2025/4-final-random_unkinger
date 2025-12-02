@@ -24,44 +24,84 @@ const LoginSignup = () => {
   };
 
   const handleLoginClick = async () => {
-    if (action === "Login") {
-      if (!email.trim()) {
-        alert("Please enter your email.");
+    // If we're in Sign Up mode, clicking "Login" just switches the view back
+    if (action === "Sign Up") {
+      setAction("Login");
+      return;
+    }
+
+    // Actual login logic (Login mode)
+    if (!email.trim() || !password.trim()) {
+      alert("Please enter both email and password.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }), // send both
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Login failed.");
         return;
       }
 
-      try {
-        const res = await fetch(`${API}/api/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        });
+      // Save JWT token
+      localStorage.setItem("token", data.token);
 
-        const data = await res.json();
-        if (!res.ok) {
-          alert(data.error || "Login failed.");
-          return;
-        }
+      // Redirect to home page (or wherever)
+      navigate("/home");
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Unexpected error during login.");
+    }
+  };
 
-        localStorage.setItem("token", data.token);
+  const handleRegister = async () => {
+    if (!username.trim() || !email.trim() || !password.trim()) {
+      alert("Please fill out username, email, and password.");
+      return;
+    }
 
-        navigate("/home");
-      } catch (err) {
-        console.error("Login error:", err);
-        alert("Unexpected error during login.");
+    try {
+      const res = await fetch(`${API}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Registration failed.");
+        return;
       }
-    } else {
+
+      alert("Account created! You can now log in.");
+      // After successful signup, switch back to Login mode
       setAction("Login");
+      setPassword("");
+    } catch (err) {
+      console.error("Register error:", err);
+      alert("Unexpected error during sign up.");
     }
   };
 
   const handleSignUpClick = () => {
+    // If in Login mode, switch to Sign Up view
     if (action === "Login") {
       setAction("Sign Up");
     } else {
-      setAction("Login");
+      // If already in Sign Up mode, actually attempt registration
+      handleRegister();
     }
   };
 
@@ -77,7 +117,6 @@ const LoginSignup = () => {
           <div className="underline"></div>
         </div>
 
-        {}
         {showReset ? (
           <div className="forgot-container">
             <p className="forgot-paragraph">
@@ -154,12 +193,15 @@ const LoginSignup = () => {
             )}
 
             <div className="submit-container">
+              {/* Sign Up button */}
               <div
                 className={action === "Login" ? "submit gray" : "submit"}
                 onClick={handleSignUpClick}
               >
                 Sign Up
               </div>
+
+              {/* Login button */}
               <div
                 className={action === "Sign Up" ? "submit gray" : "submit"}
                 onClick={handleLoginClick}

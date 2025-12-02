@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const passport = require("passport");
 const axios = require("axios");
 
 const mongoose = require("mongoose");
@@ -9,10 +10,33 @@ const { body, param, validationResult } = require("express-validator");
 const Profile = require("./models/Profile");
 const Activity = require("./models/Activity");
 const Meal = require("./models/Meal");
+const authRoutes = require("./routes/auth");
+const jwtStrategy = require("./config/jwt-config");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// Passport + JWT
+passport.use(jwtStrategy);
+app.use(passport.initialize());
+
+// Simple test route
+app.get("/", (req, res) => {
+  res.send("NutriLens API is running");
+});
+
+// Auth routes
+app.use("/api/auth", authRoutes);
+
+// Example of a protected route
+app.get(
+  "/api/protected",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.json({ message: "You accessed a protected route!", user: req.user });
+  }
+);
 
 mongoose
   .connect(process.env.MONGO_URI, {
