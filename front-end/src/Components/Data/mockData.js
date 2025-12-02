@@ -1,7 +1,7 @@
 export const mockMeals = [
   {
     id: 1,
-    date: "2021-09-19",
+    date: "2025-09-19",
     image: "https://picsum.photos/100",
     protein: "20%",
     fat: "30%",
@@ -11,7 +11,7 @@ export const mockMeals = [
   },
   {
     id: 2,
-    date: "2021-09-19",
+    date: "2025-09-19",
     image: "https://picsum.photos/100",
     protein: "25%",
     fat: "20%",

@@ -6,8 +6,6 @@ import NavBar from "../NavBar/NavBar";
 
 const AddMeal = () => {
   const navigate = useNavigate();
-
-  // TODO :
   const handleSearchClick = () => {
     navigate("/search");
   };
