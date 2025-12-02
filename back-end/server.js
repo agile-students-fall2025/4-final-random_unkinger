@@ -315,7 +315,11 @@ app.get("/api/meals", auth, async (req, res) => {
     const userId = req.user.id;
     const { date } = req.query;
 
-    console.log(`📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""}`);
+    console.log(
+      `📖 [MongoDB] Loading meals for: ${userId}${
+        date ? ` (date: ${date})` : ""
+      }`
+    );
 
     let query = { userId };
 
@@ -332,7 +336,7 @@ app.get("/api/meals", auth, async (req, res) => {
     }
 
     const meals = await Meal.find(query).sort({ loggedAt: -1 }).lean();
-    
+
     // Convert to format expected by frontend (with id field)
     const formattedMeals = meals.map((meal) => ({
       id: meal._id.toString(),
@@ -399,8 +403,9 @@ app.post("/api/meals", auth, async (req, res) => {
     const userId = req.user.id;
     console.log(`📥 [MongoDB] Creating meal for user: ${userId}`);
     console.log(`   → Request body:`, req.body);
-    
-    const { name, calories, carbs, protein, fat, notes, source, image } = req.body || {};
+
+    const { name, calories, carbs, protein, fat, notes, source, image } =
+      req.body || {};
 
     if (!name || typeof name !== "string" || !name.trim()) {
       console.log(`   ❌ Validation failed: Meal name is required`);
@@ -435,9 +440,11 @@ app.post("/api/meals", auth, async (req, res) => {
     });
 
     const saved = await newMeal.save();
-    
+
     console.log(`💾 [MongoDB] Meal saved for: ${userId}`);
-    console.log(`   → Meal: ${saved.name} (${saved.calories} cal, ${saved.protein}g protein, source: ${saved.source})`);
+    console.log(
+      `   → Meal: ${saved.name} (${saved.calories} cal, ${saved.protein}g protein, source: ${saved.source})`
+    );
 
     // Return in format expected by frontend
     res.status(201).json({
@@ -458,7 +465,9 @@ app.post("/api/meals", auth, async (req, res) => {
     console.error("❌ Error saving meal:", err);
     console.error("   → Error details:", err.message);
     console.error("   → Stack:", err.stack);
-    res.status(500).json({ error: "Failed to save meal", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to save meal", details: err.message });
   }
 });
 
