@@ -123,11 +123,10 @@ export default function DailyLog() {
                   <button
                     className="edit-btn"
                     onClick={() => {
-                      const mealId = meal._id;
                       if (meal.source === "manual" || !meal.source) {
                         navigate(`/manual-meal?edit=${meal.id}`);
                       } else {
-                        navigate(`/editmeal/${mealId}`);
+                        navigate(`/editmeal/${meal.id}`);
                       }
                     }}
                   >
