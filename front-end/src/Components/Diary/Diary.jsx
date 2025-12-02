@@ -44,7 +44,6 @@ export default function Diary() {
     const selectedDate = `${localDate.getFullYear()}-${String(
       localDate.getMonth() + 1
     ).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
-
     navigate(`/dailylog/${selectedDate}`);
   };
 
@@ -97,9 +96,8 @@ export default function Diary() {
           {days.map((day, index) => (
             <div
               key={index}
-              className={`day-cell ${day ? "clickable" : ""} ${
-                selectedDay === day ? "selected" : ""
-              }`}
+              className={`day-cell ${day ? "clickable" : ""} ${selectedDay === day ? "selected" : ""
+                }`}
               onClick={() => handleDayClick(day)}
             >
               {day}
