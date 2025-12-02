@@ -44,7 +44,6 @@ export default function Diary() {
     const selectedDate = `${localDate.getFullYear()}-${String(
       localDate.getMonth() + 1
     ).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
-    console.log("CLICKED DATE STRING:", selectedDate);
     navigate(`/dailylog/${selectedDate}`);
   };
 
