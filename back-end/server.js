@@ -98,10 +98,13 @@ const validateProfile = [
 
 const validateMeal = [
   body("name")
-    .exists().withMessage("Meal name is required")
-    .isString().withMessage("Meal name must be a string")
+    .exists()
+    .withMessage("Meal name is required")
+    .isString()
+    .withMessage("Meal name must be a string")
     .trim()
-    .notEmpty().withMessage("Meal name cannot be empty"),
+    .notEmpty()
+    .withMessage("Meal name cannot be empty"),
 
   body("calories")
     .optional()
@@ -140,7 +143,6 @@ const validateMeal = [
   },
 ];
 
-
 const validateMealId = [
   param("id")
     .custom((value) => mongoose.Types.ObjectId.isValid(value))
@@ -149,12 +151,13 @@ const validateMealId = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: "Validation failed", details: errors.array() });
+      return res
+        .status(400)
+        .json({ error: "Validation failed", details: errors.array() });
     }
     next();
   },
 ];
-
 
 const validateActivity = [
   body("name")
@@ -211,7 +214,6 @@ function addRecentSearch(queryRaw) {
 }
 
 // Meals are now stored in MongoDB - see Meal model
-
 
 app.get("/api/profile", auth, async (req, res) => {
   try {
@@ -343,7 +345,8 @@ app.get("/api/meals", auth, async (req, res) => {
     const { date } = req.query;
 
     console.log(
-      `📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""
+      `📖 [MongoDB] Loading meals for: ${userId}${
+        date ? ` (date: ${date})` : ""
       }`
     );
 

@@ -120,8 +120,8 @@ const LoginSignup = () => {
 
           <p className="text-slate-600 text-base leading-relaxed max-w-md">
             Log your meals, notice your patterns, and build a healthier routine—
-            without obsessing over numbers. NutriLens keeps things clear,
-            calm, and easy.
+            without obsessing over numbers. NutriLens keeps things clear, calm,
+            and easy.
           </p>
 
           <ul className="space-y-2 text-sm text-slate-700">
@@ -282,10 +282,7 @@ const LoginSignup = () => {
                     className="text-xs text-slate-500 hover:text-emerald-600"
                     onClick={() => setShowReset(true)}
                   >
-                    Forgot password?{" "}
-                    <span>
-                      Reset here
-                    </span>
+                    Forgot password? <span>Reset here</span>
                   </button>
                 </div>
               )}

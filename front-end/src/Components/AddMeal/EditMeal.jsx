@@ -62,8 +62,7 @@ const EditMeal = () => {
 
   const name = foodData?.name || "Food not found";
   const brand = foodData?.brand || "Unknown brand";
-  const imageUrl =
-    foodData?.imageUrl || "https://picsum.dev/image/1277/view";
+  const imageUrl = foodData?.imageUrl || "https://picsum.dev/image/1277/view";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 flex flex-col dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
