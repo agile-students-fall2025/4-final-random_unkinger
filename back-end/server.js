@@ -10,6 +10,7 @@ const { body, param, validationResult } = require("express-validator");
 const Profile = require("./models/Profile");
 const Activity = require("./models/Activity");
 const Meal = require("./models/Meal");
+const Food = require("./models/Food");
 const authRoutes = require("./routes/auth");
 const jwtStrategy = require("./config/jwt-config");
 
@@ -97,10 +98,13 @@ const validateProfile = [
 
 const validateMeal = [
   body("name")
-    .exists().withMessage("Meal name is required")
-    .isString().withMessage("Meal name must be a string")
+    .exists()
+    .withMessage("Meal name is required")
+    .isString()
+    .withMessage("Meal name must be a string")
     .trim()
-    .notEmpty().withMessage("Meal name cannot be empty"),
+    .notEmpty()
+    .withMessage("Meal name cannot be empty"),
 
   body("calories")
     .optional()
@@ -139,7 +143,6 @@ const validateMeal = [
   },
 ];
 
-
 const validateMealId = [
   param("id")
     .custom((value) => mongoose.Types.ObjectId.isValid(value))
@@ -148,12 +151,13 @@ const validateMealId = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: "Validation failed", details: errors.array() });
+      return res
+        .status(400)
+        .json({ error: "Validation failed", details: errors.array() });
     }
     next();
   },
 ];
-
 
 const validateActivity = [
   body("name")
@@ -210,7 +214,6 @@ function addRecentSearch(queryRaw) {
 }
 
 // Meals are now stored in MongoDB - see Meal model
-
 
 app.get("/api/profile", auth, async (req, res) => {
   try {
@@ -342,7 +345,8 @@ app.get("/api/meals", auth, async (req, res) => {
     const { date } = req.query;
 
     console.log(
-      `📖 [MongoDB] Loading meals for: ${userId}${date ? ` (date: ${date})` : ""
+      `📖 [MongoDB] Loading meals for: ${userId}${
+        date ? ` (date: ${date})` : ""
       }`
     );
 
@@ -593,6 +597,56 @@ app.post("/api/recents/searches", (req, res) => {
 
 app.get("/api/recents/meals", (_req, res) => {
   res.json({ items: recentMeals });
+});
+app.get("/api/foods/search", async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.json({ foods: [] });
+
+    const foods = await Food.aggregate([
+      { $unwind: "$FoundationFoods" },
+      {
+        $match: {
+          "FoundationFoods.description": { $regex: q, $options: "i" },
+        },
+      },
+      { $limit: 20 },
+      {
+        $project: {
+          description: "$FoundationFoods.description",
+          foodNutrients: "$FoundationFoods.foodNutrients",
+        },
+      },
+    ]);
+
+    const results = foods.map((f) => {
+      // get nutri data
+      const getNutrient = (namePart) => {
+        if (!f.foodNutrients) return 0;
+        const n = f.foodNutrients.find(
+          (fn) =>
+            fn.nutrient &&
+            fn.nutrient.name &&
+            fn.nutrient.name.toLowerCase().includes(namePart.toLowerCase())
+        );
+        return n ? n.amount : 0;
+      };
+
+      return {
+        id: f._id,
+        description: f.description,
+        calories: getNutrient("Energy"),
+        protein: getNutrient("Protein"),
+        carbs: getNutrient("Carbohydrate, by difference"),
+        fat: getNutrient("Total lipid (fat)"),
+      };
+    });
+
+    res.json({ foods: results });
+  } catch (err) {
+    console.error("Error searching foods:", err);
+    res.status(500).json({ error: "Search failed" });
+  }
 });
 
 const PORT = process.env.PORT || 5050;

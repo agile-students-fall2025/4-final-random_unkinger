@@ -81,6 +81,23 @@ const ManualMeal = () => {
               }
             }, 100);
           }
+        } else {
+          // prefill from search page params
+          const name = searchParams.get("name");
+          if (name) {
+            const round = (val) =>
+              val ? Math.round(Number(val)).toString() : "";
+            setForm({
+              name: name || "",
+              calories: round(searchParams.get("calories")),
+              carbs: round(searchParams.get("carbs")),
+              protein: round(searchParams.get("protein")),
+              fat: round(searchParams.get("fat")),
+              notes: "",
+            });
+            // clearing so refreshing doesnt re-trigger
+            setSearchParams({});
+          }
         }
       } catch (err) {
         console.error(err);
@@ -309,9 +326,7 @@ const ManualMeal = () => {
           className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-4"
         >
           <div>
-            <p className="text-sm font-semibold text-emerald-900">
-              Log a meal
-            </p>
+            <p className="text-sm font-semibold text-emerald-900">Log a meal</p>
             <p className="text-[11px] text-slate-500 mt-0.5">
               Add nutrition details for homemade dishes or foods without
               barcodes.
@@ -445,11 +460,7 @@ const ManualMeal = () => {
                 disabled={saving}
                 className="inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition"
               >
-                {saving
-                  ? "Saving..."
-                  : editingId
-                  ? "Update meal"
-                  : "Log meal"}
+                {saving ? "Saving..." : editingId ? "Update meal" : "Log meal"}
               </button>
               {editingId && (
                 <button
@@ -483,8 +494,7 @@ const ManualMeal = () => {
                   </p>
                 </div>
                 <span className="text-[11px] text-slate-500">
-                  {entries.length}{" "}
-                  {entries.length === 1 ? "entry" : "entries"}
+                  {entries.length} {entries.length === 1 ? "entry" : "entries"}
                 </span>
               </div>
 

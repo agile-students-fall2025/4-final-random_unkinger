@@ -1,38 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const PRODUCTS = [
-  "Protein Powder",
-  "Greek Yogurt",
-  "Almond Butter",
-  "Oats",
-  "Chicken Breast",
-  "Brown Rice",
-  "Olive Oil",
-  "Egg Whites",
-  "Cottage Cheese",
-  "Spinach",
-  "Bananas",
-  "Blueberries",
-];
-
-const FOODS = [
-  "Caesar Salad",
-  "Grilled Salmon",
-  "Veggie Omelette",
-  "Turkey Sandwich",
-  "Chicken Burrito Bowl",
-  "Avocado Toast",
-  "Quinoa Bowl",
-  "Pasta Primavera",
-  "Beef Stir Fry",
-];
-
 export default function Search() {
   const nav = useNavigate();
-  const [tab, setTab] = useState("products");
+  const [tab, setTab] = useState("food");
   const [q, setQ] = useState("");
   const [recent, setRecent] = useState([]);
+  const [foodResults, setFoodResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [debouncedQ, setDebouncedQ] = useState(q);
@@ -40,7 +14,7 @@ export default function Search() {
 
   // debounce search input
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedQ(q.trim()), 200);
+    const t = setTimeout(() => setDebouncedQ(q.trim()), 400);
     return () => clearTimeout(t);
   }, [q]);
 
@@ -70,6 +44,37 @@ export default function Search() {
       ignore = true;
     };
   }, []);
+
+  // search foods from backend when debouncedQ change
+  useEffect(() => {
+    if (tab !== "food" || !debouncedQ) {
+      setFoodResults([]);
+      return;
+    }
+
+    let ignore = false;
+    async function searchFoods() {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `/api/foods/search?q=${encodeURIComponent(debouncedQ)}`
+        );
+        if (!res.ok) throw new Error("Search failed");
+        const data = await res.json();
+        if (!ignore) {
+          setFoodResults(data.foods || []);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    searchFoods();
+    return () => {
+      ignore = true;
+    };
+  }, [debouncedQ, tab]);
 
   const onKeyDown = async (e) => {
     if (e.key !== "Enter") return;
@@ -102,13 +107,26 @@ export default function Search() {
     }
   };
 
-  const data = tab === "products" ? PRODUCTS : tab === "food" ? FOODS : recent;
-
   const results = useMemo(() => {
+    if (tab === "food") return foodResults;
     if (!debouncedQ) return [];
     const lower = debouncedQ.toLowerCase();
-    return data.filter((item) => item.toLowerCase().includes(lower));
-  }, [data, debouncedQ]);
+    return recent.filter((item) => item.toLowerCase().includes(lower));
+  }, [recent, debouncedQ, tab, foodResults]);
+
+  const handleAdd = (item) => {
+    if (tab === "food") {
+      nav(
+        `/manual-meal?name=${encodeURIComponent(
+          item.description
+        )}&calories=${item.calories}&protein=${item.protein}&carbs=${
+          item.carbs
+        }&fat=${item.fat}`
+      );
+    } else {
+      alert(`Added: ${item}`);
+    }
+  };
 
   const headerLabel =
     tab === "recent" ? "Your recent searches" : "Search results";
@@ -171,7 +189,6 @@ export default function Search() {
           {/* Tabs */}
           <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-1 gap-1">
             {[
-              { id: "products", label: "Products" },
               { id: "food", label: "Food" },
               { id: "recent", label: "Recent" },
             ].map((t) => {
@@ -225,12 +242,12 @@ export default function Search() {
                     className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-50 bg-emerald-50/60 px-3 py-2"
                   >
                     <span className="text-sm text-emerald-900 truncate">
-                      {item}
+                      {typeof item === "string" ? item : item.description}
                     </span>
                     <button
                       type="button"
                       className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 transition"
-                      onClick={() => alert(`Added: ${item}`)}
+                      onClick={() => handleAdd(item)}
                     >
                       Add
                     </button>
