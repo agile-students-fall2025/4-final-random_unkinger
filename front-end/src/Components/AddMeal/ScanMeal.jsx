@@ -7,10 +7,65 @@ const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
 
 const ScanMeal = () => {
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const [error, setError] = useState(null);
   const [scanStatus, setScanStatus] = useState(false);
   const [barcode, setBarcode] = useState(null);
+  const [lightingWarning, setLightingWarning] = useState(null); // 'too-dark', 'too-light', or null
+  const brightnessCheckIntervalRef = useRef(null);
   const navigate = useNavigate();
+
+  // Function to check video brightness
+  const checkBrightness = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    // Check if video is ready
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+    // Set canvas size to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw current video frame to canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Get image data
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    // Calculate average brightness (using luminance formula)
+    let totalBrightness = 0;
+    let pixelCount = 0;
+
+    // Sample pixels (every 10th pixel for performance)
+    for (let i = 0; i < data.length; i += 40) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      // Calculate luminance (perceived brightness)
+      const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+      totalBrightness += luminance;
+      pixelCount++;
+    }
+
+    const averageBrightness = totalBrightness / pixelCount;
+    // Normalize to 0-100 scale
+    const brightnessPercent = (averageBrightness / 255) * 100;
+
+    // Determine lighting condition
+    // Too dark: < 20%, Too light: > 80%, Good: 20-80%
+    if (brightnessPercent < 20) {
+      setLightingWarning("too-dark");
+    } else if (brightnessPercent > 80) {
+      setLightingWarning("too-light");
+    } else {
+      setLightingWarning(null);
+    }
+  }, []);
 
   const startScanning = useCallback(() => {
     if (!videoRef.current) {
@@ -87,6 +142,10 @@ const ScanMeal = () => {
           // stop and auto move on after detecting barcode
           Quagga.stop();
           setScanStatus(false);
+          if (brightnessCheckIntervalRef.current) {
+            clearInterval(brightnessCheckIntervalRef.current);
+            brightnessCheckIntervalRef.current = null;
+          }
           navigate("/edit-meal", { state: { barcode: code } });
         });
 
@@ -99,12 +158,18 @@ const ScanMeal = () => {
         Quagga.start();
         setScanStatus(true);
         console.log("Barcode scanner started");
+
+        // Start brightness checking
+        if (brightnessCheckIntervalRef.current) {
+          clearInterval(brightnessCheckIntervalRef.current);
+        }
+        brightnessCheckIntervalRef.current = setInterval(checkBrightness, 500); // Check every 500ms
       });
     } catch (e) {
       console.error("Exception during Quagga setup:", e);
       setError("Failed to setup barcode scanner: " + e.message);
     }
-  }, [navigate]);
+  }, [navigate, checkBrightness]);
 
   useEffect(() => {
     let stream = null;
@@ -141,6 +206,10 @@ const ScanMeal = () => {
         Quagga.stop();
       } catch (e) {
         // ignore
+      }
+      if (brightnessCheckIntervalRef.current) {
+        clearInterval(brightnessCheckIntervalRef.current);
+        brightnessCheckIntervalRef.current = null;
       }
     };
   }, [startScanning]);
@@ -208,6 +277,11 @@ const ScanMeal = () => {
                   playsInline
                   className="h-full w-full object-cover"
                 />
+                {/* Hidden canvas for brightness analysis */}
+                <canvas
+                  ref={canvasRef}
+                  style={{ display: "none" }}
+                />
                 {/* Overlay frame */}
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                   <div className="h-40 w-56 border-2 border-emerald-300/90 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
@@ -217,6 +291,24 @@ const ScanMeal = () => {
                     Align the barcode inside the frame
                   </p>
                 </div>
+                {/* Lighting warning */}
+                {lightingWarning && scanStatus && (
+                  <div className={`absolute top-4 left-0 right-0 flex justify-center z-10`}>
+                    <div className={`px-4 py-2.5 rounded-xl text-xs font-medium shadow-lg ${
+                      lightingWarning === "too-dark"
+                        ? "bg-red-500/90 text-white border-2 border-red-600"
+                        : lightingWarning === "too-light"
+                        ? "bg-yellow-500/90 text-white border-2 border-yellow-600"
+                        : ""
+                    }`}>
+                      {lightingWarning === "too-dark"
+                        ? "⚠️ Too dark - Move to better lighting"
+                        : lightingWarning === "too-light"
+                        ? "⚠️ Too bright - Reduce glare or move to shade"
+                        : ""}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
