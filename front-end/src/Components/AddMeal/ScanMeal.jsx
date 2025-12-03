@@ -7,9 +7,11 @@ import NavBar from "../NavBar/NavBar";
 
 const ScanMeal = () => {
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const [error, setError] = useState(null);
   const [scanStatus, setScanStatus] = useState(false);
   const [barcode, setBarcode] = useState(null);
+  const [lightingFeedback, setLightingFeedback] = useState(null);
   const navigate = useNavigate();
 
   const startScanning = React.useCallback(() => {
@@ -146,6 +148,84 @@ const ScanMeal = () => {
     };
   }, [startScanning]);
 
+  // Analyze lighting conditions from video feed
+  const analyzeLighting = React.useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) {
+      return;
+    }
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    // Only analyze if video is ready
+    if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
+      return;
+    }
+
+    // Set canvas size to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw video frame to canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Sample pixels from the center region (where barcode is likely to be)
+    const centerX = Math.floor(canvas.width / 2);
+    const centerY = Math.floor(canvas.height / 2);
+    const sampleSize = Math.min(canvas.width, canvas.height) * 0.3;
+    const startX = Math.max(0, centerX - sampleSize / 2);
+    const startY = Math.max(0, centerY - sampleSize / 2);
+    const endX = Math.min(canvas.width, centerX + sampleSize / 2);
+    const endY = Math.min(canvas.height, centerY + sampleSize / 2);
+
+    // Get image data from center region
+    const imageData = ctx.getImageData(startX, startY, endX - startX, endY - startY);
+    const data = imageData.data;
+
+    // Calculate average brightness (luminance)
+    let totalBrightness = 0;
+    let pixelCount = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      // Calculate luminance using standard formula
+      const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+      totalBrightness += brightness;
+      pixelCount++;
+    }
+
+    const averageBrightness = totalBrightness / pixelCount;
+
+    // Determine lighting feedback
+    // Brightness range: 0-255
+    // Too dark: < 50
+    // Too light: > 200
+    // Good: 50-200
+    if (averageBrightness < 50) {
+      setLightingFeedback("too dark");
+    } else if (averageBrightness > 200) {
+      setLightingFeedback("too light");
+    } else {
+      setLightingFeedback("good");
+    }
+  }, []);
+
+  // Monitor lighting conditions periodically
+  useEffect(() => {
+    if (!scanStatus || !videoRef.current) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      analyzeLighting();
+    }, 500); // Check every 500ms
+
+    return () => clearInterval(interval);
+  }, [scanStatus, analyzeLighting]);
+
   // TODO might need to remove this manual add option
   const handleAddClick = () => {
     navigate("/edit-meal");
@@ -167,12 +247,28 @@ const ScanMeal = () => {
           {error ? (
             <div className="error-message">{error}</div>
           ) : (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="camera-feed"
-            />
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="camera-feed"
+              />
+              <canvas ref={canvasRef} style={{ display: "none" }} />
+              {lightingFeedback && (
+                <div className={`lighting-feedback ${lightingFeedback}`}>
+                  {lightingFeedback === "too dark" && (
+                    <span>⚠️ Too Dark - Move to a brighter area</span>
+                  )}
+                  {lightingFeedback === "too light" && (
+                    <span>⚠️ Too Bright - Reduce glare or move to a darker area</span>
+                  )}
+                  {lightingFeedback === "good" && (
+                    <span>✓ Good Lighting</span>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
         <div className="submit-container">
