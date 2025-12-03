@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "../LoginSignup/LoginSignup.css";
-import "./ManualMeal.css";
 import NavBar from "../NavBar/NavBar";
 
 const initialForm = {
@@ -17,6 +15,7 @@ const ManualMeal = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5050";
+
   const [form, setForm] = useState(initialForm);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,9 +27,7 @@ const ManualMeal = () => {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    if (error) {
-      setError(null);
-    }
+    if (error) setError(null);
   };
 
   useEffect(() => {
@@ -45,12 +42,12 @@ const ManualMeal = () => {
           headers.Authorization = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_BASE}/api/meals`, {
-          headers,
-        });
+        const response = await fetch(`${API_BASE}/api/meals`, { headers });
+
         if (!response.ok) {
           throw new Error(`Failed to load meals (${response.status})`);
         }
+
         const data = await response.json();
         const meals = Array.isArray(data.meals) ? data.meals : [];
 
@@ -61,25 +58,26 @@ const ManualMeal = () => {
           }))
         );
 
-        // Check if there's an edit parameter in the URL
+        // handle ?edit=<id> from query string
         const editId = searchParams.get("edit");
         if (editId) {
-          const mealToEdit = meals.find((meal) => meal.id === Number(editId));
+          const mealToEdit = meals.find((meal) => meal.id === editId);
           if (mealToEdit) {
             setForm({
               name: mealToEdit.name || "",
-              calories: mealToEdit.calories || "",
-              carbs: mealToEdit.carbs || "",
-              protein: mealToEdit.protein || "",
-              fat: mealToEdit.fat || "",
+              calories: mealToEdit.calories?.toString() || "",
+              carbs: mealToEdit.carbs?.toString() || "",
+              protein: mealToEdit.protein?.toString() || "",
+              fat: mealToEdit.fat?.toString() || "",
               notes: mealToEdit.notes || "",
             });
             setEditingId(mealToEdit.id);
-            setSearchParams({});
+            setSearchParams({}); // clear query param
+
             setTimeout(() => {
-              const formElement = document.querySelector(".manual-meal-form");
-              if (formElement) {
-                formElement.scrollIntoView({ behavior: "smooth", block: "start" });
+              const el = document.querySelector("#manual-meal-form");
+              if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
               }
             }, 100);
           }
@@ -99,10 +97,7 @@ const ManualMeal = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    if (!form.name.trim()) {
-      return;
-    }
+    if (!form.name.trim()) return;
 
     setSaving(true);
     setError(null);
@@ -125,7 +120,9 @@ const ManualMeal = () => {
 
       const token = localStorage.getItem("token");
       if (!token) {
-        setError("You must be logged in to save meals. Please log in and try again.");
+        setError(
+          "You must be logged in to save meals. Please log in and try again."
+        );
         setSaving(false);
         return;
       }
@@ -150,7 +147,9 @@ const ManualMeal = () => {
           statusText: response.statusText,
           error: errorData,
         });
-        throw new Error(errorData.error || `Failed to save meal (${response.status})`);
+        throw new Error(
+          errorData.error || `Failed to save meal (${response.status})`
+        );
       }
 
       const result = await response.json();
@@ -159,10 +158,13 @@ const ManualMeal = () => {
 
       setEntries((prev) => {
         if (!editingId) {
+          // prepend new meal
           return [meal, ...prev];
         }
+        // update existing
         return prev.map((item) => (item.id === meal.id ? meal : item));
       });
+
       setForm(initialForm);
       setEditingId(null);
     } catch (err) {
@@ -176,24 +178,24 @@ const ManualMeal = () => {
     }
   };
 
-  const totals = useMemo(() => {
-    return entries.reduce(
-      (acc, item) => ({
-        calories: acc.calories + item.calories,
-        carbs: acc.carbs + item.carbs,
-        protein: acc.protein + item.protein,
-        fat: acc.fat + item.fat,
-      }),
-      { calories: 0, carbs: 0, protein: 0, fat: 0 }
-    );
-  }, [entries]);
+  const totals = useMemo(
+    () =>
+      entries.reduce(
+        (acc, item) => ({
+          calories: acc.calories + (item.calories || 0),
+          carbs: acc.carbs + (item.carbs || 0),
+          protein: acc.protein + (item.protein || 0),
+          fat: acc.fat + (item.fat || 0),
+        }),
+        { calories: 0, carbs: 0, protein: 0, fat: 0 }
+      ),
+    [entries]
+  );
 
   const formatTimestamp = (isoString) => {
     if (!isoString) return "";
     const date = new Date(isoString);
-    if (Number.isNaN(date.getTime())) {
-      return isoString;
-    }
+    if (Number.isNaN(date.getTime())) return isoString;
     return date.toLocaleString();
   };
 
@@ -207,6 +209,10 @@ const ManualMeal = () => {
       fat: meal.fat?.toString() || "",
       notes: meal.notes || "",
     });
+    const el = document.querySelector("#manual-meal-form");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   const cancelEditing = () => {
@@ -216,18 +222,14 @@ const ManualMeal = () => {
 
   const handleDelete = async (mealId) => {
     const meal = entries.find((item) => item.id === mealId);
-    if (!meal) {
-      return;
-    }
+    if (!meal) return;
 
     const confirmed =
       typeof window === "undefined"
         ? true
         : window.confirm(`Remove "${meal.name}" from your manual meals?`);
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setDeletingId(mealId);
     setError(null);
@@ -269,191 +271,326 @@ const ManualMeal = () => {
   };
 
   return (
-    <div className="manual-meal-page">
-      <div className="header">
-        <button
-          onClick={() => navigate(-1)}
-          className="back-button"
-          aria-label="Back"
-        >
-          <i className="ri-arrow-left-line"></i>
-        </button>
-        <div className="text">Enter Meal Manually</div>
-        <div className="underline"></div>
-      </div>
-
-      {error && <div className="manual-error">{error}</div>}
-
-        <form className="manual-meal-form" onSubmit={handleSubmit}>
-          <div className="manual-field">
-            <label htmlFor="name">Meal name *</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="E.g., Chicken Salad"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="manual-grid">
-            <div className="manual-field">
-              <label htmlFor="calories">Calories (kcal)</label>
-              <input
-                id="calories"
-                name="calories"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                value={form.calories}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="manual-field">
-              <label htmlFor="carbs">Carbs (g)</label>
-              <input
-                id="carbs"
-                name="carbs"
-                type="number"
-                min="0"
-                step="0.1"
-                placeholder="0"
-                value={form.carbs}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="manual-field">
-              <label htmlFor="protein">Protein (g)</label>
-              <input
-                id="protein"
-                name="protein"
-                type="number"
-                min="0"
-                step="0.1"
-                placeholder="0"
-                value={form.protein}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="manual-field">
-              <label htmlFor="fat">Fat (g)</label>
-              <input
-                id="fat"
-                name="fat"
-                type="number"
-                min="0"
-                step="0.1"
-                placeholder="0"
-                value={form.fat}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="manual-field">
-            <label htmlFor="notes">Notes (optional)</label>
-            <textarea
-              id="notes"
-              name="notes"
-              rows="3"
-              placeholder="Cooking method, ingredients, serving details..."
-              value={form.notes}
-              onChange={handleChange}
-            />
-          </div>
-
-          <button type="submit" className="submit manual-submit">
-            {saving ? "Saving..." : editingId ? "Update Meal" : "Log Meal"}
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 flex flex-col dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
+      {/* Header */}
+      <header className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-white/90 px-2.5 py-1.5 shadow-sm hover:bg-emerald-50 text-emerald-700 transition"
+            aria-label="Back"
+            type="button"
+          >
+            <i className="ri-arrow-left-line text-lg" />
           </button>
-          {editingId && (
-            <button
-              type="button"
-              className="manual-cancel"
-              onClick={cancelEditing}
-              disabled={saving}
-            >
-              Cancel Edit
-            </button>
-          )}
-        </form>
+          <div className="flex flex-col items-center">
+            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
+              NutriLens
+            </span>
+            <h1 className="mt-1 text-sm font-semibold text-emerald-900">
+              Enter meal manually
+            </h1>
+          </div>
+          <div className="w-9" />
+        </div>
+      </header>
 
+      {/* Main content */}
+      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-4">
+        {error && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs text-amber-800 shadow-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Form card */}
+        <section
+          id="manual-meal-form"
+          className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-4"
+        >
+          <div>
+            <p className="text-sm font-semibold text-emerald-900">
+              Log a meal
+            </p>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              Add nutrition details for homemade dishes or foods without
+              barcodes.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="name"
+                className="text-xs font-medium text-slate-700"
+              >
+                Meal name <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="E.g., Chicken salad with quinoa"
+                value={form.name}
+                onChange={handleChange}
+                required
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+              />
+            </div>
+
+            {/* Grid macros */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="calories"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Calories (kcal)
+                </label>
+                <input
+                  id="calories"
+                  name="calories"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="0"
+                  value={form.calories}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="carbs"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Carbs (g)
+                </label>
+                <input
+                  id="carbs"
+                  name="carbs"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="0"
+                  value={form.carbs}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="protein"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Protein (g)
+                </label>
+                <input
+                  id="protein"
+                  name="protein"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="0"
+                  value={form.protein}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="fat"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Fat (g)
+                </label>
+                <input
+                  id="fat"
+                  name="fat"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="0"
+                  value={form.fat}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                />
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="notes"
+                className="text-xs font-medium text-slate-700"
+              >
+                Notes (optional)
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                rows={3}
+                placeholder="Cooking method, ingredients, portion size..."
+                value={form.notes}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition"
+              >
+                {saving
+                  ? "Saving..."
+                  : editingId
+                  ? "Update meal"
+                  : "Log meal"}
+              </button>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={cancelEditing}
+                  disabled={saving}
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-60 disabled:cursor-not-allowed transition"
+                >
+                  Cancel edit
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+
+        {/* Summary + list */}
         {loading ? (
-          <div className="manual-loading">Loading your manual meals…</div>
+          <div className="rounded-2xl border border-emerald-100 bg-white/80 px-3.5 py-3 text-xs text-slate-600 shadow-sm">
+            Loading your manual meals…
+          </div>
         ) : (
           entries.length > 0 && (
-            <section className="manual-summary">
-              <h3 className="manual-summary-title">Meals Logged Today</h3>
-              <div className="manual-summary-totals">
+            <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <span>Total Calories</span>
-                  <strong>{totals.calories} kcal</strong>
+                  <h3 className="text-sm font-semibold text-emerald-900">
+                    Meals logged
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Manually entered meals across your recent logs.
+                  </p>
                 </div>
-                <div>
-                  <span>Carbs</span>
-                  <strong>{totals.carbs} g</strong>
+                <span className="text-[11px] text-slate-500">
+                  {entries.length}{" "}
+                  {entries.length === 1 ? "entry" : "entries"}
+                </span>
+              </div>
+
+              {/* Totals */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="rounded-2xl border border-emerald-50 bg-emerald-50/80 px-3 py-2">
+                  <span className="text-[11px] font-medium text-emerald-800 uppercase tracking-[0.14em]">
+                    Calories
+                  </span>
+                  <p className="mt-1 text-base font-semibold text-emerald-900">
+                    {totals.calories}
+                  </p>
+                  <p className="text-[11px] text-slate-500">kcal</p>
                 </div>
-                <div>
-                  <span>Protein</span>
-                  <strong>{totals.protein} g</strong>
+                <div className="rounded-2xl border border-sky-50 bg-sky-50/80 px-3 py-2">
+                  <span className="text-[11px] font-medium text-sky-800 uppercase tracking-[0.14em]">
+                    Carbs
+                  </span>
+                  <p className="mt-1 text-base font-semibold text-sky-900">
+                    {totals.carbs}
+                  </p>
+                  <p className="text-[11px] text-slate-500">g</p>
                 </div>
-                <div>
-                  <span>Fat</span>
-                  <strong>{totals.fat} g</strong>
+                <div className="rounded-2xl border border-indigo-50 bg-indigo-50/80 px-3 py-2">
+                  <span className="text-[11px] font-medium text-indigo-800 uppercase tracking-[0.14em]">
+                    Protein
+                  </span>
+                  <p className="mt-1 text-base font-semibold text-indigo-900">
+                    {totals.protein}
+                  </p>
+                  <p className="text-[11px] text-slate-500">g</p>
+                </div>
+                <div className="rounded-2xl border border-amber-50 bg-amber-50/80 px-3 py-2">
+                  <span className="text-[11px] font-medium text-amber-800 uppercase tracking-[0.14em]">
+                    Fat
+                  </span>
+                  <p className="mt-1 text-base font-semibold text-amber-900">
+                    {totals.fat}
+                  </p>
+                  <p className="text-[11px] text-slate-500">g</p>
                 </div>
               </div>
 
-              <ul className="manual-meal-list">
+              {/* List */}
+              <ul className="space-y-3">
                 {entries.map((item) => (
-                  <li key={item.id} className="manual-meal-card">
-                    <div className="manual-meal-card-header">
-                      <h4>{item.name}</h4>
-                      <div className="manual-meal-meta">
-                        {editingId === item.id && (
-                          <span className="manual-editing-pill">Editing</span>
-                        )}
-                        <time>{formatTimestamp(item.loggedAt)}</time>
+                  <li
+                    key={item.id}
+                    className="rounded-2xl border border-slate-100 bg-slate-50/70 px-3.5 py-3 flex flex-col gap-2"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900">
+                          {item.name}
+                        </h4>
+                        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                          {editingId === item.id && (
+                            <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 border border-emerald-100">
+                              Editing
+                            </span>
+                          )}
+                          <time className="text-[11px]">
+                            {formatTimestamp(item.loggedAt)}
+                          </time>
+                        </div>
                       </div>
                     </div>
-                    <div className="manual-meal-macros">
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1 text-[11px] text-slate-700">
                       <span>
-                        <strong>{item.calories}</strong> kcal
+                        <strong>{item.calories ?? 0}</strong> kcal
                       </span>
                       <span>
-                        <strong>{item.carbs}</strong> g carbs
+                        <strong>{item.carbs ?? 0}</strong> g carbs
                       </span>
                       <span>
-                        <strong>{item.protein}</strong> g protein
+                        <strong>{item.protein ?? 0}</strong> g protein
                       </span>
                       <span>
-                        <strong>{item.fat}</strong> g fat
+                        <strong>{item.fat ?? 0}</strong> g fat
                       </span>
                     </div>
+
                     {item.notes && (
-                      <p className="manual-meal-notes">{item.notes}</p>
+                      <p className="text-[11px] text-slate-600 mt-1">
+                        {item.notes}
+                      </p>
                     )}
-                    <div className="manual-meal-actions">
+
+                    <div className="mt-1 flex flex-wrap gap-2 justify-end">
                       <button
                         type="button"
-                        className="manual-edit-btn"
+                        className="inline-flex items-center gap-1 rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm hover:bg-emerald-50 disabled:opacity-60 disabled:cursor-not-allowed transition"
                         onClick={() => startEditing(item)}
                         disabled={saving && editingId === item.id}
                       >
-                        <i className="ri-edit-line" aria-hidden="true"></i>
+                        <i className="ri-edit-line text-xs" />
                         Edit meal
                       </button>
                       <button
                         type="button"
-                        className="manual-delete-btn"
+                        className="inline-flex items-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[11px] font-medium text-rose-800 shadow-sm hover:bg-rose-100 disabled:opacity-60 disabled:cursor-not-allowed transition"
                         onClick={() => handleDelete(item.id)}
                         disabled={deletingId === item.id}
                       >
-                        <i
-                          className="ri-delete-bin-6-line"
-                          aria-hidden="true"
-                        ></i>
+                        <i className="ri-delete-bin-6-line text-xs" />
                         {deletingId === item.id ? "Deleting…" : "Delete"}
                       </button>
                     </div>
@@ -463,6 +600,7 @@ const ManualMeal = () => {
             </section>
           )
         )}
+      </main>
 
       <NavBar />
     </div>

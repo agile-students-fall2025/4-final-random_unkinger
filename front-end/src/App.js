@@ -1,4 +1,4 @@
-import "./App.css";
+// import "./App.css";
 import { useState, useEffect } from "react";
 import LoginSignup from "./Components/LoginSignup/LoginSignup";
 import Home from "./Components/Home/Home";
@@ -25,9 +25,9 @@ function App() {
 
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add("dark-mode");
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove("dark-mode");
+      document.documentElement.classList.remove("dark");
     }
     localStorage.setItem("darkMode", isDarkMode.toString());
   }, [isDarkMode]);
