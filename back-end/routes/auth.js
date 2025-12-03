@@ -63,7 +63,7 @@ router.post("/login", async (req, res) => {
       expiresIn: "1d",
     });
 
-    return res.json({ token: `jwt ${token}` });
+    return res.json({ token });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ error: "Server error during login." });
