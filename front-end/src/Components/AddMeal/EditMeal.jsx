@@ -10,6 +10,7 @@ const EditMeal = () => {
   const location = useLocation();
   const [foodData, setFoodData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   const barcode = location.state?.barcode;
@@ -45,9 +46,100 @@ const EditMeal = () => {
     }
   };
 
-  const handleAdd = () => {
-    // later you might POST this as a scanned meal before navigating
-    navigate("/home");
+  const handleAdd = async () => {
+    if (!foodData) {
+      setError("No food data available to save.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("You must be logged in to save meals. Please log in and try again.");
+        setSaving(false);
+        return;
+      }
+
+      // Calculate quantity in grams
+      let quantityInGrams = 100; // Default to 100g (one serving from barcode API)
+      
+      if (quantity && !isNaN(Number(quantity)) && Number(quantity) > 0) {
+        const qty = Number(quantity);
+        switch (unit) {
+          case "gram":
+            quantityInGrams = qty;
+            break;
+          case "oz":
+            quantityInGrams = qty * 28.35; // 1 oz = 28.35g
+            break;
+          case "lbs":
+            quantityInGrams = qty * 453.592; // 1 lb = 453.592g
+            break;
+          case "amount":
+            // For "amount" unit, assume it's a serving size (100g per serving)
+            quantityInGrams = qty * 100;
+            break;
+          default:
+            quantityInGrams = qty;
+        }
+      }
+
+      // Calculate nutritional values based on quantity
+      // Barcode API returns values per 100g, so we calculate proportionally
+      const multiplier = quantityInGrams / 100;
+      
+      const payload = {
+        name: foodData.name || "Scanned food",
+        calories: Math.round((foodData.calories || 0) * multiplier),
+        carbs: Math.round(((foodData.carbs || 0) * multiplier) * 10) / 10,
+        protein: Math.round(((foodData.protein || 0) * multiplier) * 10) / 10,
+        fat: Math.round(((foodData.fat || 0) * multiplier) * 10) / 10,
+        notes: quantity && unit ? `Quantity: ${quantity} ${unit}` : "",
+        source: "scanned",
+        image: foodData.imageUrl || "",
+      };
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      console.log("📤 Saving scanned meal:", payload);
+
+      const response = await fetch(`${API}/api/meals`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("❌ Meal save failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+        });
+        throw new Error(
+          errorData.error || `Failed to save meal (${response.status})`
+        );
+      }
+
+      const result = await response.json();
+      console.log("✅ Scanned meal saved successfully:", result);
+      
+      // Navigate to home after successful save
+      navigate("/home");
+    } catch (err) {
+      console.error("Error saving scanned meal:", err);
+      setError(
+        err.message ||
+          "Something went wrong saving your meal. Please try again."
+      );
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -169,8 +261,7 @@ const EditMeal = () => {
               Adjust quantity
             </h3>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Set the amount you actually ate. (For now, this is for your own
-              reference — we’ll still add one serving.)
+              Set the amount you actually ate. Nutritional values will be calculated based on this quantity.
             </p>
           </div>
 
@@ -214,12 +305,19 @@ const EditMeal = () => {
             </div>
           </div>
 
+          {error && (
+            <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+              {error}
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleAdd}
-            className="mt-2 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition"
+            disabled={saving}
+            className="mt-2 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition"
           >
-            Add to diary
+            {saving ? "Saving..." : "Add to diary"}
           </button>
         </section>
       </main>
