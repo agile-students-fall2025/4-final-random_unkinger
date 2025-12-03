@@ -13,7 +13,26 @@ const ScanMeal = () => {
   const [barcode, setBarcode] = useState(null);
   const [lightingWarning, setLightingWarning] = useState(null); // 'too-dark', 'too-light', or null
   const brightnessCheckIntervalRef = useRef(null);
+  const lastDetectedCodeRef = useRef(null);
+  const detectionCountRef = useRef(0);
   const navigate = useNavigate();
+
+  // Function to validate barcode format
+  const isValidBarcode = (code) => {
+    if (!code || typeof code !== "string") return false;
+    
+    // Remove any whitespace
+    const cleaned = code.trim();
+    
+    // Check length (most barcodes are 8-14 digits)
+    if (cleaned.length < 8 || cleaned.length > 18) return false;
+    
+    // Check if it's mostly numeric (some barcodes have letters but most are numeric)
+    const numericCount = cleaned.replace(/[^0-9]/g, "").length;
+    if (numericCount < cleaned.length * 0.7) return false; // At least 70% numeric
+    
+    return true;
+  };
 
   // Function to check video brightness
   const checkBrightness = useCallback(() => {
@@ -99,11 +118,11 @@ const ScanMeal = () => {
         },
       },
       locator: {
-        patchSize: "medium",
-        halfSample: true,
+        patchSize: "large",
+        halfSample: false,
       },
-      numOfWorkers: 2,
-      frequency: 10,
+      numOfWorkers: 4,
+      frequency: 5,
       decoder: {
         readers: [
           "code_128_reader",
@@ -136,7 +155,28 @@ const ScanMeal = () => {
           }
 
           const code = result.codeResult.code;
-          console.log("Barcode detected:", code);
+          
+          // Validate barcode format
+          if (!isValidBarcode(code)) {
+            console.log("Invalid barcode format:", code);
+            return;
+          }
+
+          // Require multiple detections of the same code to reduce false positives
+          if (lastDetectedCodeRef.current === code) {
+            detectionCountRef.current += 1;
+          } else {
+            lastDetectedCodeRef.current = code;
+            detectionCountRef.current = 1;
+          }
+
+          // Require at least 2-3 confirmations before accepting
+          if (detectionCountRef.current < 2) {
+            console.log(`Barcode detected (${detectionCountRef.current}/2):`, code);
+            return;
+          }
+
+          console.log("Barcode confirmed:", code);
           setBarcode(code);
 
           // stop and auto move on after detecting barcode
@@ -146,6 +186,11 @@ const ScanMeal = () => {
             clearInterval(brightnessCheckIntervalRef.current);
             brightnessCheckIntervalRef.current = null;
           }
+          
+          // Reset detection tracking
+          lastDetectedCodeRef.current = null;
+          detectionCountRef.current = 0;
+          
           navigate("/edit-meal", { state: { barcode: code } });
         });
 
@@ -215,7 +260,17 @@ const ScanMeal = () => {
   }, [startScanning]);
 
   const handleAddClick = () => {
-    navigate("/edit-meal");
+    navigate("/manual-meal");
+  };
+
+  const [manualBarcodeInput, setManualBarcodeInput] = useState("");
+  const [showManualBarcode, setShowManualBarcode] = useState(false);
+
+  const handleManualBarcodeSubmit = (e) => {
+    e.preventDefault();
+    if (manualBarcodeInput.trim()) {
+      navigate("/edit-meal", { state: { barcode: manualBarcodeInput.trim() } });
+    }
   };
 
   return (
@@ -318,6 +373,37 @@ const ScanMeal = () => {
               Last detected barcode:{" "}
               <span className="font-mono text-emerald-700">{barcode}</span>
             </p>
+          )}
+        </section>
+
+        {/* Manual barcode entry */}
+        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-3">
+          <button
+            type="button"
+            onClick={() => setShowManualBarcode(!showManualBarcode)}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700 shadow-sm hover:bg-emerald-100 transition"
+          >
+            <i className="ri-keyboard-line text-base" />
+            {showManualBarcode ? "Hide" : "Enter barcode manually"}
+          </button>
+          
+          {showManualBarcode && (
+            <form onSubmit={handleManualBarcodeSubmit} className="space-y-2">
+              <input
+                type="text"
+                value={manualBarcodeInput}
+                onChange={(e) => setManualBarcodeInput(e.target.value)}
+                placeholder="Enter barcode number"
+                className="w-full rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              />
+              <button
+                type="submit"
+                disabled={!manualBarcodeInput.trim()}
+                className="w-full inline-flex items-center justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                Lookup barcode
+              </button>
+            </form>
           )}
         </section>
 

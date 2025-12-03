@@ -12,8 +12,10 @@ const EditMeal = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [manualBarcode, setManualBarcode] = useState("");
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
-  const barcode = location.state?.barcode;
+  const barcode = location.state?.barcode || manualBarcode;
 
   useEffect(() => {
     if (barcode) {
@@ -25,25 +27,46 @@ const EditMeal = () => {
   }, [barcode]);
 
   const fetchFoodData = async (code) => {
+    if (!code) {
+      setLoading(false);
+      setError("No barcode provided.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
+      setShowManualEntry(false);
 
       const res = await fetch(`${API}/api/barcode/${code}`);
 
       if (res.ok) {
         const data = await res.json();
         setFoodData(data);
+        setShowManualEntry(false);
       } else {
         const errorBody = await res.json().catch(() => ({}));
-        setError(errorBody.error || "Product not found.");
+        setError(errorBody.error || "Product not found in database.");
+        setShowManualEntry(true); // Show manual entry option
       }
     } catch (e) {
       console.error("Barcode fetch error:", e);
-      setError("Failed to connect to server.");
+      setError("Failed to connect to server. Please check your internet connection.");
+      setShowManualEntry(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleManualBarcodeSubmit = (e) => {
+    e.preventDefault();
+    if (manualBarcode.trim()) {
+      fetchFoodData(manualBarcode.trim());
+    }
+  };
+
+  const handleRetryScan = () => {
+    navigate("/scan-meal");
   };
 
   const handleAdd = async () => {
@@ -248,13 +271,60 @@ const EditMeal = () => {
           </div>
 
           {error && (
-            <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
-              {error}
+            <div className="mt-2 space-y-3">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                {error}
+                {error.includes("not found") && (
+                  <p className="mt-2 text-[10px] text-amber-700">
+                    The product might not be in the OpenFoodFacts database. Try entering the barcode manually or add the meal manually.
+                  </p>
+                )}
+              </div>
+              
+              {showManualEntry && (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 space-y-2">
+                  <p className="text-[11px] font-medium text-emerald-900">
+                    Try manual barcode entry
+                  </p>
+                  <form onSubmit={handleManualBarcodeSubmit} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={manualBarcode}
+                      onChange={(e) => setManualBarcode(e.target.value)}
+                      placeholder="Enter barcode number"
+                      className="flex-1 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-600 transition"
+                    >
+                      Lookup
+                    </button>
+                  </form>
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleRetryScan}
+                      className="flex-1 rounded-xl border border-emerald-300 bg-white px-3 py-2 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 transition"
+                    >
+                      Try scanning again
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/manual-meal")}
+                      className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition"
+                    >
+                      Add manually
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </section>
 
-        {/* Adjust quantity */}
+        {/* Adjust quantity - only show if foodData exists */}
+        {foodData && (
         <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-3">
           <div>
             <h3 className="text-sm font-semibold text-emerald-900">
@@ -320,6 +390,7 @@ const EditMeal = () => {
             {saving ? "Saving..." : "Add to diary"}
           </button>
         </section>
+        )}
       </main>
     </div>
   );
