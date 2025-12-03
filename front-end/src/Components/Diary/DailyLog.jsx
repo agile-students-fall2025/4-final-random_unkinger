@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import "./DailyLog.css";
 import NavBar from "../NavBar/NavBar";
 
-const Pencil = () => <span className="text-sm">✏️</span>;
+const Pencil = () => <span style={{ fontSize: "14px" }}>✏️</span>;
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
 
@@ -16,13 +17,13 @@ export default function DailyLog() {
     if (!date) return;
 
     const token = localStorage.getItem("token");
-    const headers = {};
 
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+    fetch(`${API}/api/meals?date=${date}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
-    fetch(`${API}/api/meals?date=${date}`, { headers })
       .then((res) => res.json())
       .then((data) => {
         setMeals(data.meals || []);
@@ -47,226 +48,95 @@ export default function DailyLog() {
     );
   }, [meals]);
 
-  const formattedDate =
-    date &&
-    new Date(date + "T00:00:00").toLocaleDateString("en-US", {
+  const formattedDate = new Date(date + "T00:00:00").toLocaleDateString(
+    "en-US",
+    {
       weekday: "long",
       month: "short",
       day: "numeric",
-    });
+    }
+  );
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 flex items-center justify-center dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-        <div className="rounded-2xl border border-emerald-100 bg-white/80 px-4 py-3 text-xs text-slate-600 shadow-sm">
-          Loading daily log…
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 flex flex-col dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-      {/* Header */}
-      <header className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => navigate("/diary")}
-            className="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-white/90 px-2.5 py-1.5 shadow-sm hover:bg-emerald-50 text-emerald-700 transition "
-            aria-label="Back to diary"
-            type="button"
-          >
-            <i className="ri-arrow-left-line text-lg" />
-          </button>
-          <div className="flex flex-col items-center">
-            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
-              Diary
-            </span>
-            <h1 className="text-sm font-semibold text-emerald-900 mt-1">
-              Daily log
-            </h1>
-          </div>
-          {/* Spacer */}
-          <div className="w-9" />
-        </div>
+    <div className="dailylog-container">
+      <header className="header">
+        <button
+          onClick={() => navigate("/diary")}
+          className="back-button"
+          aria-label="Back"
+        >
+          <i className="ri-arrow-left-line"></i>
+        </button>
+        <div className="text">Diary</div>
+        <div className="underline"></div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-4">
-        {/* Date + summary card */}
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm"
-            >
-              <span className="mr-1.5">
-                <i className="ri-calendar-line text-sm align-middle" />
-              </span>
-              <span>{formattedDate || "Selected day"}</span>
-            </button>
-          </div>
+      <main className="content">
+        <button className="date-btn">Date: {formattedDate}</button>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1">
-            <div className="rounded-2xl border border-emerald-50 bg-emerald-50/70 px-3 py-2">
-              <p className="text-[11px] font-medium text-emerald-800 uppercase tracking-[0.14em]">
-                Calories
-              </p>
-              <p className="mt-1 text-base font-semibold text-emerald-900">
-                {totals.calories}
-              </p>
-              <p className="text-[11px] text-slate-500">kcal</p>
-            </div>
-            <div className="rounded-2xl border border-sky-50 bg-sky-50/70 px-3 py-2">
-              <p className="text-[11px] font-medium text-sky-800 uppercase tracking-[0.14em]">
-                Carbs
-              </p>
-              <p className="mt-1 text-base font-semibold text-sky-900">
-                {totals.carbs}
-              </p>
-              <p className="text-[11px] text-slate-500">g</p>
-            </div>
-            <div className="rounded-2xl border border-indigo-50 bg-indigo-50/70 px-3 py-2">
-              <p className="text-[11px] font-medium text-indigo-800 uppercase tracking-[0.14em]">
-                Protein
-              </p>
-              <p className="mt-1 text-base font-semibold text-indigo-900">
-                {totals.protein}
-              </p>
-              <p className="text-[11px] text-slate-500">g</p>
-            </div>
-            <div className="rounded-2xl border border-amber-50 bg-amber-50/70 px-3 py-2">
-              <p className="text-[11px] font-medium text-amber-800 uppercase tracking-[0.14em]">
-                Fat
-              </p>
-              <p className="mt-1 text-base font-semibold text-amber-900">
-                {totals.fat}
-              </p>
-              <p className="text-[11px] text-slate-500">g</p>
-            </div>
-          </div>
-        </section>
+        <div className="macro-summary">
+          <p>
+            Total Calories: {totals.calories} kcal
+          </p>
+          <p>
+            Total Carbs: {totals.carbs} g
+          </p>
+          <p>
+            Total Protein: {totals.protein} g
+          </p>
+          <p>
+            Total Fat: {totals.fat} g
+          </p>
+        </div>
 
-        {/* Meals list card */}
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <i
-                className="ri-restaurant-fill text-lg text-emerald-500"
-                aria-hidden="true"
-              />
-              <h2 className="text-sm font-semibold text-emerald-900">
-                Logged meals
-              </h2>
-            </div>
-            <span className="text-[11px] text-slate-500">
-              {meals.length} {meals.length === 1 ? "entry" : "entries"}
-            </span>
-          </div>
-
-          {meals.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-emerald-100 bg-emerald-50/60 px-3 py-4 text-center">
-              <p className="text-xs text-slate-600">
-                No meals logged for this day yet.
-              </p>
-              <p className="text-[11px] text-slate-500 mt-1">
-                Go back to Home to add a meal, then revisit this diary entry.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {meals.map((meal) => (
-                <div
-                  key={meal.id || meal._id}
-                  className="rounded-2xl border border-emerald-50 bg-emerald-50/50 p-3 flex flex-col gap-2"
-                >
-                  {/* Name + source tag */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/90 border border-emerald-100 text-[11px] font-medium text-emerald-700">
-                        🍽
-                      </span>
-                      <p className="text-sm font-semibold text-emerald-900">
-                        {meal.name}
-                      </p>
-                    </div>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
-                        meal.source === "scanned"
-                          ? "bg-sky-50 text-sky-800 border-sky-200"
-                          : "bg-slate-50 text-slate-700 border-slate-200"
-                      }`}
-                    >
-                      {meal.source === "scanned" ? "Scanned" : "Manual"}
-                    </span>
+        <div className="meal-list">
+          {meals.map((meal) => (
+            <div className="meal-card" key={meal._id}>
+              <div className="meal-name-row">
+                <div className="meal-name">{meal.name}</div>
+                <span className={`meal-source-tag meal-source-tag--${meal.source || "manual"}`}>
+                  {meal.source === "scanned" ? "Scanned" : "Manual"}
+                </span>
+              </div>
+              <div className="meal-content-row">
+                <img
+                  src={meal.image || "https://picsum.photos/id/63/400/300"}
+                  alt={meal.name}
+                  className="meal-image"
+                />
+                <div className="meal-info">
+                  <div className="macros">
+                    <p>Protein = {meal.protein}g</p>
+                    <p>Fat = {meal.fat}g</p>
+                    <p>Carbs = {meal.carbs}g</p>
+                    <p>Calories = {meal.calories}</p>
+                    <p className="added">
+                      Added:{" "}
+                      {new Date(meal.loggedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
                   </div>
-
-                  {/* Image + info */}
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
-                      <div className="h-20 w-24 sm:h-24 sm:w-28 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100">
-                        <img
-                          src={
-                            meal.image ||
-                            "https://picsum.photos/id/63/400/300"
-                          }
-                          alt={meal.name}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-slate-700">
-                        <p>
-                          <span className="font-medium">Protein:</span>{" "}
-                          {meal.protein} g
-                        </p>
-                        <p>
-                          <span className="font-medium">Fat:</span>{" "}
-                          {meal.fat} g
-                        </p>
-                        <p>
-                          <span className="font-medium">Carbs:</span>{" "}
-                          {meal.carbs} g
-                        </p>
-                        <p>
-                          <span className="font-medium">Calories:</span>{" "}
-                          {meal.calories}
-                        </p>
-                        <p className="col-span-2 text-slate-500">
-                          <span className="font-medium">Added:</span>{" "}
-                          {meal.loggedAt &&
-                            new Date(meal.loggedAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                        </p>
-                      </div>
-
-                      <div className="mt-2 flex justify-end">
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-1 rounded-xl border border-emerald-200 bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm hover:bg-emerald-50 transition"
-                          onClick={() => {
-                            if (meal.source === "manual" || !meal.source) {
-                              navigate(`/manual-meal?edit=${meal.id}`);
-                            } else {
-                              navigate(`/editmeal/${meal.id}`);
-                            }
-                          }}
-                        >
-                          <Pencil />
-                          Edit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <button
+                    className="edit-btn"
+                    onClick={() => {
+                      if (meal.source === "manual" || !meal.source) {
+                        navigate(`/manual-meal?edit=${meal.id}`);
+                      } else {
+                        navigate(`/editmeal/${meal.id}`);
+                      }
+                    }}
+                  >
+                    <Pencil />
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
-        </section>
+          ))}
+        </div>
       </main>
 
       <NavBar />

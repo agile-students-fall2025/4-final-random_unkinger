@@ -25,9 +25,9 @@ function App() {
 
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add("dark-mode");
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove("dark-mode");
     }
     localStorage.setItem("darkMode", isDarkMode.toString());
   }, [isDarkMode]);

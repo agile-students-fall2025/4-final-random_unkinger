@@ -10,15 +10,12 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
-    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.19.2",
     "express-validator": "^7.3.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.20.1",
-    "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1"
+    "mongoose": "^8.20.1"
   },
   "devDependencies": {
     "c8": "^9.1.0",
