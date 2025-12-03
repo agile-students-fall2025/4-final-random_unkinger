@@ -73,6 +73,18 @@
   color: #ccc;
 }
 
+.adjusted-calories {
+  display: block;
+  font-size: 18px;
+  font-weight: 500;
+  color: #3F72AF;
+  margin-top: 8px;
+}
+
+.dark-mode .adjusted-calories {
+  color: #5a9bd4;
+}
+
 .nutrient-tables {
   display: flex;
   justify-content: space-around;
@@ -182,4 +194,9 @@
 
 .dark-mode .quantity-unit-inputs input::placeholder {
   color: #aaa;
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
