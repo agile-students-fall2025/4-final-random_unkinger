@@ -117,11 +117,9 @@ export default function Search() {
   const handleAdd = (item) => {
     if (tab === "food") {
       nav(
-        `/manual-meal?name=${encodeURIComponent(
-          item.description
-        )}&calories=${item.calories}&protein=${item.protein}&carbs=${
-          item.carbs
-        }&fat=${item.fat}`
+        `/manual-meal?name=${encodeURIComponent(item.description)}&calories=${
+          item.calories
+        }&protein=${item.protein}&carbs=${item.carbs}&fat=${item.fat}`
       );
     } else {
       alert(`Added: ${item}`);
@@ -133,7 +131,6 @@ export default function Search() {
 
   return (
     <div className=" min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-emerald-50 via-white to-lime-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-
       <main className="flex-1 w-full max-w-md mx-auto px-4 sm:px-6 pt-4 pb-10">
         {/* Top bar */}
         <div className="flex items-center gap-3 mb-4">
@@ -212,9 +209,7 @@ export default function Search() {
 
           {/* Results header */}
           <div className="flex items-center justify-between mt-1">
-            <p className="text-xs font-medium text-slate-600">
-              {headerLabel}
-            </p>
+            <p className="text-xs font-medium text-slate-600">{headerLabel}</p>
             {tab === "recent" && loading && (
               <span className="text-[11px] text-slate-400">Loading…</span>
             )}

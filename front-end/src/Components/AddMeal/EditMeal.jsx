@@ -51,7 +51,9 @@ const EditMeal = () => {
       }
     } catch (e) {
       console.error("Barcode fetch error:", e);
-      setError("Failed to connect to server. Please check your internet connection.");
+      setError(
+        "Failed to connect to server. Please check your internet connection."
+      );
       setShowManualEntry(true);
     } finally {
       setLoading(false);
@@ -81,14 +83,16 @@ const EditMeal = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        setError("You must be logged in to save meals. Please log in and try again.");
+        setError(
+          "You must be logged in to save meals. Please log in and try again."
+        );
         setSaving(false);
         return;
       }
 
       // Calculate quantity in grams
       let quantityInGrams = 100; // Default to 100g (one serving from barcode API)
-      
+
       if (quantity && !isNaN(Number(quantity)) && Number(quantity) > 0) {
         const qty = Number(quantity);
         switch (unit) {
@@ -113,13 +117,13 @@ const EditMeal = () => {
       // Calculate nutritional values based on quantity
       // Barcode API returns values per 100g, so we calculate proportionally
       const multiplier = quantityInGrams / 100;
-      
+
       const payload = {
         name: foodData.name || "Scanned food",
         calories: Math.round((foodData.calories || 0) * multiplier),
-        carbs: Math.round(((foodData.carbs || 0) * multiplier) * 10) / 10,
-        protein: Math.round(((foodData.protein || 0) * multiplier) * 10) / 10,
-        fat: Math.round(((foodData.fat || 0) * multiplier) * 10) / 10,
+        carbs: Math.round((foodData.carbs || 0) * multiplier * 10) / 10,
+        protein: Math.round((foodData.protein || 0) * multiplier * 10) / 10,
+        fat: Math.round((foodData.fat || 0) * multiplier * 10) / 10,
         notes: quantity && unit ? `Quantity: ${quantity} ${unit}` : "",
         source: "scanned",
         image: foodData.imageUrl || "",
@@ -152,7 +156,7 @@ const EditMeal = () => {
 
       const result = await response.json();
       console.log("✅ Scanned meal saved successfully:", result);
-      
+
       // Navigate to home after successful save
       navigate("/home");
     } catch (err) {
@@ -276,17 +280,21 @@ const EditMeal = () => {
                 {error}
                 {error.includes("not found") && (
                   <p className="mt-2 text-[10px] text-amber-700">
-                    The product might not be in the OpenFoodFacts database. Try entering the barcode manually or add the meal manually.
+                    The product might not be in the OpenFoodFacts database. Try
+                    entering the barcode manually or add the meal manually.
                   </p>
                 )}
               </div>
-              
+
               {showManualEntry && (
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 space-y-2">
                   <p className="text-[11px] font-medium text-emerald-900">
                     Try manual barcode entry
                   </p>
-                  <form onSubmit={handleManualBarcodeSubmit} className="flex gap-2">
+                  <form
+                    onSubmit={handleManualBarcodeSubmit}
+                    className="flex gap-2"
+                  >
                     <input
                       type="text"
                       value={manualBarcode}
@@ -325,71 +333,72 @@ const EditMeal = () => {
 
         {/* Adjust quantity - only show if foodData exists */}
         {foodData && (
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-3">
-          <div>
-            <h3 className="text-sm font-semibold text-emerald-900">
-              Adjust quantity
-            </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              Set the amount you actually ate. Nutritional values will be calculated based on this quantity.
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <div className="flex-1 space-y-1.5">
-              <label
-                htmlFor="quantity"
-                className="text-xs font-medium text-slate-700"
-              >
-                Quantity
-              </label>
-              <input
-                id="quantity"
-                type="number"
-                min="0"
-                step="0.1"
-                placeholder="e.g. 50"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
-              />
+          <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-3">
+            <div>
+              <h3 className="text-sm font-semibold text-emerald-900">
+                Adjust quantity
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Set the amount you actually ate. Nutritional values will be
+                calculated based on this quantity.
+              </p>
             </div>
-            <div className="w-28 space-y-1.5">
-              <label
-                htmlFor="unit"
-                className="text-xs font-medium text-slate-700"
-              >
-                Unit
-              </label>
-              <select
-                id="unit"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
-              >
-                <option value="gram">gram</option>
-                <option value="oz">oz</option>
-                <option value="lbs">lbs</option>
-                <option value="amount">quantity</option>
-              </select>
-            </div>
-          </div>
 
-          {error && (
-            <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
-              {error}
+            <div className="flex gap-2">
+              <div className="flex-1 space-y-1.5">
+                <label
+                  htmlFor="quantity"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Quantity
+                </label>
+                <input
+                  id="quantity"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="e.g. 50"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                />
+              </div>
+              <div className="w-28 space-y-1.5">
+                <label
+                  htmlFor="unit"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Unit
+                </label>
+                <select
+                  id="unit"
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                >
+                  <option value="gram">gram</option>
+                  <option value="oz">oz</option>
+                  <option value="lbs">lbs</option>
+                  <option value="amount">quantity</option>
+                </select>
+              </div>
             </div>
-          )}
 
-          <button
-            type="button"
-            onClick={handleAdd}
-            disabled={saving}
-            className="mt-2 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition"
-          >
-            {saving ? "Saving..." : "Add to diary"}
-          </button>
-        </section>
+            {error && (
+              <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={saving}
+              className="mt-2 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition"
+            >
+              {saving ? "Saving..." : "Add to diary"}
+            </button>
+          </section>
         )}
       </main>
     </div>
