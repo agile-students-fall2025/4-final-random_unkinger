@@ -10,6 +10,7 @@ const { body, param, validationResult } = require("express-validator");
 const Profile = require("./models/Profile");
 const Activity = require("./models/Activity");
 const Meal = require("./models/Meal");
+const Food = require("./models/Food");
 const authRoutes = require("./routes/auth");
 const jwtStrategy = require("./config/jwt-config");
 
@@ -593,6 +594,56 @@ app.post("/api/recents/searches", (req, res) => {
 
 app.get("/api/recents/meals", (_req, res) => {
   res.json({ items: recentMeals });
+});
+app.get("/api/foods/search", async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.json({ foods: [] });
+
+    const foods = await Food.aggregate([
+      { $unwind: "$FoundationFoods" },
+      {
+        $match: {
+          "FoundationFoods.description": { $regex: q, $options: "i" },
+        },
+      },
+      { $limit: 20 },
+      {
+        $project: {
+          description: "$FoundationFoods.description",
+          foodNutrients: "$FoundationFoods.foodNutrients",
+        },
+      },
+    ]);
+
+    const results = foods.map((f) => {
+      // get nutri data
+      const getNutrient = (namePart) => {
+        if (!f.foodNutrients) return 0;
+        const n = f.foodNutrients.find(
+          (fn) =>
+            fn.nutrient &&
+            fn.nutrient.name &&
+            fn.nutrient.name.toLowerCase().includes(namePart.toLowerCase())
+        );
+        return n ? n.amount : 0;
+      };
+
+      return {
+        id: f._id,
+        description: f.description,
+        calories: getNutrient("Energy"),
+        protein: getNutrient("Protein"),
+        carbs: getNutrient("Carbohydrate, by difference"),
+        fat: getNutrient("Total lipid (fat)"),
+      };
+    });
+
+    res.json({ foods: results });
+  } catch (err) {
+    console.error("Error searching foods:", err);
+    res.status(500).json({ error: "Search failed" });
+  }
 });
 
 const PORT = process.env.PORT || 5050;

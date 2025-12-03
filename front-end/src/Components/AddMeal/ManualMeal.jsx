@@ -81,6 +81,22 @@ const ManualMeal = () => {
               }
             }, 100);
           }
+        } else {
+          // prefill from search page params 
+          const name = searchParams.get("name");
+          if (name) {
+            const round = (val) => (val ? Math.round(Number(val)).toString() : "");
+            setForm({
+              name: name || "",
+              calories: round(searchParams.get("calories")),
+              carbs: round(searchParams.get("carbs")),
+              protein: round(searchParams.get("protein")),
+              fat: round(searchParams.get("fat")),
+              notes: "",
+            });
+            // clearing so refreshing doesnt re-trigger
+            setSearchParams({});
+          }
         }
       } catch (err) {
         console.error(err);
