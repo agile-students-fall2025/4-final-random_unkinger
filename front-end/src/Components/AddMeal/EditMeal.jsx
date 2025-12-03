@@ -10,9 +10,12 @@ const EditMeal = () => {
   const location = useLocation();
   const [foodData, setFoodData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [manualBarcode, setManualBarcode] = useState("");
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
-  const barcode = location.state?.barcode;
+  const barcode = location.state?.barcode || manualBarcode;
 
   useEffect(() => {
     if (barcode) {
@@ -24,30 +27,142 @@ const EditMeal = () => {
   }, [barcode]);
 
   const fetchFoodData = async (code) => {
+    if (!code) {
+      setLoading(false);
+      setError("No barcode provided.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
+      setShowManualEntry(false);
 
       const res = await fetch(`${API}/api/barcode/${code}`);
 
       if (res.ok) {
         const data = await res.json();
         setFoodData(data);
+        setShowManualEntry(false);
       } else {
         const errorBody = await res.json().catch(() => ({}));
-        setError(errorBody.error || "Product not found.");
+        setError(errorBody.error || "Product not found in database.");
+        setShowManualEntry(true); // Show manual entry option
       }
     } catch (e) {
       console.error("Barcode fetch error:", e);
-      setError("Failed to connect to server.");
+      setError("Failed to connect to server. Please check your internet connection.");
+      setShowManualEntry(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAdd = () => {
-    // later you might POST this as a scanned meal before navigating
-    navigate("/home");
+  const handleManualBarcodeSubmit = (e) => {
+    e.preventDefault();
+    if (manualBarcode.trim()) {
+      fetchFoodData(manualBarcode.trim());
+    }
+  };
+
+  const handleRetryScan = () => {
+    navigate("/scan-meal");
+  };
+
+  const handleAdd = async () => {
+    if (!foodData) {
+      setError("No food data available to save.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("You must be logged in to save meals. Please log in and try again.");
+        setSaving(false);
+        return;
+      }
+
+      // Calculate quantity in grams
+      let quantityInGrams = 100; // Default to 100g (one serving from barcode API)
+      
+      if (quantity && !isNaN(Number(quantity)) && Number(quantity) > 0) {
+        const qty = Number(quantity);
+        switch (unit) {
+          case "gram":
+            quantityInGrams = qty;
+            break;
+          case "oz":
+            quantityInGrams = qty * 28.35; // 1 oz = 28.35g
+            break;
+          case "lbs":
+            quantityInGrams = qty * 453.592; // 1 lb = 453.592g
+            break;
+          case "amount":
+            // For "amount" unit, assume it's a serving size (100g per serving)
+            quantityInGrams = qty * 100;
+            break;
+          default:
+            quantityInGrams = qty;
+        }
+      }
+
+      // Calculate nutritional values based on quantity
+      // Barcode API returns values per 100g, so we calculate proportionally
+      const multiplier = quantityInGrams / 100;
+      
+      const payload = {
+        name: foodData.name || "Scanned food",
+        calories: Math.round((foodData.calories || 0) * multiplier),
+        carbs: Math.round(((foodData.carbs || 0) * multiplier) * 10) / 10,
+        protein: Math.round(((foodData.protein || 0) * multiplier) * 10) / 10,
+        fat: Math.round(((foodData.fat || 0) * multiplier) * 10) / 10,
+        notes: quantity && unit ? `Quantity: ${quantity} ${unit}` : "",
+        source: "scanned",
+        image: foodData.imageUrl || "",
+      };
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      console.log("📤 Saving scanned meal:", payload);
+
+      const response = await fetch(`${API}/api/meals`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("❌ Meal save failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+        });
+        throw new Error(
+          errorData.error || `Failed to save meal (${response.status})`
+        );
+      }
+
+      const result = await response.json();
+      console.log("✅ Scanned meal saved successfully:", result);
+      
+      // Navigate to home after successful save
+      navigate("/home");
+    } catch (err) {
+      console.error("Error saving scanned meal:", err);
+      setError(
+        err.message ||
+          "Something went wrong saving your meal. Please try again."
+      );
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -156,21 +271,67 @@ const EditMeal = () => {
           </div>
 
           {error && (
-            <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
-              {error}
+            <div className="mt-2 space-y-3">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                {error}
+                {error.includes("not found") && (
+                  <p className="mt-2 text-[10px] text-amber-700">
+                    The product might not be in the OpenFoodFacts database. Try entering the barcode manually or add the meal manually.
+                  </p>
+                )}
+              </div>
+              
+              {showManualEntry && (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 space-y-2">
+                  <p className="text-[11px] font-medium text-emerald-900">
+                    Try manual barcode entry
+                  </p>
+                  <form onSubmit={handleManualBarcodeSubmit} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={manualBarcode}
+                      onChange={(e) => setManualBarcode(e.target.value)}
+                      placeholder="Enter barcode number"
+                      className="flex-1 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-600 transition"
+                    >
+                      Lookup
+                    </button>
+                  </form>
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleRetryScan}
+                      className="flex-1 rounded-xl border border-emerald-300 bg-white px-3 py-2 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 transition"
+                    >
+                      Try scanning again
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/manual-meal")}
+                      className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition"
+                    >
+                      Add manually
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </section>
 
-        {/* Adjust quantity */}
+        {/* Adjust quantity - only show if foodData exists */}
+        {foodData && (
         <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-3">
           <div>
             <h3 className="text-sm font-semibold text-emerald-900">
               Adjust quantity
             </h3>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Set the amount you actually ate. (For now, this is for your own
-              reference — we’ll still add one serving.)
+              Set the amount you actually ate. Nutritional values will be calculated based on this quantity.
             </p>
           </div>
 
@@ -214,14 +375,22 @@ const EditMeal = () => {
             </div>
           </div>
 
+          {error && (
+            <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+              {error}
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleAdd}
-            className="mt-2 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition"
+            disabled={saving}
+            className="mt-2 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition"
           >
-            Add to diary
+            {saving ? "Saving..." : "Add to diary"}
           </button>
         </section>
+        )}
       </main>
     </div>
   );
