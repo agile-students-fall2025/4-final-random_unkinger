@@ -1,5 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "../LoginSignup/LoginSignup.css";
+import "./Profile.css";
 import NavBar from "../NavBar/NavBar";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
@@ -31,13 +33,10 @@ export default function Profile() {
 
     async function loadProfile() {
       try {
-        const headers = {};
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-
         const res = await fetch(`${API}/api/profile`, {
-          headers,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (!res.ok) {
@@ -149,247 +148,158 @@ export default function Profile() {
   };
 
   return (
-    <div className=" min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-emerald-50 via-white to-lime-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-      {/* Header */}
-      <header className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
-              Profile
-            </span>
-            <h1 className="text-sm font-semibold text-emerald-900 mt-1">
-              {form.name || "Your Profile"}
-            </h1>
-          </div>
-          <button
-            type="button"
-            onClick={onLogout}
-            className="inline-flex items-center justify-center rounded-full border border-red-100 bg-white/90 px-3 py-1.5 text-[11px] font-medium text-red-500 shadow-sm hover:bg-red-50 hover:border-red-200 transition"
-          >
-            Logout
-          </button>
+    <div className="profile-page">
+      <div className="container">
+        <div className="header">
+          <div className="text">{form.name || "Name"}</div>
+          <div className="underline"></div>
         </div>
-      </header>
 
-      {/* Main content */}
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-5">
-        {/* Avatar + name card */}
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex items-center gap-4">
-          <div className="relative">
-          {form.avatarUrl ? (
-          <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-emerald-100 shadow-sm bg-slate-100">
-            <img
-              src={form.avatarUrl}
-              alt="avatar"
-              className="h-full w-full object-cover"
-            />
+        <div className="avatar-row">
+          <div className="avatar-wrap">
+            {form.avatarUrl ? (
+              <img className="avatar-img" src={form.avatarUrl} alt="avatar" />
+            ) : (
+              <div className="avatar-placeholder">
+                Profile
+                <br />
+                Picture
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="h-20 w-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-[11px] text-emerald-900 text-center">
-            Profile
-            <br />
-            Picture
-          </div>
-        )}
-      </div>
-            <div>
-              <p className="text-sm font-semibold text-emerald-900">
-                {form.name || "Name not set"}
-              </p>
-              <p className="text-xs text-slate-500 mt-1">
-                Update your basic info and goals to personalize NutriLens.
-              </p>
-              {bmi && (
-                <p className="mt-2 text-xs text-emerald-700 font-medium">
-                  BMI:{" "}
-                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] border border-emerald-100">
-                    {bmi}
-                  </span>
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="sm:ml-auto">
-            <label className="inline-flex items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm hover:bg-emerald-100 cursor-pointer transition">
+          <div className="avatar-actions">
+            <label className="avatar-upload">
               <span>Change photo</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={onAvatarChange}
-                className="hidden"
-              />
+              <input type="file" accept="image/*" onChange={onAvatarChange} />
             </label>
           </div>
-        </section>
+        </div>
 
-        {/* Form card */}
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
-          <h2 className="text-sm font-semibold text-emerald-900 mb-3">
-            Personal details
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {/* Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Name
-              </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <input
-                  name="name"
-                  type="text"
-                  placeholder="Your name"
-                  value={form.name}
-                  onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* BMI (read-only) */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                BMI
-              </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-                <input
-                  type="text"
-                  value={bmi}
-                  placeholder="—"
-                  disabled
-                  aria-label="Body Mass Index"
-                  className="w-full bg-transparent text-sm text-slate-500 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Age */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Age
-              </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <input
-                  name="age"
-                  type="number"
-                  min="0"
-                  placeholder="Years"
-                  value={form.age}
-                  onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Height */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Height
-              </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <input
-                  name="heightCm"
-                  type="number"
-                  min="0"
-                  placeholder="cm"
-                  value={form.heightCm}
-                  onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Weight */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Weight
-              </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <input
-                  name="weightKg"
-                  type="number"
-                  min="0"
-                  placeholder="kg"
-                  value={form.weightKg}
-                  onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Activity */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Activity level
-              </label>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <select
-                  name="activity"
-                  value={form.activity}
-                  onChange={handle}
-                  aria-label="Activity level"
-                  className="w-full bg-transparent text-sm text-slate-900 outline-none"
-                >
-                  <option value="sedentary">Sedentary</option>
-                  <option value="light">Lightly active</option>
-                  <option value="moderate">Moderately active</option>
-                  <option value="active">Active</option>
-                  <option value="very_active">Very active</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Calorie Goal */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Calorie goal
-              </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <input
-                  name="calorieGoal"
-                  type="number"
-                  min="0"
-                  placeholder="kcal/day"
-                  value={form.calorieGoal}
-                  onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Protein Goal */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Protein goal
-              </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <input
-                  name="proteinGoal"
-                  type="number"
-                  min="0"
-                  placeholder="g/day"
-                  value={form.proteinGoal}
-                  onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
-                />
-              </div>
+        <div className="form-grid">
+          <div className="form-row">
+            <label className="form-label">Name</label>
+            <div className="input profile-input">
+              <input
+                name="name"
+                type="text"
+                placeholder=" Your name"
+                value={form.name}
+                onChange={handle}
+              />
             </div>
           </div>
 
-          {/* Save button */}
-          <div className="mt-4 flex justify-end">
-            <button
-              type="button"
-              onClick={onSave}
-              className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition"
-            >
-              Save profile
-            </button>
+          <div className="form-row">
+            <label className="form-label">BMI</label>
+            <div className="input profile-input">
+              <input
+                type="text"
+                value={bmi}
+                placeholder=" —"
+                disabled
+                aria-label="Body Mass Index"
+              />
+            </div>
           </div>
-        </section>
-      </main>
 
+          <div className="form-row">
+            <label className="form-label">Age</label>
+            <div className="input profile-input">
+              <input
+                name="age"
+                type="number"
+                placeholder=" years"
+                value={form.age}
+                onChange={handle}
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label className="form-label">Height</label>
+            <div className="input profile-input">
+              <input
+                name="heightCm"
+                type="number"
+                placeholder=" cm"
+                value={form.heightCm}
+                onChange={handle}
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label className="form-label">Weight</label>
+            <div className="input profile-input">
+              <input
+                name="weightKg"
+                type="number"
+                placeholder=" kg"
+                value={form.weightKg}
+                onChange={handle}
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label className="form-label">Activity</label>
+            <div className="input input--select profile-input">
+              <select
+                name="activity"
+                value={form.activity}
+                onChange={handle}
+                aria-label="Activity level"
+              >
+                <option value="sedentary">Sedentary</option>
+                <option value="light">Lightly active</option>
+                <option value="moderate">Moderately active</option>
+                <option value="active">Active</option>
+                <option value="very_active">Very active</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label className="form-label">Calorie Goal</label>
+            <div className="input profile-input">
+              <input
+                name="calorieGoal"
+                type="number"
+                placeholder=" kcal/day"
+                value={form.calorieGoal}
+                onChange={handle}
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label className="form-label">Protein Goal</label>
+            <div className="input profile-input">
+              <input
+                name="proteinGoal"
+                type="number"
+                placeholder=" g/day"
+                value={form.proteinGoal}
+                onChange={handle}
+                min="0"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="submit-container profile-actions">
+          <div className="submit submit--sm" onClick={onSave}>
+            Save
+          </div>
+          <div className="submit submit--sm gray" onClick={onLogout}>
+            Logout
+          </div>
+        </div>
+      </div>
       <NavBar />
     </div>
   );

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "../LoginSignup/LoginSignup.css";
+import "./ActivityTracking.css";
 import NavBar from "../NavBar/NavBar";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
@@ -16,9 +18,9 @@ const ActivityTracking = () => {
 
   const todayLabel = new Date().toLocaleDateString();
 
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       console.warn("No token found; redirecting to login.");
       navigate("/");
@@ -27,13 +29,10 @@ const ActivityTracking = () => {
 
     (async () => {
       try {
-        const headers = {};
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-
         const res = await fetch(`${API}/api/activities`, {
-          headers,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (!res.ok) {
@@ -47,6 +46,7 @@ const ActivityTracking = () => {
           name: a.name,
           time: String(a.timeMinutes),
           notes: a.notes || "",
+
           date: a.date
             ? new Date(a.date).toLocaleDateString()
             : new Date(a.createdAt || Date.now()).toLocaleDateString(),
@@ -73,8 +73,6 @@ const ActivityTracking = () => {
     if (!name || !time) return;
 
     const token = localStorage.getItem("token");
-
-    
     if (!token) {
       alert("You must be logged in to add activities.");
       navigate("/");
@@ -82,16 +80,12 @@ const ActivityTracking = () => {
     }
 
     try {
-      const headers = {
-        "Content-Type": "application/json",
-      };
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const res = await fetch(`${API}/api/activities`, {
         method: "POST",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           name,
           time,
@@ -99,7 +93,7 @@ const ActivityTracking = () => {
         }),
       });
 
-      const json = await res.json().catch(() => ({}));
+      const json = await res.json();
       if (!res.ok) {
         const msg =
           json.error ||
@@ -109,12 +103,11 @@ const ActivityTracking = () => {
         return;
       }
 
-      // If backend returns the saved object, adapt it
       const newActivity = {
-        id: json._id || json.id,
-        name: json.name || name,
-        time: String(json.timeMinutes || time),
-        notes: json.notes || notes || "",
+        id: json._id,
+        name: json.name,
+        time: String(json.timeMinutes),
+        notes: json.notes || "",
         date: json.date
           ? new Date(json.date).toLocaleDateString()
           : todayLabel,
@@ -130,7 +123,6 @@ const ActivityTracking = () => {
 
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       alert("You must be logged in to delete activities.");
       navigate("/");
@@ -138,14 +130,11 @@ const ActivityTracking = () => {
     }
 
     try {
-      const headers = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const res = await fetch(`${API}/api/activities/${id}`, {
         method: "DELETE",
-        headers,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) {
@@ -161,7 +150,9 @@ const ActivityTracking = () => {
     }
   };
 
-  const todaysActivities = activities.filter((a) => a.date === todayLabel);
+  const todaysActivities = activities.filter(
+    (a) => a.date === todayLabel
+  );
 
   const totalTimeToday = todaysActivities.reduce(
     (sum, activity) => sum + parseInt(activity.time || "0", 10),
@@ -169,223 +160,118 @@ const ActivityTracking = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 flex flex-col dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-      {/* Header */}
-      <header className="px-4 sm:px-6 pt-4 pb-3 flex items-center justify-between border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
+    <div className="activity-page">
+      <div className="header">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-white/90 px-2.5 py-1.5 shadow-sm hover:bg-emerald-50 transition text-emerald-700"
+          className="back-button"
           aria-label="Back"
-          type="button"
         >
-          <i className="ri-arrow-left-line text-lg" />
+          <i className="ri-arrow-left-line"></i>
         </button>
+        <div className="text">Activity Tracking</div>
+        <div className="underline"></div>
+      </div>
 
-        <div className="flex flex-col items-center">
-          <h1 className="text-sm font-semibold tracking-[0.18em] uppercase text-emerald-800">
-            Activity Tracking
-          </h1>
-          <span className="mt-1 h-1 w-10 rounded-full bg-gradient-to-r from-emerald-400 to-lime-400" />
+      <form onSubmit={handleSubmit} className="activity-form">
+        <div className="input">
+          <i className="ri-run-line"></i>
+          <input
+            type="text"
+            name="name"
+            placeholder="Activity name (e.g., Running, Swimming)"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        {/* Spacer to balance layout */}
-        <div className="w-9" />
-      </header>
+        <div className="input">
+          <i className="ri-time-line"></i>
+          <input
+            type="number"
+            name="time"
+            placeholder="Duration (minutes)"
+            value={form.time}
+            onChange={handleChange}
+            min="1"
+            required
+          />
+        </div>
 
-      {/* Main content */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 pb-24 pt-4 space-y-5">
-        {/* Form card */}
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h2 className="text-sm font-semibold text-emerald-900">
-                Log a new activity
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Track movement, however small—walks, stretching, dancing, and
-                more.
-              </p>
-            </div>
-            <span className="hidden sm:inline-flex text-[11px] px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-              {todayLabel}
-            </span>
+        <div className="input">
+          <i className="ri-edit-box-line"></i>
+          <input
+            type="text"
+            name="notes"
+            placeholder="Notes (optional)"
+            value={form.notes}
+            onChange={handleChange}
+          />
+        </div>
+
+        <button type="submit" className="submit submit--add">
+          Add Activity
+        </button>
+      </form>
+
+      <div className="activities-list">
+        <h3 className="list-header">Today's Activities</h3>
+        {todaysActivities.length === 0 ? (
+          <div className="empty-state">
+            <p>No activities logged yet for today. Start tracking your activities!</p>
           </div>
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-3 sm:space-y-4 mt-2"
-          >
-            {/* Activity name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Activity name
-              </label>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <i className="ri-run-line text-slate-400 text-lg" />
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="e.g., Walking, Yoga, Dance session"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Duration */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Duration (minutes)
-              </label>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <i className="ri-time-line text-slate-400 text-lg" />
-                <input
-                  type="number"
-                  name="time"
-                  min="1"
-                  placeholder="How long did you move?"
-                  value={form.time}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Notes (optional)
-              </label>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
-                <i className="ri-edit-box-line text-slate-400 text-lg" />
-                <input
-                  type="text"
-                  name="notes"
-                  placeholder="How did it feel? Any details you want to remember."
-                  value={form.notes}
-                  onChange={handleChange}
-                  className="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="pt-1">
-              <button
-                type="submit"
-                className="w-full inline-flex justify-center items-center gap-1 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition"
-              >
-                <span className="text-base">＋</span>
-                Add Activity
-              </button>
-            </div>
-          </form>
-        </section>
-
-        {/* Activities list card */}
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <i
-                className="ri-checkbox-circle-line text-lg text-emerald-500"
-                aria-hidden="true"
-              />
-              <h3 className="text-sm font-semibold text-emerald-900">
-                Today&apos;s Activities
-              </h3>
-            </div>
-            <span className="text-[11px] text-slate-500">
-              {todaysActivities.length} logged
-            </span>
-          </div>
-
-          {todaysActivities.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-emerald-100 bg-emerald-50/40 px-3 py-4 text-center">
-              <p className="text-xs text-slate-600">
-                No activities logged yet for today.
-              </p>
-              <p className="text-[11px] text-slate-500 mt-1">
-                Start with a short walk, a stretch, or any gentle movement.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3 mt-1">
-              {todaysActivities.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-start justify-between gap-3 rounded-2xl border border-emerald-50 bg-emerald-50/40 px-3 py-2.5"
-                >
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-line text-emerald-500 text-base" />
-                      <span className="text-sm font-medium text-emerald-900">
-                        {activity.name}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-600">
-                      <span className="inline-flex items-center gap-1">
-                        <i className="ri-time-line text-[13px]" />
-                        {activity.time} min
-                      </span>
-
-                      {activity.notes && (
-                        <span className="inline-flex items-center gap-1">
-                          <i className="ri-edit-box-line text-[13px]" />
-                          {activity.notes}
-                        </span>
-                      )}
-
-                      <span className="inline-flex items-center gap-1">
-                        <i className="ri-calendar-line text-[13px]" />
-                        {activity.date}
-                      </span>
-                    </div>
+        ) : (
+          <div className="activities">
+            {todaysActivities.map((activity) => (
+              <div key={activity.id} className="activity-card">
+                <div className="activity-info">
+                  <div className="activity-name">
+                    <i className="ri-checkbox-circle-line"></i>
+                    {activity.name}
                   </div>
-
-                  <button
-                    className="inline-flex items-center justify-center rounded-full border border-red-100 bg-white/80 p-1.5 text-red-500 hover:bg-red-50 hover:border-red-200 transition"
-                    onClick={() => handleDelete(activity.id)}
-                    aria-label="Delete activity"
-                    type="button"
-                  >
-                    <i className="ri-delete-bin-line text-[15px]" />
-                  </button>
+                  <div className="activity-details">
+                    <span className="activity-time">
+                      <i className="ri-time-line"></i>
+                      {activity.time} min
+                    </span>
+                    {activity.notes && (
+                      <span className="activity-notes">
+                        <i className="ri-edit-box-line"></i>
+                        {activity.notes}
+                      </span>
+                    )}
+                    <span className="activity-date">
+                      <i className="ri-calendar-line"></i>
+                      {activity.date}
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Stats summary */}
-        {todaysActivities.length > 0 && (
-          <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
-            <h3 className="text-sm font-semibold text-emerald-900 mb-3">
-              Today&apos;s Summary
-            </h3>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-2xl border border-emerald-50 bg-emerald-50/60 px-3 py-2.5">
-                <p className="text-[11px] font-medium text-emerald-800 uppercase tracking-[0.16em]">
-                  Total activities
-                </p>
-                <p className="mt-1 text-lg font-semibold text-emerald-900">
-                  {todaysActivities.length}
-                </p>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(activity.id)}
+                  aria-label="Delete activity"
+                >
+                  <i className="ri-delete-bin-line"></i>
+                </button>
               </div>
-              <div className="rounded-2xl border border-emerald-50 bg-emerald-50/60 px-3 py-2.5">
-                <p className="text-[11px] font-medium text-emerald-800 uppercase tracking-[0.16em]">
-                  Total time
-                </p>
-                <p className="mt-1 text-lg font-semibold text-emerald-900">
-                  {totalTimeToday} min
-                </p>
-              </div>
-            </div>
-          </section>
+            ))}
+          </div>
         )}
-      </main>
+      </div>
+
+      {todaysActivities.length > 0 && (
+        <div className="stats-summary">
+          <div className="stat-item">
+            <span className="stat-label">Total Activities Today:</span>
+            <span className="stat-value">{todaysActivities.length}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Total Time Today:</span>
+            <span className="stat-value">{totalTimeToday} min</span>
+          </div>
+        </div>
+      )}
 
       <NavBar />
     </div>

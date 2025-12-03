@@ -1,4 +1,3 @@
-// routes/auth.js
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -64,8 +63,7 @@ router.post("/login", async (req, res) => {
       expiresIn: "1d",
     });
 
-    // IMPORTANT: no "jwt " prefix here
-    return res.json({ token });
+    return res.json({ token: `jwt ${token}` });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ error: "Server error during login." });

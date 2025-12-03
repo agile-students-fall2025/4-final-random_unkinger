@@ -187,6 +187,25 @@ const validateActivity = [
   },
 ];
 
+app.post(
+  "/api/auth/login",
+  [body("email").isEmail().withMessage("Valid email is required")],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    const userId = email.trim().toLowerCase();
+
+    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.json({ token });
+  }
+);
 
 const MAX_RECENTS = 10;
 let recentSearches = [];
@@ -214,6 +233,42 @@ function addRecentSearch(queryRaw) {
 }
 
 // Meals are now stored in MongoDB - see Meal model
+
+app.post("/api/auth/login", (req, res) => {
+  const { email } = req.body || {};
+
+  if (!email || typeof email !== "string" || !email.trim()) {
+    return res.status(400).json({ error: "Valid email is required." });
+  }
+
+  const userId = email.trim().toLowerCase();
+
+  const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+
+  res.json({ token });
+});
+
+app.post(
+  "/api/auth/login",
+  [body("email").isEmail().withMessage("Valid email is required")],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    const userId = email.trim().toLowerCase();
+
+    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.json({ token });
+  }
+);
 
 app.get("/api/profile", auth, async (req, res) => {
   try {
