@@ -598,6 +598,8 @@ app.post("/api/recents/searches", (req, res) => {
 app.get("/api/recents/meals", (_req, res) => {
   res.json({ items: recentMeals });
 });
+
+// quickly add meals by searching them
 app.get("/api/foods/search", async (req, res) => {
   try {
     const { q } = req.query;
