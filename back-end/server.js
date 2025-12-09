@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
 const axios = require("axios");
-
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { body, param, validationResult } = require("express-validator");
@@ -13,24 +12,15 @@ const Meal = require("./models/Meal");
 const Food = require("./models/Food");
 const authRoutes = require("./routes/auth");
 const jwtStrategy = require("./config/jwt-config");
-
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-// Passport + JWT
 passport.use(jwtStrategy);
 app.use(passport.initialize());
-
-// Simple test route
 app.get("/", (req, res) => {
   res.send("NutriLens API is running");
 });
-
-// Auth routes
 app.use("/api/auth", authRoutes);
-
-// Example of a protected route
 app.get(
   "/api/protected",
   passport.authenticate("jwt", { session: false }),
@@ -84,8 +74,7 @@ const validateProfile = [
 
   body("avatarUrl")
     .optional({ checkFalsy: true })
-    .isString()
-    .isLength({ max: 500 }),
+    .isString(),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -188,6 +177,22 @@ const validateActivity = [
   },
 ];
 
+const validateActivityId = [
+  param("id")
+    .custom((value) => mongoose.Types.ObjectId.isValid(value))
+    .withMessage("Invalid activity ID."),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(400)
+        .json({ error: "Validation failed", details: errors.array() });
+    }
+    next();
+  },
+];
+
 const MAX_RECENTS = 10;
 let recentSearches = [];
 let recentMeals = [];
@@ -212,8 +217,6 @@ function addRecentSearch(queryRaw) {
   recentSearches = recentSearches.slice(0, MAX_RECENTS);
   return recentSearches;
 }
-
-// Meals are now stored in MongoDB - see Meal model
 
 app.get("/api/profile", auth, async (req, res) => {
   try {
@@ -318,6 +321,35 @@ app.post("/api/activities", auth, validateActivity, async (req, res) => {
   }
 });
 
+app.put(
+  "/api/activities/:id",
+  auth,
+  validateActivityId,
+  validateActivity,
+  async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { id } = req.params;
+      const { name, time, notes } = req.body || {};
+
+      const current = await Activity.findOne({ _id: id, userId });
+      if (!current) {
+        return res.status(404).json({ error: "Activity not found" });
+      }
+
+      current.name = name.trim();
+      current.timeMinutes = Number(time);
+      current.notes = notes || "";
+
+      const saved = await current.save();
+      res.json(saved);
+    } catch (err) {
+      console.error("Error updating activity:", err);
+      res.status(500).json({ error: "Failed to update activity" });
+    }
+  }
+);
+
 app.delete("/api/activities/:id", auth, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -352,7 +384,6 @@ app.get("/api/meals", auth, async (req, res) => {
 
     let query = { userId };
 
-    // Filter by date if provided
     if (date) {
       const targetDate = new Date(date + "T00:00:00");
       const nextDay = new Date(targetDate);
@@ -366,7 +397,6 @@ app.get("/api/meals", auth, async (req, res) => {
 
     const meals = await Meal.find(query).sort({ loggedAt: -1 }).lean();
 
-    // Convert to format expected by frontend (with id field)
     const formattedMeals = meals.map((meal) => ({
       id: meal._id.toString(),
       name: meal.name,
@@ -380,10 +410,10 @@ app.get("/api/meals", auth, async (req, res) => {
       loggedAt: meal.loggedAt.toISOString(),
     }));
 
-    console.log(`   ✅ Found ${formattedMeals.length} meals`);
+    console.log(`   Found ${formattedMeals.length} meals`);
     res.json({ meals: formattedMeals });
   } catch (err) {
-    console.error("❌ Error loading meals:", err);
+    console.error("Error loading meals:", err);
     res.status(500).json({ error: "Failed to load meals" });
   }
 });
@@ -458,7 +488,6 @@ app.post("/api/meals", auth, validateMeal, async (req, res) => {
       `   → Meal: ${saved.name} (${saved.calories} cal, ${saved.protein}g protein, source: ${saved.source})`
     );
 
-    // Return in format expected by frontend
     res.status(201).json({
       meal: {
         id: saved._id.toString(),
@@ -474,7 +503,7 @@ app.post("/api/meals", auth, validateMeal, async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Error saving meal:", err);
+    console.error("Error saving meal:", err);
     console.error("   → Error details:", err.message);
     console.error("   → Stack:", err.stack);
     res
@@ -487,8 +516,6 @@ app.put("/api/meals/:id", auth, validateMealId, async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
-
-    // Find the meal and verify it belongs to the user
     const current = await Meal.findOne({ _id: id, userId });
 
     if (!current) {
@@ -537,7 +564,7 @@ app.put("/api/meals/:id", auth, validateMealId, async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Error updating meal:", err);
+    console.error("Error updating meal:", err);
     if (err.name === "CastError") {
       return res.status(400).json({ error: "Invalid meal ID." });
     }
@@ -574,7 +601,7 @@ app.delete("/api/meals/:id", auth, validateMealId, async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Error deleting meal:", err);
+    console.error("Error deleting meal:", err);
     if (err.name === "CastError") {
       return res.status(400).json({ error: "Invalid meal ID." });
     }
@@ -599,7 +626,6 @@ app.get("/api/recents/meals", (_req, res) => {
   res.json({ items: recentMeals });
 });
 
-// quickly add meals by searching them
 app.get("/api/foods/search", async (req, res) => {
   try {
     const { q } = req.query;
@@ -622,7 +648,6 @@ app.get("/api/foods/search", async (req, res) => {
     ]);
 
     const results = foods.map((f) => {
-      // get nutri data
       const getNutrient = (namePart) => {
         if (!f.foodNutrients) return 0;
         const n = f.foodNutrients.find(

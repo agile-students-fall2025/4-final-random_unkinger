@@ -8,6 +8,7 @@ const profileSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+
     name: { type: String, trim: true },
     age: { type: Number, min: 0, max: 120 },
     heightCm: { type: Number, min: 0 },
@@ -17,10 +18,12 @@ const profileSchema = new mongoose.Schema(
       enum: ["sedentary", "light", "moderate", "active", "very_active"],
       default: "sedentary",
     },
+
     calorieGoal: { type: Number, min: 0 },
     proteinGoal: { type: Number, min: 0 },
     avatarUrl: { type: String, trim: true },
   },
+
   { timestamps: true }
 );
 
