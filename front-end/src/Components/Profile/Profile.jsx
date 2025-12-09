@@ -72,13 +72,15 @@ export default function Profile() {
               : f.proteinGoal,
           avatarUrl: data.avatarUrl ?? f.avatarUrl,
         }));
-      } catch (err) {
+      } 
+      catch (err) {
         console.error("Failed to load profile:", err);
       }
     }
 
     loadProfile();
-  }, [navigate]);
+  }, 
+  [navigate]);
 
   const bmi = useMemo(() => {
     const h = parseFloat(form.heightCm);
@@ -87,7 +89,8 @@ export default function Profile() {
     const m = h / 100;
     const v = w / (m * m);
     return Number.isFinite(v) ? v.toFixed(1) : "";
-  }, [form.heightCm, form.weightKg]);
+  }, 
+  [form.heightCm, form.weightKg]);
 
   const handle = (e) => {
     const { name, value } = e.target;
@@ -100,12 +103,18 @@ export default function Profile() {
   const onAvatarChange = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setForm((f) => ({
-      ...f,
-      avatarUrl: url,
-    }));
+  
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = reader.result;
+      setForm((f) => ({
+        ...f,
+        avatarUrl: dataUrl,
+      }));
+    };
+    reader.readAsDataURL(file);
   };
+  
 
   const onLogout = () => {
     localStorage.removeItem("token");
@@ -150,7 +159,6 @@ export default function Profile() {
 
   return (
     <div className=" min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-emerald-50 via-white to-lime-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-      {/* Header */}
       <header className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
@@ -171,9 +179,7 @@ export default function Profile() {
         </div>
       </header>
 
-      {/* Main content */}
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-5">
-        {/* Avatar + name card */}
         <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex items-center gap-4">
           <div className="relative">
@@ -247,7 +253,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* BMI (read-only) */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">
                 BMI
@@ -264,7 +269,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Age */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">
                 Age
@@ -282,7 +286,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Height */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">
                 Height
@@ -300,7 +303,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Weight */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">
                 Weight
@@ -318,7 +320,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Activity */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">
                 Activity level
@@ -340,7 +341,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Calorie Goal */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">
                 Calorie goal
@@ -358,7 +358,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Protein Goal */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">
                 Protein goal
@@ -377,7 +376,6 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Save button */}
           <div className="mt-4 flex justify-end">
             <button
               type="button"

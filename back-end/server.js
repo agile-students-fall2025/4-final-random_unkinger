@@ -74,8 +74,7 @@ const validateProfile = [
 
   body("avatarUrl")
     .optional({ checkFalsy: true })
-    .isString()
-    .isLength({ max: 500 }),
+    .isString(),
 
   (req, res, next) => {
     const errors = validationResult(req);
