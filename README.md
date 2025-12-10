@@ -1,3 +1,6 @@
+[![Tests](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/ci.yml/badge.svg)](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/ci.yml/)
+[![Deployment](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/cd.yml/badge.svg)](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/cd.yml/)
+
 # NutriLens
 
 
@@ -19,11 +22,48 @@ Sprint 0 Roles:
 ## Project History
 NutriLens came to be through the Agile Software Development & DevOps class for Fall 2025. Our team completed a project proposal to work on for the entire semester, the outcome of that being NutriLens. We were inspired by how complicated nutrition apps can be — endless numbers, confusing data, and cluttered interfaces that make eating healthy feel like work. We wanted to design something that felt different: a playful, intelligent companion that makes food tracking simple, educational, and even fun.
 
-## How to Run
-1. clone the git repo
-2. cd into the /front-end folder
-3. run the command `npm install` to install all the needed packages
-4. run the command `npm start` to start the local server
+## How to Run with Docker Compose
+
+To run the application using Docker Compose, follow these steps:
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://raw.githubusercontent.com/swe-students-fall2025/5-final-sudo/
+    cd 4-final-random_unkinger
+    ```
+
+2.  **Build and start the containers:**
+    ```bash
+    docker-compose up -d --build
+    ```
+    The application will be available at [http://localhost:80](http://localhost:80).
+
+3.  **To stop the application:**
+    ```bash
+    docker-compose down
+    ```
+
+## How to Run manually 
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://raw.githubusercontent.com/swe-students-fall2025/5-final-sudo/
+    cd 4-final-random_unkinger
+    ```
+
+2.  **Navigate to the `front-end` directory and install dependencies:**
+    ```bash
+    cd front-end
+    npm start
+    npm install
+    ```
+
+3.  **Install backend and start the backend server:**
+    ```bash
+    cd back-end
+    npm install
+    npm start
+    ```
 
 ## How to Contribute
 We welcome contributions to NutriLens! Please read our [CONTRIBUTING.md](https://github.com/agile-students-fall2025/4-final-random_unkinger/blob/master/CONTRIBUTING.md) file for details on:
