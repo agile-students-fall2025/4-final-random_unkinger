@@ -4,7 +4,7 @@ const app = require("../server");
 
 describe("Recent Searches API", () => {
   beforeEach(() => {
-    if (app.__resetRecents) app.__resetRecents(); // <— add this
+    if (app.__resetRecents) app.__resetRecents();
   });
 
   it("GET /api/recents/searches returns an array of recent searches", async () => {
@@ -31,10 +31,10 @@ describe("Recent Searches API", () => {
     await request(app).post("/api/recents/searches").send({ query: "taco" });
     const res = await request(app)
       .post("/api/recents/searches")
-      .send({ query: "TACO" }); // duplicate ignoring case
+      .send({ query: "TACO" });
     expect(res.status).to.equal(201);
     expect(res.body.items).to.have.length(1);
-    expect(res.body.items[0].query).to.equal("TACO"); // latest on top
+    expect(res.body.items[0].query).to.equal("TACO");
   });
   it("GET /api/recents/searches shows newest first", async () => {
     await request(app).post("/api/recents/searches").send({ query: "noodles" });
