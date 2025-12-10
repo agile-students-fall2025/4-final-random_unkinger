@@ -455,7 +455,8 @@ app.get("/api/barcode/:barcode", async (req, res) => {
 
   try {
     const response = await axios.get(
-      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`,
+      { timeout: 5000 } // 5 second timeout
     );
 
     if (response.data.status === 1) {
