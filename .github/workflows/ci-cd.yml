@@ -1,0 +1,35 @@
+name: CD deploy to digital ocean
+on:
+  push:
+    branches:
+      - master # only deploy on master change
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: secure copy files to droplet
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+          source: "./"
+          target: "/var/www/nutri"
+
+      - name: ssh and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/nutri
+            echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
+            docker-compose down
+            docker-compose up --build -d
+            docker image prune -f
+
