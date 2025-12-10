@@ -17,7 +17,7 @@ jobs:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
-          source: "./"
+          source: "back-end,front-end,docker-compose.yml"
           target: "/var/www/nutri"
 
       - name: ssh and deploy
@@ -33,4 +33,3 @@ jobs:
             docker-compose down
             docker-compose --env-file ./.env up --build -d
             docker image prune -f
-

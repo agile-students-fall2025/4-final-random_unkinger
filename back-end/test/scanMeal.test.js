@@ -15,5 +15,4 @@ describe("Scan Meal API", () => {
     expect(res.body).to.have.property("name");
     expect(res.body.name).to.equal("Coca-Cola en canette");
   });
-
 });
