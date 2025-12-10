@@ -31,6 +31,6 @@ jobs:
             cd /var/www/nutri
             echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
             docker-compose down
-            docker-compose up --build -d
+            docker-compose --env-file ./.env up --build -d
             docker image prune -f
 
