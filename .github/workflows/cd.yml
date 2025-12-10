@@ -33,4 +33,3 @@ jobs:
             docker-compose down
             docker-compose --env-file ./.env up --build -d
             docker image prune -f
-
