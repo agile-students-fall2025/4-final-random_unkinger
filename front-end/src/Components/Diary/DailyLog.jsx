@@ -280,7 +280,7 @@ export default function DailyLog() {
           )}
         </section>
         {/* Activities list card */}
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
+                <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <i
@@ -292,8 +292,7 @@ export default function DailyLog() {
               </h2>
             </div>
             <span className="text-[11px] text-slate-500">
-              {activities.length}{" "}
-              {activities.length === 1 ? "entry" : "entries"}
+              {activities.length} {activities.length === 1 ? "entry" : "entries"}
             </span>
           </div>
 
@@ -336,11 +335,11 @@ export default function DailyLog() {
                       </span>
                     )}
 
-                    {(activity.date || activity.createdAt) && (
+                    {(activity.loggedAt || activity.createdAt) && (
                       <span className="inline-flex items-center gap-1">
                         <i className="ri-calendar-line text-[13px]" />
                         {new Date(
-                          activity.date || activity.createdAt
+                          activity.loggedAt || activity.createdAt
                         ).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -348,11 +347,12 @@ export default function DailyLog() {
                       </span>
                     )}
                   </div>
+
                   <div className="flex justify-end mt-2">
                     <button
                       type="button"
                       className="inline-flex items-center gap-1 rounded-xl border border-emerald-200 bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm hover:bg-emerald-50 transition"
-                      onClick={() => navigate("/tracking")} 
+                      onClick={() => navigate("/tracking")} // or "/activity-tracking", whatever your route is
                     >
                       <Pencil />
                       Edit

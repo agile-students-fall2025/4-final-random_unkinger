@@ -168,6 +168,11 @@ const validateActivity = [
     .isLength({ max: 1000 })
     .withMessage("Notes must be at most 1000 characters"),
 
+  body("loggedAt")
+    .optional()
+    .isISO8601()
+    .withMessage("loggedAt must be a valid ISO date"), 
+
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -290,27 +295,52 @@ app.post("/api/profile", auth, validateProfile, async (req, res) => {
 app.get("/api/activities", auth, async (req, res) => {
   try {
     const userId = req.user.id;
-    const activities = await Activity.find({ userId }).sort({
-      date: -1,
+    const { date } = req.query;
+
+    console.log(
+      `📖 [MongoDB] Loading activities for: ${userId}${
+        date ? ` (date: ${date})` : ""
+      }`
+    );
+
+    let query = { userId };
+
+    if (date) {
+      const targetDate = new Date(date + "T00:00:00");
+      const nextDay = new Date(targetDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      query.loggedAt = {
+        $gte: targetDate,
+        $lt: nextDay,
+      };
+    }
+
+    const activities = await Activity.find(query).sort({
+      loggedAt: -1,
       createdAt: -1,
     });
-    res.json(activities);
+
+    console.log(`   Found ${activities.length} activities`);
+    res.json(activities); 
   } catch (err) {
     console.error("Error loading activities:", err);
     res.status(500).json({ error: "Failed to load activities" });
   }
 });
 
+
 app.post("/api/activities", auth, validateActivity, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, time, notes } = req.body;
+    const { name, time, notes, loggedAt } = req.body;
 
     const activity = new Activity({
       userId,
       name: name.trim(),
       timeMinutes: Number(time),
       notes: notes || "",
+      loggedAt: loggedAt ? new Date(loggedAt) : new Date(),
     });
 
     const saved = await activity.save();
