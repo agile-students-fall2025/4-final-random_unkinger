@@ -7,6 +7,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
     defaults:
       run:
         working-directory: ./back-end
@@ -26,4 +32,6 @@ jobs:
     - name: run tests with coverage
       env:
         JWT_SECRET: a-key-for-testing-lol
+        MONGO_URI: mongodb://localhost:27017/nutrilens-test
+        CI: true
       run: npx c8 mocha "test/**/*.test.js" --exit
