@@ -23,6 +23,7 @@ export default function Profile() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       console.warn("No token found, redirecting to login.");
       navigate("/");
@@ -32,6 +33,7 @@ export default function Profile() {
     async function loadProfile() {
       try {
         const headers = {};
+
         if (token) {
           headers.Authorization = `Bearer ${token}`;
         }
@@ -72,25 +74,23 @@ export default function Profile() {
               : f.proteinGoal,
           avatarUrl: data.avatarUrl ?? f.avatarUrl,
         }));
-      } 
-      catch (err) {
-        console.error("Failed to load profile:", err);
+      } catch (err) {
+        console.error("Error: Failed to load profile:", err);
       }
     }
 
     loadProfile();
-  }, 
-  [navigate]);
+  }, [navigate]);
 
   const bmi = useMemo(() => {
     const h = parseFloat(form.heightCm);
     const w = parseFloat(form.weightKg);
+
     if (!h || !w) return "";
     const m = h / 100;
     const v = w / (m * m);
     return Number.isFinite(v) ? v.toFixed(1) : "";
-  }, 
-  [form.heightCm, form.weightKg]);
+  }, [form.heightCm, form.weightKg]);
 
   const handle = (e) => {
     const { name, value } = e.target;
@@ -103,7 +103,7 @@ export default function Profile() {
   const onAvatarChange = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-  
+
     const reader = new FileReader();
     reader.onloadend = () => {
       const dataUrl = reader.result;
@@ -114,7 +114,6 @@ export default function Profile() {
     };
     reader.readAsDataURL(file);
   };
-  
 
   const onLogout = () => {
     localStorage.removeItem("token");
@@ -146,7 +145,7 @@ export default function Profile() {
         const msg =
           json.error ||
           (json.errors && json.errors[0]?.msg) ||
-          "Unknown error saving profile.";
+          "Unexpected error saving profile.";
         alert("Failed to save profile: " + msg);
       } else {
         alert("Profile saved!");
@@ -182,23 +181,23 @@ export default function Profile() {
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-5">
         <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex items-center gap-4">
-          <div className="relative">
-          {form.avatarUrl ? (
-          <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-emerald-100 shadow-sm bg-slate-100">
-            <img
-              src={form.avatarUrl}
-              alt="avatar"
-              className="h-full w-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="h-20 w-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-[11px] text-emerald-900 text-center">
-            Profile
-            <br />
-            Picture
-          </div>
-        )}
-      </div>
+            <div className="relative">
+              {form.avatarUrl ? (
+                <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-emerald-100 shadow-sm bg-slate-100">
+                  <img
+                    src={form.avatarUrl}
+                    alt="avatar"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="h-20 w-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-[11px] text-emerald-900 text-center">
+                  Profile
+                  <br />
+                  Picture
+                </div>
+              )}
+            </div>
             <div>
               <p className="text-sm font-semibold text-emerald-900">
                 {form.name || "Name not set"}
@@ -230,17 +229,14 @@ export default function Profile() {
           </div>
         </section>
 
-        {/* Form card */}
         <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
           <h2 className="text-sm font-semibold text-emerald-900 mb-3">
             Personal details
           </h2>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {/* Name */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Name
-              </label>
+              <label className="text-xs font-medium text-slate-600">Name</label>
               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
                 <input
                   name="name"
@@ -254,9 +250,7 @@ export default function Profile() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                BMI
-              </label>
+              <label className="text-xs font-medium text-slate-600">BMI</label>
               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                 <input
                   type="text"
@@ -270,9 +264,7 @@ export default function Profile() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-600">
-                Age
-              </label>
+              <label className="text-xs font-medium text-slate-600">Age</label>
               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
                 <input
                   name="age"
@@ -290,6 +282,7 @@ export default function Profile() {
               <label className="text-xs font-medium text-slate-600">
                 Height
               </label>
+
               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
                 <input
                   name="heightCm"
@@ -307,6 +300,7 @@ export default function Profile() {
               <label className="text-xs font-medium text-slate-600">
                 Weight
               </label>
+
               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
                 <input
                   name="weightKg"
@@ -324,6 +318,7 @@ export default function Profile() {
               <label className="text-xs font-medium text-slate-600">
                 Activity level
               </label>
+
               <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
                 <select
                   name="activity"
@@ -333,10 +328,10 @@ export default function Profile() {
                   className="w-full bg-transparent text-sm text-slate-900 outline-none"
                 >
                   <option value="sedentary">Sedentary</option>
-                  <option value="light">Lightly active</option>
-                  <option value="moderate">Moderately active</option>
+                  <option value="light">Lightly Active</option>
+                  <option value="moderate">Moderately Active</option>
                   <option value="active">Active</option>
-                  <option value="very_active">Very active</option>
+                  <option value="very_active">Very Active</option>
                 </select>
               </div>
             </div>
@@ -345,6 +340,7 @@ export default function Profile() {
               <label className="text-xs font-medium text-slate-600">
                 Calorie goal
               </label>
+
               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
                 <input
                   name="calorieGoal"
