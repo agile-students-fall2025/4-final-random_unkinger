@@ -4,7 +4,7 @@
 
 # NutriLens
 
-http://nutri.hossain.cc/
+https://nutri.iinotes.org/
 
 ## Project Vision Statement
 To create an engaging, accessible, and intelligent healthy-eating app that helps users understand what they eat, build better habits, and track their food and activity in one place.
