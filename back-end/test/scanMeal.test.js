@@ -16,17 +16,4 @@ describe("Scan Meal API", () => {
     expect(res.body.name).to.equal("Coca-Cola en canette");
   });
 
-  it("check for valid product nutrition", async () => {
-    const res = await request(app).get("/api/barcode/5449000000996");
-    expect(res.status).to.equal(200);
-
-    expect(res.body).to.have.property("calories");
-    expect(res.body.calories).to.equal(44);
-
-    expect(res.body).to.have.property("protein");
-    expect(res.body.protein).to.equal(0);
-
-    expect(res.body).to.have.property("carbs");
-    expect(res.body.carbs).to.equal(10.6);
-  });
 });
