@@ -4,7 +4,7 @@
 
 # NutriLens
 
-https://nutri.iinotes.org/
+http://138.197.68.160/
 
 ## Project Vision Statement
 To create an engaging, accessible, and intelligent healthy-eating app that helps users understand what they eat, build better habits, and track their food and activity in one place.
