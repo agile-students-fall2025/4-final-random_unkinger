@@ -13,7 +13,7 @@ describe("Scan Meal API", () => {
     expect(res.status).to.equal(200);
 
     expect(res.body).to.have.property("name");
-    expect(res.body.name).to.equal("Cola Cola Original Taste");
+    expect(res.body.name).to.equal("Coca-Cola en canette");
   });
 
   it("check for valid product nutrition", async () => {
