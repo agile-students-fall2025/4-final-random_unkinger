@@ -9,6 +9,11 @@ services:
       - JWT_SECRET=${JWT_SECRET}
     networks:
       - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   frontend:
     build: ./front-end
@@ -19,6 +24,8 @@ services:
       - backend
     networks:
       - app-network
+    logging:
+      driver: "json-file"
 
 networks:
   app-network:
