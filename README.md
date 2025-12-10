@@ -19,11 +19,32 @@ Sprint 0 Roles:
 ## Project History
 NutriLens came to be through the Agile Software Development & DevOps class for Fall 2025. Our team completed a project proposal to work on for the entire semester, the outcome of that being NutriLens. We were inspired by how complicated nutrition apps can be — endless numbers, confusing data, and cluttered interfaces that make eating healthy feel like work. We wanted to design something that felt different: a playful, intelligent companion that makes food tracking simple, educational, and even fun.
 
-## How to Run
-1. clone the git repo
-2. cd into the /front-end folder
-3. run the command `npm install` to install all the needed packages
-4. run the command `npm start` to start the local server
+# How to Run
+## **1. Clone the repository**
+
+```bash
+git clone https://github.com/agile-students-fall2025/4-final-random_unkinger.git
+cd 4-final-random_unkinger
+```
+
+## **2. cd into the /back-end folder, install, and run**
+
+```bash
+cd back-end
+npm install
+npm start
+```
+
+## **3. cd into the /front-end folder, install, and run**
+
+```bash
+cd ..
+cd front-end
+npm install
+npm start
+```
+
+
 
 ## How to Contribute
 We welcome contributions to NutriLens! Please read our [CONTRIBUTING.md](https://github.com/agile-students-fall2025/4-final-random_unkinger/blob/master/CONTRIBUTING.md) file for details on:
