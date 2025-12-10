@@ -9,6 +9,7 @@ const initialForm = {
   protein: "",
   fat: "",
   notes: "",
+  image: "",
 };
 
 const ManualMeal = () => {
@@ -70,6 +71,7 @@ const ManualMeal = () => {
               protein: mealToEdit.protein?.toString() || "",
               fat: mealToEdit.fat?.toString() || "",
               notes: mealToEdit.notes || "",
+              image: mealToEdit.image || "",
             });
             setEditingId(mealToEdit.id);
             setSearchParams({}); // clear query param
@@ -94,6 +96,7 @@ const ManualMeal = () => {
               protein: round(searchParams.get("protein")),
               fat: round(searchParams.get("fat")),
               notes: "",
+              image: "",
             });
             // clearing so refreshing doesnt re-trigger
             setSearchParams({});
@@ -127,6 +130,7 @@ const ManualMeal = () => {
         protein: form.protein ? Number(form.protein) : undefined,
         fat: form.fat ? Number(form.fat) : undefined,
         notes: form.notes.trim(),
+        image: form.image.trim(),
         source: "manual",
       };
 
@@ -225,6 +229,7 @@ const ManualMeal = () => {
       protein: meal.protein?.toString() || "",
       fat: meal.fat?.toString() || "",
       notes: meal.notes || "",
+      image: meal.image || "",
     });
     const el = document.querySelector("#manual-meal-form");
     if (el) {
@@ -451,6 +456,58 @@ const ManualMeal = () => {
                 onChange={handleChange}
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
               />
+            </div>
+
+            {/* image upload */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="image"
+                className="text-xs font-medium text-slate-700"
+              >
+                Image (optional)
+              </label>
+              <div className="flex items-center gap-3">
+                {form.image && (
+                  <div className="h-16 w-16 rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                    <img
+                      src={form.image}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+                <label className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer transition">
+                  <i className="ri-upload-2-line mr-1.5 text-emerald-600" />
+                  {form.image ? "Change image" : "Upload image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setForm((prev) => ({
+                            ...prev,
+                            image: reader.result,
+                          }));
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+                {form.image && (
+                  <button
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, image: "" }))}
+                    className="text-xs text-rose-600 hover:text-rose-700 font-medium"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Actions */}

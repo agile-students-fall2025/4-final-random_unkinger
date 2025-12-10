@@ -13,7 +13,9 @@ const Food = require("./models/Food");
 const authRoutes = require("./routes/auth");
 const jwtStrategy = require("./config/jwt-config");
 const app = express();
-app.use(express.json());
+// 10 mb limit for images increase if you are rich i am poor rn
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cors());
 passport.use(jwtStrategy);
 app.use(passport.initialize());
@@ -434,7 +436,12 @@ app.get("/api/barcode/:barcode", async (req, res) => {
         barcode: barcode,
         name: product.product_name || "Unknown",
         brand: product.brands || "Unknown",
-        imageUrl: product.image_url || null,
+        imageUrl:
+          product.image_front_url ||
+          product.image_url ||
+          product.image_front_small_url ||
+          product.image_front_thumb_url ||
+          null,
         calories: Math.round((nutri.energy_value || 0) / 4.184),
         protein: Math.round((nutri.proteins_100g || 0) * 10) / 10,
         carbs: Math.round((nutri.carbohydrates_100g || 0) * 10) / 10,

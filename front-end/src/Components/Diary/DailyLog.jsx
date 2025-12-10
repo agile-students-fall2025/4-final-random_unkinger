@@ -204,15 +204,18 @@ export default function DailyLog() {
                   {/* Image + info */}
                   <div className="flex gap-3">
                     <div className="flex-shrink-0">
-                      <div className="h-20 w-24 sm:h-24 sm:w-28 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100">
-                        <img
-                          src={
-                            meal.image ||
-                            "https://picsum.photos/id/63/400/300"
-                          }
-                          alt={meal.name}
-                          className="h-full w-full object-cover"
-                        />
+                      <div className="h-20 w-24 sm:h-24 sm:w-28 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 flex items-center justify-center">
+                        {meal.image ? (
+                          <img
+                            src={meal.image}
+                            alt={meal.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-[10px] text-slate-400 font-medium text-center px-1">
+                            No Image
+                          </span>
+                        )}
                       </div>
                     </div>
 
