@@ -54,7 +54,16 @@ We welcome contributions to NutriLens! Please read our [CONTRIBUTING.md](https:/
 - How to submit changes and create pull requests
 
 ## Building and Testing
-*To be updated once the project reaches this stage*
+NutriLens includes a full automated test suite for the back-end using **Mocha**, **Chai**, **Supertest**, and **c8** for coverage.  
+All tests are located inside the `back-end/test/` directory.
+
+## Instructions:
+```bash
+cd back-end
+npm install
+npm start
+npm test
+```
 
 ## Project Links
 [Product Backlog & Sprint Task Board](https://github.com/orgs/agile-students-fall2025/projects/53)
