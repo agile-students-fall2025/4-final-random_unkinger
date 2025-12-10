@@ -461,10 +461,38 @@ app.get("/api/barcode/:barcode", async (req, res) => {
     if (response.data.status === 1) {
       const product = response.data.product;
 
+      // Try multiple name fields, prioritizing more specific ones
+      // and filtering out generic names like "Extract from image"
+      const genericNames = ["extract from image", "unknown", ""];
+      
+      // Check all possible name fields in order of preference
+      const nameCandidates = [
+        product.product_name_en,
+        product.product_name_fr,
+        product.product_name,
+        product.abbreviated_product_name,
+        product.generic_name,
+      ].filter(name => name && typeof name === 'string' && name.trim() !== '');
+
+      // Find the first non-generic name, or use the first available name
+      let productName = "Unknown";
+      for (const candidate of nameCandidates) {
+        const normalized = candidate.toLowerCase().trim();
+        if (!genericNames.includes(normalized)) {
+          productName = candidate;
+          break;
+        }
+      }
+      
+      // If all names were generic, use the first available one
+      if (productName === "Unknown" && nameCandidates.length > 0) {
+        productName = nameCandidates[0];
+      }
+
       const nutri = product.nutriments || {};
       const nutriData = {
         barcode: barcode,
-        name: product.product_name || "Unknown",
+        name: productName,
         brand: product.brands || "Unknown",
         imageUrl:
           product.image_front_url ||
@@ -710,6 +738,70 @@ app.get("/api/foods/search", async (req, res) => {
   } catch (err) {
     console.error("Error searching foods:", err);
     res.status(500).json({ error: "Search failed" });
+  }
+});
+
+app.get("/api/macros/summary", async (req, res) => {
+  try {
+    const { date } = req.query;
+
+    let query = {};
+
+    if (date) {
+      const targetDate = new Date(date + "T00:00:00");
+      const nextDay = new Date(targetDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      query.loggedAt = {
+        $gte: targetDate,
+        $lt: nextDay,
+      };
+    }
+
+    const meals = await Meal.find(query).lean();
+
+    if (meals.length === 0) {
+      return res.json({
+        message: "No meals available for this date.",
+        mostProtein: { name: "", value: 0 },
+        mostCarbs: { name: "", value: 0 },
+        mostFat: { name: "", value: 0 },
+      });
+    }
+
+    let mostProtein = meals[0];
+    let mostCarbs = meals[0];
+    let mostFat = meals[0];
+
+    for (const meal of meals) {
+      if (meal.protein > mostProtein.protein) {
+        mostProtein = meal;
+      }
+      if (meal.carbs > mostCarbs.carbs) {
+        mostCarbs = meal;
+      }
+      if (meal.fat > mostFat.fat) {
+        mostFat = meal;
+      }
+    }
+
+    res.json({
+      mostProtein: {
+        name: mostProtein.name,
+        value: mostProtein.protein,
+      },
+      mostCarbs: {
+        name: mostCarbs.name,
+        value: mostCarbs.carbs,
+      },
+      mostFat: {
+        name: mostFat.name,
+        value: mostFat.fat,
+      },
+    });
+  } catch (err) {
+    console.error("Error getting macro summary:", err);
+    res.status(500).json({ error: "Failed to get macro summary" });
   }
 });
 
