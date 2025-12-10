@@ -14,7 +14,7 @@ const initialForm = {
 const ManualMeal = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5050";
+  const API_BASE = process.env.REACT_APP_API_URL || "";
 
   const [form, setForm] = useState(initialForm);
   const [entries, setEntries] = useState([]);

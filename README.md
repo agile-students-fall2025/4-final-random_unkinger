@@ -24,6 +24,18 @@ Sprint 0 Roles:
 ## Project History
 NutriLens came to be through the Agile Software Development & DevOps class for Fall 2025. Our team completed a project proposal to work on for the entire semester, the outcome of that being NutriLens. We were inspired by how complicated nutrition apps can be — endless numbers, confusing data, and cluttered interfaces that make eating healthy feel like work. We wanted to design something that felt different: a playful, intelligent companion that makes food tracking simple, educational, and even fun.
 
+## Setup
+
+Before running, create `.env` files for the `front-end` and `back-end` by copying the `.env.example` files.
+
+- **Front-End (`.env.development`):**
+  - `REACT_APP_API_URL`: URL for the back-end API.
+
+- **Back-End (`.env`):**
+  - `MONGO_URI`: MongoDB connection string.
+  - `JWT_SECRET`: Secret for signing JSON Web Tokens.
+  - `PORT`: Port for the back-end server.
+
 ## How to Run with Docker Compose
 
 To run the application using Docker Compose, follow these steps:

@@ -4,6 +4,9 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --no-optional
 COPY . .
+# bootleg env now for will fix later
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
 RUN npm run build
 
 # production environment optimized
