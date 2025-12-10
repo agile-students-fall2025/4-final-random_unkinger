@@ -265,11 +265,7 @@ export default function DailyLog() {
                           type="button"
                           className="inline-flex items-center gap-1 rounded-xl border border-emerald-200 bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm hover:bg-emerald-50 transition"
                           onClick={() => {
-                            if (meal.source === "manual" || !meal.source) {
-                              navigate(`/manual-meal?edit=${meal.id}`);
-                            } else {
-                              navigate(`/editmeal/${meal.id}`);
-                            }
+                            navigate(`/manual-meal?edit=${meal.id}&returnTo=${date}`);
                           }}
                         >
                           <Pencil />
