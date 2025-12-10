@@ -500,7 +500,7 @@ app.get("/api/barcode/:barcode", async (req, res) => {
           product.image_front_small_url ||
           product.image_front_thumb_url ||
           null,
-        calories: Math.round((nutri.energy_value || 0) / 4.184),
+        calories: Math.round(nutri['energy-kcal_100g'] || (nutri.energy_value || 0) / 4.184),
         protein: Math.round((nutri.proteins_100g || 0) * 10) / 10,
         carbs: Math.round((nutri.carbohydrates_100g || 0) * 10) / 10,
         fat: Math.round((nutri.fat_100g || 0) * 10) / 10,

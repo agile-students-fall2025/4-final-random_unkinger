@@ -1,4 +1,4 @@
-name: CD deploy to digital ocean
+name: Deploy to prod
 on:
   push:
     branches:
