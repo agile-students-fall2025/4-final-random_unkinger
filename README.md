@@ -1,8 +1,10 @@
 [![Tests](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/ci.yml/badge.svg)](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/ci.yml/)
 [![Deployment](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/cd.yml/badge.svg)](https://github.com/agile-students-fall2025/4-final-random_unkinger/actions/workflows/cd.yml/)
 
+
 # NutriLens
 
+http://nutri.hossain.cc/
 
 ## Project Vision Statement
 To create an engaging, accessible, and intelligent healthy-eating app that helps users understand what they eat, build better habits, and track their food and activity in one place.
