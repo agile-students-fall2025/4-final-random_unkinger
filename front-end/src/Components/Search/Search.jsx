@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import NavBar from "../NavBar/NavBar";
 
 export default function Search() {
   const nav = useNavigate();
@@ -130,27 +131,32 @@ export default function Search() {
     tab === "recent" ? "Your recent searches" : "Search results";
 
   return (
-    <div className=" min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-emerald-50 via-white to-lime-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-      <main className="flex-1 w-full max-w-md mx-auto px-4 sm:px-6 pt-4 pb-10">
-        {/* Top bar */}
-        <div className="flex items-center gap-3 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 flex flex-col dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
+      {/* Header */}
+      <header className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
+        <div className="flex items-center justify-between">
           <button
-            type="button"
-            aria-label="Go back"
             onClick={() => nav(-1)}
             className="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-white/90 px-2.5 py-1.5 shadow-sm hover:bg-emerald-50 text-emerald-700 transition"
+            aria-label="Back"
+            type="button"
           >
             <i className="ri-arrow-left-line text-lg" />
           </button>
-          <div className="flex flex-col">
-            <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+          <div className="flex flex-col items-center">
+            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
               NutriLens
             </span>
-            <h1 className="text-sm font-semibold text-emerald-900">
+            <h1 className="mt-1 text-sm font-semibold text-emerald-900">
               Search Foods & Products
             </h1>
           </div>
+          <div className="w-9" />
         </div>
+      </header>
+
+      {/* Main content */}
+      <main className="flex-1 w-full max-w-md mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-4">
 
         {/* Main card */}
         <div className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 space-y-4">
@@ -253,6 +259,8 @@ export default function Search() {
           </div>
         </div>
       </main>
+
+      <NavBar />
     </div>
   );
 }

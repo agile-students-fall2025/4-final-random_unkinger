@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import NavBar from "../NavBar/NavBar";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
 
@@ -401,6 +402,8 @@ const EditMeal = () => {
           </section>
         )}
       </main>
+
+      <NavBar />
     </div>
   );
 };
