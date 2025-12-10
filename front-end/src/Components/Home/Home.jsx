@@ -129,7 +129,7 @@ export default function Home() {
             alt="NutriLens logo"
             className="h-8 w-8 rounded-xl object-contain"
           />
-          <span className="text-lg font-semibold tracking-tight text-emerald-900">
+          <span className="text-lg font-semibold tracking-tight text-emerald-900 dark:text-slate-100">
             NutriLens
           </span>
         </div>
