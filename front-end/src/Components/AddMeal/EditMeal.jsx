@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import NavBar from "../NavBar/NavBar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import NavBar from "../NavBar/NavBar";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
 
