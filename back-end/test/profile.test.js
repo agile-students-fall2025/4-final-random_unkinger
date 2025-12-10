@@ -4,12 +4,10 @@ const app = require("../server");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
-// Helper function to get a test token
 async function getTestToken() {
   const testEmail = `test-${Date.now()}@example.com`;
   const testPassword = "testpassword123";
-  
-  // Create test user
+
   const passwordHash = await bcrypt.hash(testPassword, 10);
   const user = new User({
     username: "testuser",
@@ -18,7 +16,6 @@ async function getTestToken() {
   });
   await user.save();
 
-  // Login to get token
   const loginRes = await request(app).post("/api/auth/login").send({
     email: testEmail,
     password: testPassword,
@@ -59,18 +56,18 @@ describe("Profile API", () => {
       .set("Authorization", `Bearer ${authToken}`)
       .send({ calorieGoal: -1 });
     expect(res.status).to.equal(400);
-    // Check if error is in details array (validation format)
+
     if (res.body.details) {
-      const calorieError = res.body.details.find((d) =>
-        d.msg && d.msg.toLowerCase().includes("calorie")
+      const calorieError = res.body.details.find(
+        (d) => d.msg && d.msg.toLowerCase().includes("calorie")
       );
       expect(calorieError).to.exist;
     } else if (res.body.errors) {
-      // Check errors array format (express-validator uses 'path' instead of 'param')
-      const calorieError = res.body.errors.find((e) =>
-        (e.msg && e.msg.toLowerCase().includes("calorie")) ||
-        (e.param && e.param.toLowerCase().includes("calorie")) ||
-        (e.path && e.path.toLowerCase().includes("calorie"))
+      const calorieError = res.body.errors.find(
+        (e) =>
+          (e.msg && e.msg.toLowerCase().includes("calorie")) ||
+          (e.param && e.param.toLowerCase().includes("calorie")) ||
+          (e.path && e.path.toLowerCase().includes("calorie"))
       );
       expect(calorieError).to.exist;
     } else {
