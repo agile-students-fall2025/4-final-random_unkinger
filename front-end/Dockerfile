@@ -1,12 +1,13 @@
-FROM node:18-alpine
+# build env
+FROM node:20-alpine as build
 WORKDIR /usr/src/app
 COPY package*.json ./
-
-# install app dependencies
 RUN npm install
-
-# copy app source
 COPY . .
+RUN npm run build
 
-EXPOSE 3000
-CMD ["npm", "start"]
+# production environment optimized
+FROM nginx:stable-alpine
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

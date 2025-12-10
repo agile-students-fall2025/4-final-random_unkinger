@@ -275,7 +275,7 @@ const LoginSignup = () => {
               </div>
 
               {/* Forgot password link (only in Login mode) */}
-              {action === "Login" && (
+              {/* {action === "Login" && (
                 <div className="mt-3 flex justify-end">
                   <button
                     type="button"
@@ -285,7 +285,7 @@ const LoginSignup = () => {
                     Forgot password? <span>Reset here</span>
                   </button>
                 </div>
-              )}
+              )} */}
 
               {/* Buttons */}
               <div className="mt-6 flex flex-col gap-3">
