@@ -2,7 +2,6 @@ name: run backend test cases
 
 on:
   push:
-  pull_request:
 
 jobs:
   test:
@@ -25,4 +24,6 @@ jobs:
       run: npm install
 
     - name: run tests with coverage
+      env:
+        JWT_SECRET: a-key-for-testing-lol
       run: npx c8 mocha "test/**/*.test.js" --exit
