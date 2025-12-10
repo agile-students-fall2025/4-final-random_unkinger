@@ -134,19 +134,19 @@ export default function Home() {
           </span>
         </div>
         <div className="hidden sm:flex flex-col items-end text-xs text-slate-500">
-          <span className="uppercase tracking-[0.16em] text-[11px]">
+          <span className="uppercase tracking-[0.16em] text-[11px] dark:text-white">
             Today
           </span>
-          <span className="font-medium text-slate-700">{formattedDate}</span>
+          <span className="font-medium text-slate-700 dark:text-slate-300">{formattedDate}</span>
         </div>
       </header>
 
       {/* Main content */}
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 pb-24 pt-4 space-y-5">
         {/* Small date label for mobile */}
-        <h2 className="sm:hidden text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+        <h2 className="sm:hidden text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 dark:text-white">
           Today,{" "}
-          <span className="normal-case font-normal tracking-normal">
+          <span className="normal-case font-normal tracking-normal dark:text-slate-300">
             {formattedDate}
           </span>
         </h2>

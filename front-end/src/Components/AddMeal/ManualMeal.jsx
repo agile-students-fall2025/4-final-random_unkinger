@@ -2,6 +2,56 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import NavBar from "../NavBar/NavBar";
 
+const getMealFormState = (meal) => {
+  let quantity = 1;
+  let unit = "gram";
+  let notes = meal.notes || "";
+
+  let baseCalories = meal.calories;
+  let baseCarbs = meal.carbs;
+  let baseProtein = meal.protein;
+  let baseFat = meal.fat;
+
+  if (notes.startsWith("Quantity: ")) {
+    const lines = notes.split('\n');
+    const quantityLine = lines[0];
+    const remainingNotes = lines.slice(1).join('\n');
+    
+    const quantityString = quantityLine.substring("Quantity: ".length);
+    const firstSpaceIndex = quantityString.indexOf(' ');
+
+    if (firstSpaceIndex !== -1) {
+      const qtyStr = quantityString.substring(0, firstSpaceIndex);
+      const savedQuantity = parseFloat(qtyStr);
+      
+      if (!isNaN(savedQuantity) && savedQuantity > 0) {
+        quantity = savedQuantity;
+        unit = quantityString.substring(firstSpaceIndex + 1);
+        notes = remainingNotes.trim();
+
+        // de calculate base macros
+        baseCalories = Math.round((meal.calories || 0) / savedQuantity);
+        baseCarbs = Math.round(((meal.carbs || 0) / savedQuantity) * 10) / 10;
+        baseProtein = Math.round(((meal.protein || 0) / savedQuantity) * 10) / 10;
+        baseFat = Math.round(((meal.fat || 0) / savedQuantity) * 10) / 10;
+      }
+    }
+  }
+
+  return {
+    name: meal.name || "",
+    calories: baseCalories?.toString() || "",
+    carbs: baseCarbs?.toString() || "",
+    protein: baseProtein?.toString() || "",
+    fat: baseFat?.toString() || "",
+    notes,
+    image: meal.image || "",
+    quantity: quantity.toString(),
+    unit,
+  };
+};
+
+
 const initialForm = {
   name: "",
   calories: "",
@@ -10,6 +60,8 @@ const initialForm = {
   fat: "",
   notes: "",
   image: "",
+  quantity: "1",
+  unit: "gram",
 };
 
 const ManualMeal = () => {
@@ -69,15 +121,7 @@ const ManualMeal = () => {
         if (editId) {
           const mealToEdit = meals.find((meal) => meal.id === editId);
           if (mealToEdit) {
-            setForm({
-              name: mealToEdit.name || "",
-              calories: mealToEdit.calories?.toString() || "",
-              carbs: mealToEdit.carbs?.toString() || "",
-              protein: mealToEdit.protein?.toString() || "",
-              fat: mealToEdit.fat?.toString() || "",
-              notes: mealToEdit.notes || "",
-              image: mealToEdit.image || "",
-            });
+            setForm(getMealFormState(mealToEdit));
             setEditingId(mealToEdit.id);
             // Clear query params but preserve returnTo in state
             const newParams = new URLSearchParams();
@@ -107,6 +151,8 @@ const ManualMeal = () => {
               fat: round(searchParams.get("fat")),
               notes: "",
               image: "",
+              quantity: "1",
+              unit: "serving",
             });
             // clearing so refreshing doesnt re-trigger
             setSearchParams({});
@@ -133,13 +179,32 @@ const ManualMeal = () => {
     setError(null);
 
     try {
+      const quantity = form.quantity ? Number(form.quantity) : 1;
+      const unit = form.unit.trim() || "serving";
+      const finalCalories = form.calories
+        ? Math.round(Number(form.calories) * quantity)
+        : undefined;
+      const finalCarbs = form.carbs
+        ? Math.round(Number(form.carbs) * quantity * 10) / 10
+        : undefined;
+      const finalProtein = form.protein
+        ? Math.round(Number(form.protein) * quantity * 10) / 10
+        : undefined;
+      const finalFat = form.fat
+        ? Math.round(Number(form.fat) * quantity * 10) / 10
+        : undefined;
+      const quantityNote = `Quantity: ${quantity} ${unit}`;
+      const finalNotes = form.notes.trim()
+        ? `${quantityNote}\n${form.notes.trim()}`
+        : quantityNote;
+
       const payload = {
         name: form.name.trim(),
-        calories: form.calories ? Number(form.calories) : undefined,
-        carbs: form.carbs ? Number(form.carbs) : undefined,
-        protein: form.protein ? Number(form.protein) : undefined,
-        fat: form.fat ? Number(form.fat) : undefined,
-        notes: form.notes.trim(),
+        calories: finalCalories,
+        carbs: finalCarbs,
+        protein: finalProtein,
+        fat: finalFat,
+        notes: finalNotes,
         image: form.image.trim(),
         source: "manual",
       };
@@ -239,15 +304,7 @@ const ManualMeal = () => {
 
   const startEditing = (meal) => {
     setEditingId(meal.id);
-    setForm({
-      name: meal.name || "",
-      calories: meal.calories?.toString() || "",
-      carbs: meal.carbs?.toString() || "",
-      protein: meal.protein?.toString() || "",
-      fat: meal.fat?.toString() || "",
-      notes: meal.notes || "",
-      image: meal.image || "",
-    });
+    setForm(getMealFormState(meal));
     const el = document.querySelector("#manual-meal-form");
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -381,6 +438,54 @@ const ManualMeal = () => {
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
               />
             </div>
+
+            {/* quantity */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="quantity"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Quantity
+                </label>
+                <input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="e.g. 1.5"
+                  value={form.quantity}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="unit"
+                  className="text-xs font-medium text-slate-700"
+                >
+                  Unit
+                </label>
+                <select
+                  id="unit"
+                  name="unit"
+                  value={form.unit}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                >
+                  <option value="gram">gram</option>
+                  <option value="oz">oz</option>
+                  <option value="lbs">lbs</option>
+                  <option value="amount">quantity</option>
+                </select>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-500 -mt-2">
+              Enter the nutrition values for a single serving, then set the
+              quantity.
+            </p>
 
             {/* Grid macros */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
