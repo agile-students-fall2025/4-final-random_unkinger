@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Quagga from "@ericblade/quagga2";
 import NavBar from "../NavBar/NavBar";
 
-const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
+const API = process.env.REACT_APP_API_URL || "";
 
 const ScanMeal = () => {
   const videoRef = useRef(null);

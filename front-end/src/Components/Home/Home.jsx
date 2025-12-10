@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../NavBar/NavBar";
 import GoalReminder from "./GoalReminder";
 
-const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
+const API = process.env.REACT_APP_API_URL || "";
 
 export default function Home() {
   const today = new Date();

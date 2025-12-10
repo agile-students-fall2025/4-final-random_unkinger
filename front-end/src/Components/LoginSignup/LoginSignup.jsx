@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 // You can remove this now if you're not using the old CSS anymore:
 // import "./LoginSignup.css";
 
-const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
+const API = process.env.REACT_APP_API_URL || "";
 
 const LoginSignup = () => {
   const [action, setAction] = useState("Login"); // "Login" or "Sign Up"

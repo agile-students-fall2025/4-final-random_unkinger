@@ -4,7 +4,7 @@ import NavBar from "../NavBar/NavBar";
 
 const Pencil = () => <span className="text-sm">✏️</span>;
 
-const API = process.env.REACT_APP_API_URL || "http://localhost:5050";
+const API = process.env.REACT_APP_API_URL || "";
 
 export default function DailyLog() {
   const { date } = useParams();
