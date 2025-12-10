@@ -23,6 +23,7 @@ const ManualMeal = () => {
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [returnTo, setReturnTo] = useState(null);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -60,6 +61,10 @@ const ManualMeal = () => {
 
         // handle ?edit=<id> from query string
         const editId = searchParams.get("edit");
+        const returnToDate = searchParams.get("returnTo");
+        if (returnToDate) {
+          setReturnTo(returnToDate);
+        }
         if (editId) {
           const mealToEdit = meals.find((meal) => meal.id === editId);
           if (mealToEdit) {
@@ -72,7 +77,12 @@ const ManualMeal = () => {
               notes: mealToEdit.notes || "",
             });
             setEditingId(mealToEdit.id);
-            setSearchParams({}); // clear query param
+            // Clear query params but preserve returnTo in state
+            const newParams = new URLSearchParams();
+            if (returnToDate) {
+              newParams.set("returnTo", returnToDate);
+            }
+            setSearchParams(newParams);
 
             setTimeout(() => {
               const el = document.querySelector("#manual-meal-form");
@@ -183,7 +193,14 @@ const ManualMeal = () => {
       });
 
       setForm(initialForm);
+      const wasEditing = !!editingId;
       setEditingId(null);
+      
+      // If we came from diary and were editing, navigate back to diary
+      if (wasEditing && returnTo) {
+        navigate(`/dailylog/${returnTo}`);
+        return;
+      }
     } catch (err) {
       console.error(err);
       setError(
@@ -293,7 +310,13 @@ const ManualMeal = () => {
       <header className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (returnTo) {
+                navigate(`/dailylog/${returnTo}`);
+              } else {
+                navigate(-1);
+              }
+            }}
             className="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-white/90 px-2.5 py-1.5 shadow-sm hover:bg-emerald-50 text-emerald-700 transition"
             aria-label="Back"
             type="button"
