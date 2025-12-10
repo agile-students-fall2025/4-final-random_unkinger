@@ -25,7 +25,7 @@ export default function Profile() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      console.warn("No token found, redirecting to login.");
+      console.warn("No token found - redirecting to login.");
       navigate("/");
       return;
     }
@@ -75,7 +75,7 @@ export default function Profile() {
           avatarUrl: data.avatarUrl ?? f.avatarUrl,
         }));
       } catch (err) {
-        console.error("Error: Failed to load profile:", err);
+        console.error("Failed to load profile:", err);
       }
     }
 
@@ -123,7 +123,7 @@ export default function Profile() {
   const onSave = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("You must be logged in to save your profile.");
+      alert("You must be logged in to save profile.");
       navigate("/");
       return;
     }
@@ -146,22 +146,34 @@ export default function Profile() {
           json.error ||
           (json.errors && json.errors[0]?.msg) ||
           "Unexpected error saving profile.";
-        alert("Failed to save profile: " + msg);
+        alert("Error: Failed to save profile: " + msg);
       } else {
         alert("Profile saved!");
       }
     } catch (err) {
       console.error("Error saving profile:", err);
-      alert("Unexpected error saving profile.");
+      alert("Error: Unexpected error saving profile.");
     }
   };
 
   return (
-    <div className=" min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-emerald-50 via-white to-lime-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
-      <header className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 bg-white/60 backdrop-blur-md">
+    <div
+      className="min-h-screen flex flex-col px-4 
+      bg-gradient-to-br from-emerald-50
+     via-white to-lime-50 dark:bg-gray-900 
+     dark:from-gray-900 dark:via-gray-900 
+     dark:to-gray-950"
+    >
+      <header
+        className="px-4 sm:px-6 pt-4 pb-3 border-b border-emerald-100/70 
+      bg-white/60 backdrop-blur-md"
+      >
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
+            <span
+              className="text-[11px] font-medium uppercase tracking-[0.2em] 
+            text-slate-500"
+            >
               Profile
             </span>
             <h1 className="text-sm font-semibold text-emerald-900 mt-1">
@@ -171,7 +183,9 @@ export default function Profile() {
           <button
             type="button"
             onClick={onLogout}
-            className="inline-flex items-center justify-center rounded-full border border-red-100 bg-white/90 px-3 py-1.5 text-[11px] font-medium text-red-500 shadow-sm hover:bg-red-50 hover:border-red-200 transition"
+            className="inline-flex items-center justify-center rounded-full border 
+            border-red-100 bg-white/90 px-3 py-1.5 text-[11px] font-medium text-red-500 
+            shadow-sm hover:bg-red-50 hover:border-red-200 transition"
           >
             Logout
           </button>
@@ -179,11 +193,18 @@ export default function Profile() {
       </header>
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-4 pb-24 space-y-5">
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+        <section
+          className="bg-white/80 backdrop-blur-md border border-emerald-100 
+        rounded-3xl shadow-sm p-4 sm:p-5 flex flex-col 
+        sm:flex-row sm:items-center gap-4"
+        >
           <div className="flex items-center gap-4">
             <div className="relative">
               {form.avatarUrl ? (
-                <div className="h-20 w-20 rounded-full overflow-hidden border-2 border-emerald-100 shadow-sm bg-slate-100">
+                <div
+                  className="h-20 w-20 rounded-full overflow-hidden border-2 
+                border-emerald-100 shadow-sm bg-slate-100"
+                >
                   <img
                     src={form.avatarUrl}
                     alt="avatar"
@@ -191,7 +212,11 @@ export default function Profile() {
                   />
                 </div>
               ) : (
-                <div className="h-20 w-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-[11px] text-emerald-900 text-center">
+                <div
+                  className="h-20 w-20 rounded-full bg-emerald-50 border-2 
+                border-emerald-100 flex items-center justify-center text-[11px] 
+                text-emerald-900 text-center"
+                >
                   Profile
                   <br />
                   Picture
@@ -208,7 +233,11 @@ export default function Profile() {
               {bmi && (
                 <p className="mt-2 text-xs text-emerald-700 font-medium">
                   BMI:{" "}
-                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] border border-emerald-100">
+                  <span
+                    className="inline-flex items-center rounded-full
+                     bg-emerald-50 
+                  px-2 py-0.5 text-[11px] border border-emerald-100"
+                  >
                     {bmi}
                   </span>
                 </p>
@@ -217,7 +246,12 @@ export default function Profile() {
           </div>
 
           <div className="sm:ml-auto">
-            <label className="inline-flex items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm hover:bg-emerald-100 cursor-pointer transition">
+            <label
+              className="inline-flex items-center justify-center rounded-xl
+             border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px]
+              font-medium
+              text-emerald-800 shadow-sm hover:bg-emerald-100 cursor-pointer transition"
+            >
               <span>Change photo</span>
               <input
                 type="file"
@@ -229,7 +263,10 @@ export default function Profile() {
           </div>
         </section>
 
-        <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
+        <section
+          className="bg-white/80 backdrop-blur-md border border-emerald-100
+         rounded-3xl shadow-sm p-4 sm:p-5"
+        >
           <h2 className="text-sm font-semibold text-emerald-900 mb-3">
             Personal details
           </h2>
@@ -237,21 +274,30 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">Name</label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
+              <div
+                className="flex items-center rounded-xl border border-slate-200 
+              bg-slate-50 px-3 py-2 focus-within:border-emerald-400 
+              focus-within:bg-white 
+              focus-within:ring-1 focus-within:ring-emerald-200 transition"
+              >
                 <input
                   name="name"
                   type="text"
                   placeholder="Your name"
                   value={form.name}
                   onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="w-full bg-transparent text-sm text-slate-900 
+                  placeholder:text-slate-400 outline-none"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">BMI</label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <div
+                className="flex items-center rounded-xl border border-slate-200 
+              bg-slate-50 px-3 py-2"
+              >
                 <input
                   type="text"
                   value={bmi}
@@ -265,7 +311,12 @@ export default function Profile() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-600">Age</label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
+              <div
+                className="flex items-center rounded-xl border border-slate-200 
+              bg-slate-50 px-3 py-2 focus-within:border-emerald-400 
+              focus-within:bg-white
+               focus-within:ring-1 focus-within:ring-emerald-200 transition"
+              >
                 <input
                   name="age"
                   type="number"
@@ -273,7 +324,8 @@ export default function Profile() {
                   placeholder="Years"
                   value={form.age}
                   onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="w-full bg-transparent text-sm text-slate-900 
+                  placeholder:text-slate-400 outline-none"
                 />
               </div>
             </div>
@@ -283,7 +335,12 @@ export default function Profile() {
                 Height
               </label>
 
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
+              <div
+                className="flex items-center rounded-xl border border-slate-200
+               bg-slate-50 px-3 py-2 focus-within:border-emerald-400
+                focus-within:bg-white 
+               focus-within:ring-1 focus-within:ring-emerald-200 transition"
+              >
                 <input
                   name="heightCm"
                   type="number"
@@ -291,7 +348,8 @@ export default function Profile() {
                   placeholder="cm"
                   value={form.heightCm}
                   onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="w-full bg-transparent text-sm text-slate-900 
+                  placeholder:text-slate-400 outline-none"
                 />
               </div>
             </div>
@@ -301,7 +359,12 @@ export default function Profile() {
                 Weight
               </label>
 
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
+              <div
+                className="flex items-center rounded-xl border border-slate-200
+               bg-slate-50 px-3 py-2 focus-within:border-emerald-400 
+               focus-within:bg-white
+                focus-within:ring-1 focus-within:ring-emerald-200 transition"
+              >
                 <input
                   name="weightKg"
                   type="number"
@@ -309,7 +372,8 @@ export default function Profile() {
                   placeholder="kg"
                   value={form.weightKg}
                   onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="w-full bg-transparent text-sm text-slate-900 
+                  placeholder:text-slate-400 outline-none"
                 />
               </div>
             </div>
@@ -319,7 +383,12 @@ export default function Profile() {
                 Activity level
               </label>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
+              <div
+                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 
+              focus-within:border-emerald-400 focus-within:bg-white
+               focus-within:ring-1 
+              focus-within:ring-emerald-200 transition"
+              >
                 <select
                   name="activity"
                   value={form.activity}
@@ -341,7 +410,12 @@ export default function Profile() {
                 Calorie goal
               </label>
 
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
+              <div
+                className="flex items-center rounded-xl border border-slate-200 
+              bg-slate-50 px-3 py-2 focus-within:border-emerald-400 
+              focus-within:bg-white
+               focus-within:ring-1 focus-within:ring-emerald-200 transition"
+              >
                 <input
                   name="calorieGoal"
                   type="number"
@@ -349,7 +423,8 @@ export default function Profile() {
                   placeholder="kcal/day"
                   value={form.calorieGoal}
                   onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="w-full bg-transparent text-sm text-slate-900 
+                  placeholder:text-slate-400 outline-none"
                 />
               </div>
             </div>
@@ -358,7 +433,12 @@ export default function Profile() {
               <label className="text-xs font-medium text-slate-600">
                 Protein goal
               </label>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-emerald-400 focus-within:bg-white focus-within:ring-1 focus-within:ring-emerald-200 transition">
+              <div
+                className="flex items-center rounded-xl border border-slate-200 
+              bg-slate-50 px-3 py-2 focus-within:border-emerald-400 
+              focus-within:bg-white
+               focus-within:ring-1 focus-within:ring-emerald-200 transition"
+              >
                 <input
                   name="proteinGoal"
                   type="number"
@@ -366,7 +446,8 @@ export default function Profile() {
                   placeholder="g/day"
                   value={form.proteinGoal}
                   onChange={handle}
-                  className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="w-full bg-transparent text-sm text-slate-900 
+                  placeholder:text-slate-400 outline-none"
                 />
               </div>
             </div>
@@ -376,7 +457,12 @@ export default function Profile() {
             <button
               type="button"
               onClick={onSave}
-              className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition"
+              className="inline-flex items-center justify-center rounded-xl
+               bg-emerald-500 px-4 py-2.5 text-sm font-medium 
+               text-white shadow-sm
+                hover:bg-emerald-600 focus-visible:outline-none 
+                focus-visible:ring-2 
+                focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition"
             >
               Save profile
             </button>
