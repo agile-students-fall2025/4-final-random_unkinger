@@ -4,12 +4,10 @@ const app = require("../server");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
-// Helper function to get a test token
 async function getTestToken() {
   const testEmail = `test-${Date.now()}@example.com`;
   const testPassword = "testpassword123";
-  
-  // Create test user
+
   const passwordHash = await bcrypt.hash(testPassword, 10);
   const user = new User({
     username: "testuser",
@@ -18,7 +16,6 @@ async function getTestToken() {
   });
   await user.save();
 
-  // Login to get token
   const loginRes = await request(app).post("/api/auth/login").send({
     email: testEmail,
     password: testPassword,
@@ -96,8 +93,8 @@ describe("Manual Meals API", () => {
     expect(res.status).to.equal(400);
     expect(res.body.error).to.equal("Validation failed");
     expect(res.body.details).to.be.an("array");
-    const caloriesError = res.body.details.find((d) =>
-      d.msg && d.msg.toLowerCase().includes("calories")
+    const caloriesError = res.body.details.find(
+      (d) => d.msg && d.msg.toLowerCase().includes("calories")
     );
     expect(caloriesError).to.exist;
   });
@@ -134,7 +131,7 @@ describe("Manual Meals API", () => {
   });
 
   it("PUT /api/meals/:id returns 404 for missing meal", async () => {
-    const fakeId = "507f1f77bcf86cd799439011"; // Valid ObjectId format
+    const fakeId = "507f1f77bcf86cd799439011";
     const res = await request(app)
       .put(`/api/meals/${fakeId}`)
       .set("Authorization", `Bearer ${authToken}`)
@@ -173,7 +170,7 @@ describe("Manual Meals API", () => {
   });
 
   it("DELETE /api/meals/:id returns 404 for missing meal", async () => {
-    const fakeId = "507f1f77bcf86cd799439011"; // Valid ObjectId format
+    const fakeId = "507f1f77bcf86cd799439011";
     const res = await request(app)
       .delete(`/api/meals/${fakeId}`)
       .set("Authorization", `Bearer ${authToken}`);
