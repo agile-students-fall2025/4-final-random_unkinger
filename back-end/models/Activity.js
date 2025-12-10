@@ -24,12 +24,16 @@ const activitySchema = new mongoose.Schema(
       maxlength: 1000,
       default: "",
     },
-    date: {
+    loggedAt: {
       type: Date,
       default: Date.now,
-    },
+      required: true,
+      index: true,
+    },    
   },
   { timestamps: true }
 );
+
+activitySchema.index({ userId: 1, loggedAt: -1 });
 
 module.exports = mongoose.model("Activity", activitySchema);

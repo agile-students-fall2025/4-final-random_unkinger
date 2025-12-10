@@ -10,6 +10,7 @@ export default function DailyLog() {
   const { date } = useParams();
   const navigate = useNavigate();
   const [meals, setMeals] = useState([]);
+  const [activities, setActivities] = useState([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,17 +23,32 @@ export default function DailyLog() {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    fetch(`${API}/api/meals?date=${date}`, { headers })
-      .then((res) => res.json())
-      .then((data) => {
-        setMeals(data.meals || []);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch meals and activities for this date in parallel // NEW
+        const [mealsRes, activitiesRes] = await Promise.all([
+          fetch(`${API}/api/meals?date=${date}`, { headers }),
+          fetch(`${API}/api/activities?date=${date}`, { headers }),
+        ]);
+
+        const mealsJson = await mealsRes.json().catch(() => ({}));
+        const activitiesJson = await activitiesRes.json().catch(() => []);
+
+        setMeals(mealsJson.meals || []);
+        setActivities(Array.isArray(activitiesJson) ? activitiesJson : []);
+
+      } catch (err) {
+        console.error("Error fetching daily data:", err);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching meals:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, [date]);
+
 
   // Calculate totals from meals
   const totals = useMemo(() => {
@@ -204,15 +220,18 @@ export default function DailyLog() {
                   {/* Image + info */}
                   <div className="flex gap-3">
                     <div className="flex-shrink-0">
-                      <div className="h-20 w-24 sm:h-24 sm:w-28 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100">
-                        <img
-                          src={
-                            meal.image ||
-                            "https://picsum.photos/id/63/400/300"
-                          }
-                          alt={meal.name}
-                          className="h-full w-full object-cover"
-                        />
+                      <div className="h-20 w-24 sm:h-24 sm:w-28 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 flex items-center justify-center">
+                        {meal.image ? (
+                          <img
+                            src={meal.image}
+                            alt={meal.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-[10px] text-slate-400 font-medium text-center px-1">
+                            No Image
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -257,6 +276,90 @@ export default function DailyLog() {
                         </button>
                       </div>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+        {/* Activities list card */}
+                <section className="bg-white/80 backdrop-blur-md border border-emerald-100 rounded-3xl shadow-sm p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <i
+                className="ri-run-line text-lg text-emerald-500"
+                aria-hidden="true"
+              />
+              <h2 className="text-sm font-semibold text-emerald-900">
+                Logged activities
+              </h2>
+            </div>
+            <span className="text-[11px] text-slate-500">
+              {activities.length} {activities.length === 1 ? "entry" : "entries"}
+            </span>
+          </div>
+
+          {activities.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-emerald-100 bg-emerald-50/60 px-3 py-4 text-center">
+              <p className="text-xs text-slate-600">
+                No activities logged for this day yet.
+              </p>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Use the Activity Tracking page to log movement for this day.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activities.map((activity) => (
+                <div
+                  key={activity.id || activity._id}
+                  className="rounded-2xl border border-emerald-50 bg-emerald-50/50 p-3 flex flex-col gap-1.5"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/90 border border-emerald-100 text-[11px] font-medium text-emerald-700">
+                        🏃
+                      </span>
+                      <p className="text-sm font-semibold text-emerald-900">
+                        {activity.name}
+                      </p>
+                    </div>
+                    <span className="text-[11px] text-slate-500 inline-flex items-center gap-1">
+                      <i className="ri-time-line text-[13px]" />
+                      {(activity.timeMinutes ?? activity.time ?? 0)} min
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-600 mt-1">
+                    {activity.notes && (
+                      <span className="inline-flex items-center gap-1">
+                        <i className="ri-edit-box-line text-[13px]" />
+                        {activity.notes}
+                      </span>
+                    )}
+
+                    {(activity.loggedAt || activity.createdAt) && (
+                      <span className="inline-flex items-center gap-1">
+                        <i className="ri-calendar-line text-[13px]" />
+                        {new Date(
+                          activity.loggedAt || activity.createdAt
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end mt-2">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-xl border border-emerald-200 bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-emerald-800 shadow-sm hover:bg-emerald-50 transition"
+                      onClick={() => navigate("/tracking")} // or "/activity-tracking", whatever your route is
+                    >
+                      <Pencil />
+                      Edit
+                    </button>
                   </div>
                 </div>
               ))}

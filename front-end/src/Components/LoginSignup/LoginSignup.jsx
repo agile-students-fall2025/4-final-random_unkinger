@@ -118,22 +118,22 @@ const LoginSignup = () => {
             .
           </h1>
 
-          <p className="text-slate-600 text-base leading-relaxed max-w-md">
+          <p className="text-slate-600 dark:text-slate-100 text-base leading-relaxed max-w-md">
             Log your meals, notice your patterns, and build a healthier routine—
             without obsessing over numbers. NutriLens keeps things clear, calm,
             and easy.
           </p>
 
-          <ul className="space-y-2 text-sm text-slate-700">
+          <ul className="space-y-2 text-sm text-slate-700 dark:text-slate-100">
             <li className="flex items-center gap-2">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Track meals and mood in one place
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-2 dark:text-slate-100">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
               See gentle trends instead of harsh metrics
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-2 dark:text-slate-100">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Designed to feel light, not clinical
             </li>
