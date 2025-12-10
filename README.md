@@ -66,6 +66,12 @@ To run the application using Docker Compose, follow these steps:
     npm install
     npm start
     ```
+4. **Run backend tests with coverage check**
+    ```bash
+    cd back-end
+    npm install
+    npx c8 mocha "test/**/*.test.js" --exit
+    ```
 
 ## How to Contribute
 We welcome contributions to NutriLens! Please read our [CONTRIBUTING.md](https://github.com/agile-students-fall2025/4-final-random_unkinger/blob/master/CONTRIBUTING.md) file for details on:
