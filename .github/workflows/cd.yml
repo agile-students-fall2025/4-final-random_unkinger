@@ -26,6 +26,7 @@ jobs:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+          command_timeout: 30m
           script: |
             cd /var/www/nutri
             echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
