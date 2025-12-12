@@ -26,12 +26,10 @@ NutriLens came to be through the Agile Software Development & DevOps class for F
 
 ## Setup
 
-Before running, create `.env` files for the `front-end` and `back-end` by copying the `.env.example` files.
+Before running, create a single `.env` file in the root directory.
 
-- **Front-End (`.env.development`):**
+- **Root (`.env`):**
   - `REACT_APP_API_URL`: URL for the back-end API.
-
-- **Back-End (`.env`):**
   - `MONGO_URI`: MongoDB connection string.
   - `JWT_SECRET`: Secret for signing JSON Web Tokens.
   - `PORT`: Port for the back-end server.
@@ -57,7 +55,14 @@ To run the application using Docker Compose, follow these steps:
     docker-compose down
     ```
 
-## How to Run manually 
+## How to Contribute
+We welcome contributions to NutriLens! Please read our [CONTRIBUTING.md](https://github.com/agile-students-fall2025/4-final-random_unkinger/blob/master/CONTRIBUTING.md) file for details on:
+- Our Code of Conduct and Team Norms
+- The Development Workflow and Git Practices
+- How to set up your local development environment
+- How to submit changes and create pull requests
+
+## Building and Testing
 
 1.  **Clone the repository:**
     ```bash
@@ -85,15 +90,6 @@ To run the application using Docker Compose, follow these steps:
     npx c8 mocha "test/**/*.test.js" --exit
     ```
 
-## How to Contribute
-We welcome contributions to NutriLens! Please read our [CONTRIBUTING.md](https://github.com/agile-students-fall2025/4-final-random_unkinger/blob/master/CONTRIBUTING.md) file for details on:
-- Our Code of Conduct and Team Norms
-- The Development Workflow and Git Practices
-- How to set up your local development environment
-- How to submit changes and create pull requests
-
-## Building and Testing
-*To be updated once the project reaches this stage*
 
 ## Project Links
 [Product Backlog & Sprint Task Board](https://github.com/orgs/agile-students-fall2025/projects/53)

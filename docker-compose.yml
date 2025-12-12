@@ -4,6 +4,8 @@ services:
     ports:
       - "5050:5050"
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
       - MONGO_URI=${MONGO_URI}
       - JWT_SECRET=${JWT_SECRET}
