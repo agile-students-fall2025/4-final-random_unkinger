@@ -402,7 +402,7 @@ const EditMeal = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => navigate("/manual-meal")}
+                      onClick={() => navigate("/manual-meal", { state: { from: "/edit-meal" } })}
                       className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition"
                     >
                       Add manually

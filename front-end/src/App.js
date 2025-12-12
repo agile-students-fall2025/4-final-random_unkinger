@@ -10,6 +10,7 @@ import ActivityTracking from "./Components/ActivityTracking/ActivityTracking";
 import EditMeal from "./Components/AddMeal/EditMeal";
 import Search from "./Components/Search/Search";
 import ThemeToggle from "./Components/ThemeToggle/ThemeToggle";
+import NavBar from "./Components/NavBar/NavBar";
 
 import Diary from "./Components/Diary/Diary";
 import DailyLog from "./Components/Diary/DailyLog";
@@ -58,6 +59,7 @@ function App() {
 
     <Router>
       <ThemeToggle isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <NavBar />
       <Routes>
         <Route path="/" element={<LoginSignup />} />
         <Route path="/home" element={<Home />} />

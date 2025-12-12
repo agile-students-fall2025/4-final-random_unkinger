@@ -120,7 +120,8 @@ export default function Search() {
       nav(
         `/manual-meal?name=${encodeURIComponent(item.description)}&calories=${
           item.calories
-        }&protein=${item.protein}&carbs=${item.carbs}&fat=${item.fat}`
+        }&protein=${item.protein}&carbs=${item.carbs}&fat=${item.fat}`,
+        { state: { from: "/search" } }
       );
     } else {
       alert(`Added: ${item}`);

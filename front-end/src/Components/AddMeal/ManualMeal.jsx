@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import NavBar from "../NavBar/NavBar";
-
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 const initialForm = {
   name: "",
   calories: "",
@@ -14,6 +12,7 @@ const initialForm = {
 
 const ManualMeal = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const API_BASE = process.env.REACT_APP_API_URL || "";
 
@@ -96,13 +95,6 @@ const ManualMeal = () => {
               image: mealToEdit.image || "",
             });
             setEditingId(mealToEdit.id);
-            // Clear query params but preserve returnTo in state
-            const newParams = new URLSearchParams();
-            if (returnToDate) {
-              newParams.set("returnTo", returnToDate);
-            }
-            setSearchParams(newParams);
-
             setTimeout(() => {
               const el = document.querySelector("#manual-meal-form");
               if (el) {
@@ -125,8 +117,6 @@ const ManualMeal = () => {
               notes: "",
               image: "",
             });
-            // clearing so refreshing doesnt re-trigger
-            setSearchParams({});
           }
         }
       } catch (err) {
@@ -216,6 +206,9 @@ const ManualMeal = () => {
       setForm(initialForm);
       const wasEditing = !!editingId;
       setEditingId(null);
+
+      // clear query after save
+      setSearchParams({}, { replace: true, state: location.state });
       
       // If we came from diary and were editing, navigate back to diary
       if (wasEditing && returnTo) {
@@ -336,7 +329,12 @@ const ManualMeal = () => {
               if (returnTo) {
                 navigate(`/dailylog/${returnTo}`);
               } else {
-                navigate(-1);
+                // bootleg nav for now
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate("/add-meal");
+                }
               }
             }}
             className="inline-flex items-center justify-center rounded-full border border-emerald-100 bg-white/90 px-2.5 py-1.5 shadow-sm hover:bg-emerald-50 text-emerald-700 transition"
@@ -691,8 +689,6 @@ const ManualMeal = () => {
           )
         )}
       </main>
-
-      <NavBar />
     </div>
   );
 };

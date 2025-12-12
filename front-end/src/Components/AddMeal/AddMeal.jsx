@@ -14,7 +14,7 @@ const AddMeal = () => {
   };
 
   const handleManualClick = () => {
-    navigate("/manual-meal");
+    navigate("/manual-meal", { state: { from: "/add-meal" } });
   };
 
   return (
