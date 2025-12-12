@@ -9,6 +9,7 @@ const initialForm = {
   protein: "",
   fat: "",
   notes: "",
+  image: "",
 };
 
 const ManualMeal = () => {
@@ -29,6 +30,17 @@ const ManualMeal = () => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     if (error) setError(null);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm((prev) => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   useEffect(() => {
@@ -81,6 +93,7 @@ const ManualMeal = () => {
               protein: mealToEdit.protein?.toString() || "",
               fat: mealToEdit.fat?.toString() || "",
               notes: mealToEdit.notes || "",
+              image: mealToEdit.image || "",
             });
             setEditingId(mealToEdit.id);
             // Clear query params but preserve returnTo in state
@@ -110,6 +123,7 @@ const ManualMeal = () => {
               protein: round(searchParams.get("protein")),
               fat: round(searchParams.get("fat")),
               notes: "",
+              image: "",
             });
             // clearing so refreshing doesnt re-trigger
             setSearchParams({});
@@ -143,6 +157,7 @@ const ManualMeal = () => {
         protein: form.protein ? Number(form.protein) : undefined,
         fat: form.fat ? Number(form.fat) : undefined,
         notes: form.notes.trim(),
+        image: form.image,
         source: "manual",
       };
 
@@ -248,6 +263,7 @@ const ManualMeal = () => {
       protein: meal.protein?.toString() || "",
       fat: meal.fat?.toString() || "",
       notes: meal.notes || "",
+      image: meal.image || "",
     });
     const el = document.querySelector("#manual-meal-form");
     if (el) {
@@ -480,6 +496,41 @@ const ManualMeal = () => {
                 onChange={handleChange}
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
               />
+            </div>
+
+            {/* Image Upload */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700">
+                Photo (optional)
+              </label>
+              <div className="flex items-center gap-3">
+                {form.image && (
+                  <div className="relative h-16 w-16 rounded-xl overflow-hidden border border-slate-200">
+                    <img
+                      src={form.image}
+                      alt="Meal preview"
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setForm((prev) => ({ ...prev, image: "" }))}
+                      className="absolute top-0.5 right-0.5 bg-black/50 text-white rounded-full p-0.5 hover:bg-black/70"
+                    >
+                      <i className="ri-close-line text-xs" />
+                    </button>
+                  </div>
+                )}
+                <label className="cursor-pointer inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+                  <i className="ri-camera-line text-slate-500" />
+                  {form.image ? "Change photo" : "Add photo"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </label>
+              </div>
             </div>
 
             {/* Actions */}
