@@ -4,6 +4,8 @@ import NavBar from "../NavBar/NavBar";
 
 const initialForm = {
   name: "",
+  quantity: "",
+  unit: "gram",
   calories: "",
   carbs: "",
   protein: "",
@@ -12,12 +14,35 @@ const initialForm = {
   image: "",
 };
 
+const getGrams = (qty, unit) => {
+  const q = Number(qty);
+  if (!q || isNaN(q)) return 0;
+  switch (unit) {
+    case "gram":
+      return q;
+    case "oz":
+      return q * 28.35;
+    case "lbs":
+      return q * 453.592;
+    case "amount":
+      return q * 100; // assuming 1 serving = 100g
+    default:
+      return q;
+  }
+};
+
 const ManualMeal = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const API_BASE = process.env.REACT_APP_API_URL || "";
 
   const [form, setForm] = useState(initialForm);
+  const [density, setDensity] = useState({
+    calories: 0,
+    carbs: 0,
+    protein: 0,
+    fat: 0,
+  });
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -28,7 +53,38 @@ const ManualMeal = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (["calories", "carbs", "protein", "fat"].includes(name)) {
+      setForm((prev) => {
+        const newForm = { ...prev, [name]: value };
+        const grams = getGrams(newForm.quantity, newForm.unit);
+        const effectiveGrams = grams > 0 ? grams : 100;
+        setDensity((prevD) => ({
+          ...prevD,
+          [name]: Number(value) / effectiveGrams,
+        }));
+        return newForm;
+      });
+    } else if (["quantity", "unit"].includes(name)) {
+      setForm((prev) => {
+        const newForm = { ...prev, [name]: value };
+        const grams = getGrams(newForm.quantity, newForm.unit);
+        if (grams > 0) {
+          newForm.calories = Math.round(density.calories * grams).toString();
+          newForm.carbs = (
+            Math.round(density.carbs * grams * 10) / 10
+          ).toString();
+          newForm.protein = (
+            Math.round(density.protein * grams * 10) / 10
+          ).toString();
+          newForm.fat = (Math.round(density.fat * grams * 10) / 10).toString();
+        }
+        return newForm;
+      });
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+
     if (error) setError(null);
   };
 
@@ -86,15 +142,43 @@ const ManualMeal = () => {
         if (editId) {
           const mealToEdit = meals.find((meal) => meal.id === editId);
           if (mealToEdit) {
+            let quantity = "";
+            let unit = "gram";
+            let notes = mealToEdit.notes || "";
+
+            if (notes.startsWith("Quantity: ")) {
+              const parts = notes.split("\n");
+              const qtyLine = parts[0];
+              const qtyParts = qtyLine.replace("Quantity: ", "").split(" ");
+              if (qtyParts.length >= 2) {
+                quantity = qtyParts[0];
+                unit = qtyParts[1];
+              }
+              // remove quantitu line from notes for the form
+              notes = parts.slice(1).join("\n");
+            }
+
             setForm({
               name: mealToEdit.name || "",
+              quantity,
+              unit,
               calories: mealToEdit.calories?.toString() || "",
               carbs: mealToEdit.carbs?.toString() || "",
               protein: mealToEdit.protein?.toString() || "",
               fat: mealToEdit.fat?.toString() || "",
-              notes: mealToEdit.notes || "",
+              notes,
               image: mealToEdit.image || "",
             });
+
+            const grams = getGrams(quantity, unit);
+            const effectiveGrams = grams > 0 ? grams : 100;
+            setDensity({
+              calories: (Number(mealToEdit.calories) || 0) / effectiveGrams,
+              carbs: (Number(mealToEdit.carbs) || 0) / effectiveGrams,
+              protein: (Number(mealToEdit.protein) || 0) / effectiveGrams,
+              fat: (Number(mealToEdit.fat) || 0) / effectiveGrams,
+            });
+
             setEditingId(mealToEdit.id);
             // Clear query params but preserve returnTo in state
             const newParams = new URLSearchParams();
@@ -116,15 +200,32 @@ const ManualMeal = () => {
           if (name) {
             const round = (val) =>
               val ? Math.round(Number(val)).toString() : "";
+            const cals = round(searchParams.get("calories"));
+            const carbs = round(searchParams.get("carbs"));
+            const protein = round(searchParams.get("protein"));
+            const fat = round(searchParams.get("fat"));
+
             setForm({
               name: name || "",
-              calories: round(searchParams.get("calories")),
-              carbs: round(searchParams.get("carbs")),
-              protein: round(searchParams.get("protein")),
-              fat: round(searchParams.get("fat")),
+              quantity: "",
+              unit: "gram",
+              calories: cals,
+              carbs: carbs,
+              protein: protein,
+              fat: fat,
               notes: "",
               image: "",
             });
+
+            // default 100g assumption
+            const effectiveGrams = 100;
+            setDensity({
+              calories: (Number(cals) || 0) / effectiveGrams,
+              carbs: (Number(carbs) || 0) / effectiveGrams,
+              protein: (Number(protein) || 0) / effectiveGrams,
+              fat: (Number(fat) || 0) / effectiveGrams,
+            });
+
             // clearing so refreshing doesnt re-trigger
             setSearchParams({});
           }
@@ -150,13 +251,18 @@ const ManualMeal = () => {
     setError(null);
 
     try {
+      let finalNotes = form.notes.trim();
+      if (form.quantity && form.unit) {
+        finalNotes = `Quantity: ${form.quantity} ${form.unit}\n${finalNotes}`;
+      }
+
       const payload = {
         name: form.name.trim(),
         calories: form.calories ? Number(form.calories) : undefined,
         carbs: form.carbs ? Number(form.carbs) : undefined,
         protein: form.protein ? Number(form.protein) : undefined,
         fat: form.fat ? Number(form.fat) : undefined,
-        notes: form.notes.trim(),
+        notes: finalNotes.trim(),
         image: form.image,
         source: "manual",
       };
@@ -256,15 +362,43 @@ const ManualMeal = () => {
 
   const startEditing = (meal) => {
     setEditingId(meal.id);
+    
+    let quantity = "";
+    let unit = "gram";
+    let notes = meal.notes || "";
+
+    if (notes.startsWith("Quantity: ")) {
+      const parts = notes.split("\n");
+      const qtyLine = parts[0];
+      const qtyParts = qtyLine.replace("Quantity: ", "").split(" ");
+      if (qtyParts.length >= 2) {
+        quantity = qtyParts[0];
+        unit = qtyParts[1];
+      }
+      notes = parts.slice(1).join("\n");
+    }
+
     setForm({
       name: meal.name || "",
+      quantity,
+      unit,
       calories: meal.calories?.toString() || "",
       carbs: meal.carbs?.toString() || "",
       protein: meal.protein?.toString() || "",
       fat: meal.fat?.toString() || "",
-      notes: meal.notes || "",
+      notes,
       image: meal.image || "",
     });
+
+    const grams = getGrams(quantity, unit);
+    const effectiveGrams = grams > 0 ? grams : 100;
+    setDensity({
+      calories: (Number(meal.calories) || 0) / effectiveGrams,
+      carbs: (Number(meal.carbs) || 0) / effectiveGrams,
+      protein: (Number(meal.protein) || 0) / effectiveGrams,
+      fat: (Number(meal.fat) || 0) / effectiveGrams,
+    });
+
     const el = document.querySelector("#manual-meal-form");
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -274,6 +408,7 @@ const ManualMeal = () => {
   const cancelEditing = () => {
     setEditingId(null);
     setForm(initialForm);
+    setDensity({ calories: 0, carbs: 0, protein: 0, fat: 0 });
   };
 
   const handleDelete = async (mealId) => {
@@ -397,6 +532,60 @@ const ManualMeal = () => {
                 required
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
               />
+            </div>
+
+            {/* uantity */}
+            <div className="pt-1 pb-2">
+              <div className="mb-3">
+                <h3 className="text-sm font-semibold text-emerald-900">
+                  Adjust quantity
+                </h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Set the amount you actually ate. Nutritional values will be
+                  calculated based on this quantity.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1 space-y-1.5">
+                  <label
+                    htmlFor="quantity"
+                    className="text-xs font-medium text-slate-700"
+                  >
+                    Quantity
+                  </label>
+                  <input
+                    id="quantity"
+                    name="quantity"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="e.g. 100"
+                    value={form.quantity}
+                    onChange={handleChange}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                  />
+                </div>
+                <div className="w-28 space-y-1.5">
+                  <label
+                    htmlFor="unit"
+                    className="text-xs font-medium text-slate-700"
+                  >
+                    Unit
+                  </label>
+                  <select
+                    id="unit"
+                    name="unit"
+                    value={form.unit}
+                    onChange={handleChange}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+                  >
+                    <option value="gram">gram</option>
+                    <option value="oz">oz</option>
+                    <option value="lbs">lbs</option>
+                    <option value="amount">quantity</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             {/* Grid macros */}
